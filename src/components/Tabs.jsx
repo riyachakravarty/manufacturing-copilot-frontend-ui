@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import ModeToggle from './ModeToggle';
+import React, { useState } from "react";
+import DataVisualizationAndEngineering from "./DataVisualizationAndEngineering";
+// import other components for future tabs as needed
 
 const Tabs = () => {
   const [activeTab, setActiveTab] = useState("dataViz");
@@ -7,55 +8,77 @@ const Tabs = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "dataViz":
-        return <div>Data visualization and engineering content goes here.</div>;
+        return <DataVisualizationAndEngineering />;
       case "eda":
-        return <div>Exploratory data analysis content goes here.</div>;
+        return <div>Exploratory Data Analysis content (coming soon)</div>;
       case "featureEng":
-        return <div>Feature engineering content goes here.</div>;
+        return <div>Feature Engineering content (coming soon)</div>;
       case "mlDev":
-        return <div>ML model development content goes here.</div>;
+        return <div>ML Model Development content (coming soon)</div>;
       default:
         return null;
     }
   };
 
   return (
-    <div className="tabs-container" style={{ padding: '1rem' }}>
-      {/* Mode Toggle */}
-      <div style={{ marginBottom: '1rem' }}>
-        <ModeToggle />
-      </div>
-
+    <div>
       {/* Tab Buttons */}
-      <div className="tab-buttons" style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: "1rem" }}>
         <button
           onClick={() => setActiveTab("dataViz")}
-          className={activeTab === "dataViz" ? "active" : ""}
+          style={{
+            marginRight: "8px",
+            padding: "6px 12px",
+            background: activeTab === "dataViz" ? "#007bff" : "#eee",
+            color: activeTab === "dataViz" ? "#fff" : "#000",
+            border: "none",
+            borderRadius: "4px",
+          }}
         >
-          Data visualization and engineering
+          Data Visualization & Engineering
         </button>
         <button
           onClick={() => setActiveTab("eda")}
-          className={activeTab === "eda" ? "active" : ""}
+          style={{
+            marginRight: "8px",
+            padding: "6px 12px",
+            background: activeTab === "eda" ? "#007bff" : "#eee",
+            color: activeTab === "eda" ? "#fff" : "#000",
+            border: "none",
+            borderRadius: "4px",
+          }}
         >
-          Exploratory data analysis
+          Exploratory Data Analysis
         </button>
         <button
           onClick={() => setActiveTab("featureEng")}
-          className={activeTab === "featureEng" ? "active" : ""}
+          style={{
+            marginRight: "8px",
+            padding: "6px 12px",
+            background: activeTab === "featureEng" ? "#007bff" : "#eee",
+            color: activeTab === "featureEng" ? "#fff" : "#000",
+            border: "none",
+            borderRadius: "4px",
+          }}
         >
-          Feature engineering
+          Feature Engineering
         </button>
         <button
           onClick={() => setActiveTab("mlDev")}
-          className={activeTab === "mlDev" ? "active" : ""}
+          style={{
+            padding: "6px 12px",
+            background: activeTab === "mlDev" ? "#007bff" : "#eee",
+            color: activeTab === "mlDev" ? "#fff" : "#000",
+            border: "none",
+            borderRadius: "4px",
+          }}
         >
-          ML model development
+          ML Model Development
         </button>
       </div>
 
       {/* Tab Content */}
-      <div className="tab-content">
+      <div>
         {renderTabContent()}
       </div>
     </div>
