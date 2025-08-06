@@ -1,19 +1,27 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+
+import { AppProvider } from "./context/AppContext"; // Global context for file, mode, etc.
+import theme from "./theme"; // Custom MUI theme with dark blue and green shades
+
 import HomePage from "./pages/HomePage";
-import MainAppPage from "./pages/MainAppPage";
-import { AppProvider } from "./context/AppContext";
+import MainPage from "./pages/MainPage";
 
 function App() {
   return (
-    <AppProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/main" element={<MainAppPage />} />
-        </Routes>
-      </Router>
-    </AppProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AppProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/main" element={<MainPage />} />
+          </Routes>
+        </Router>
+      </AppProvider>
+    </ThemeProvider>
   );
 }
 

@@ -1,88 +1,169 @@
-import React from 'react';
+// src/pages/HomePage.jsx
+
+import React, { useState } from 'react';
 import {
+  Box,
+  Button,
   Container,
   Typography,
-  Box,
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  FormControl,
-  InputLabel,
   MenuItem,
   Select,
-  Divider,
+  Card,
+  CardContent,
+  Grid,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
-const Home = ({ onFileUpload, onModeSelect }) => {
-  const [selectedMode, setSelectedMode] = React.useState('');
-  const fileInputRef = React.useRef();
+const HomePage = ({ setUploadedFile, setSelectedMode }) => {
+  const [file, setFile] = useState(null);
+  const [mode, setMode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [fileName, setFileName] = useState('');
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const navigate = useNavigate();
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) onFileUpload(file);
+    setFile(e.target.files[0]);
+    setFileName(e.target.files[0]?.name || '');
   };
 
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
+  const handleModeChange = (e) => {
+    setMode(e.target.value);
   };
 
-  const handleModeChange = (event) => {
-    setSelectedMode(event.target.value);
-    onModeSelect(event.target.value);
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('https://manufacturing-copilot-backend.onrender.com/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setUploadedFile(file);
+        setSelectedMode(mode);
+        setShowSnackbar(true);
+      } else {
+        alert('File upload failed');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartExploring = () => {
+    if (file && mode) {
+      navigate('/main');
+    } else {
+      alert('Please upload a file and select a mode first.');
+    }
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 6 }}>
-      <Typography variant="h4" align="center" gutterBottom>
-        Welcome to Manufacturing Co-Pilot
-      </Typography>
-      <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4 }}>
-        Start by uploading your data and selecting how you'd like to proceed.
-      </Typography>
-
-      {/* File Upload Section */}
-      <Card sx={{ mb: 4, p: 2 }}>
+    <Container maxWidth="md" sx={{ py: 5 }}>
+      <Card elevation={6}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Step 1: Upload CSV File
+          <Typography variant="h4" gutterBottom>
+            Welcome to the Manufacturing Co-Pilot
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<UploadFileIcon />}
-            onClick={handleUploadClick}
-            sx={{ mt: 2 }}
-          >
-            Choose File
-          </Button>
-          <input
-            type="file"
-            accept=".csv"
-            style={{ display: 'none' }}
-            ref={fileInputRef}
-            onChange={handleFileChange}
-          />
+          <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+            Upload your dataset and choose how you'd like to interact with the platform.
+          </Typography>
+
+          <Box sx={{ my: 3 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={8}>
+                <Button
+                  variant="outlined"
+                  component="label"
+                  startIcon={<UploadFileIcon />}
+                  fullWidth
+                >
+                  Select File
+                  <input type="file" hidden onChange={handleFileChange} />
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleUpload}
+                  disabled={!file || loading}
+                  startIcon={<UploadFileIcon />}
+                  fullWidth
+                >
+                  {loading ? <CircularProgress size={20} color="inherit" /> : 'Upload'}
+                </Button>
+              </Grid>
+
+              {fileName && (
+                <Grid item xs={12}>
+                  <Typography variant="body2" color="success.main">
+                    File "{fileName}" has been uploaded successfully.
+                  </Typography>
+                </Grid>
+              )}
+
+              <Grid item xs={12}>
+                <Typography variant="h6">Select Mode</Typography>
+                <Select
+                  fullWidth
+                  value={mode}
+                  onChange={handleModeChange}
+                  displayEmpty
+                  startAdornment={<SettingsSuggestIcon sx={{ mr: 1 }} />}
+                >
+                  <MenuItem value="" disabled>
+                    Choose mode
+                  </MenuItem>
+                  <MenuItem value="button">Click of a Button</MenuItem>
+                  <MenuItem value="genai">Gen-AI Led Prompt</MenuItem>
+                </Select>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  startIcon={<RocketLaunchIcon />}
+                  onClick={handleStartExploring}
+                  fullWidth
+                >
+                  Start Exploring
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
         </CardContent>
       </Card>
 
-      {/* Mode Selection Section */}
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Step 2: Select Interaction Mode
-          </Typography>
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>Select Mode</InputLabel>
-            <Select value={selectedMode} label="Select Mode" onChange={handleModeChange}>
-              <MenuItem value="click">Click of a Button</MenuItem>
-              <MenuItem value="genai">Gen-AI Led Prompt</MenuItem>
-            </Select>
-          </FormControl>
-        </CardContent>
-      </Card>
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setShowSnackbar(false)}
+      >
+        <Alert severity="success" onClose={() => setShowSnackbar(false)}>
+          File uploaded successfully!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
 
-export default Home;
+export default HomePage;
