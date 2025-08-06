@@ -1,34 +1,90 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import Tabs from "../components/Tabs";
-import { useAppContext } from "../context/AppContext";
+// src/pages/MainPage.jsx
 
-const MainAppPage = () => {
-  const navigate = useNavigate();
-  const { uploadedFileName, mode } = useAppContext();
+import React, { useContext } from 'react';
+import { AppContext } from '../context/AppContext';
+import { Box, Typography, Tabs, Tab, Card, CardContent, Chip } from '@mui/material';
+import { DataObject, Insights, Build, PrecisionManufacturing } from '@mui/icons-material';
 
-  const handleBack = () => {
-    navigate("/");
+const tabLabels = [
+  { label: "Data Visualization & Engineering", icon: <DataObject /> },
+  { label: "Exploratory Data Analysis", icon: <Insights /> },
+  { label: "Feature Engineering", icon: <Build /> },
+  { label: "ML Model Development", icon: <PrecisionManufacturing /> },
+];
+
+const MainPage = () => {
+  const { selectedFile, selectedMode } = useContext(AppContext);
+  const [currentTab, setCurrentTab] = React.useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setCurrentTab(newValue);
   };
 
   return (
-    <div className="min-h-screen bg-white px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Manufacturing Co-Pilot</h1>
-        <button
-          onClick={handleBack}
-          className="text-sm text-blue-600 border border-blue-600 px-4 py-1 rounded hover:bg-blue-50"
-        >
-          ⬅ Back
-        </button>
-      </div>
+    <Box sx={{ padding: 4 }}>
+      {/* Header */}
+      <Typography variant="h4" sx={{ mb: 2, color: 'primary.main' }}>
+        Welcome to Manufacturing Co-Pilot
+      </Typography>
 
-      {/* Optional: Show file name & mode */}
-      {/* <p className="text-gray-500 mb-4">File: {uploadedFileName} | Mode: {mode}</p> */}
+      {/* File + Mode */}
+      <Box sx={{ mb: 3 }}>
+        {selectedFile && (
+          <Chip
+            label={`📄 File: ${selectedFile.name}`}
+            color="success"
+            variant="outlined"
+            sx={{ mr: 2 }}
+          />
+        )}
+        {selectedMode && (
+          <Chip
+            label={`🧭 Mode: ${selectedMode}`}
+            color="info"
+            variant="outlined"
+          />
+        )}
+      </Box>
 
-      <Tabs />
-    </div>
+      {/* Tab Navigation */}
+      <Tabs
+        value={currentTab}
+        onChange={handleTabChange}
+        indicatorColor="secondary"
+        textColor="inherit"
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{ mb: 3 }}
+      >
+        {tabLabels.map((tab, index) => (
+          <Tab
+            key={index}
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {tab.icon}
+                <span>{tab.label}</span>
+              </Box>
+            }
+          />
+        ))}
+      </Tabs>
+
+      {/* Tab Content Area */}
+      <Card sx={{ borderRadius: 4, p: 3, boxShadow: 3 }}>
+        <CardContent>
+          <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+            {tabLabels[currentTab].label}
+          </Typography>
+          <Box mt={2}>
+            <Typography variant="body1">
+              {/* Placeholder content */}
+              This section will contain features for <strong>{tabLabels[currentTab].label}</strong>. You can implement graphs, inputs, model config options, etc., here.
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 
-export default MainAppPage;
+export default MainPage;
