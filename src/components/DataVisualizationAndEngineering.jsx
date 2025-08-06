@@ -1,9 +1,11 @@
 // src/components/DataVisualizationAndEngineering.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import Plot from "react-plotly.js";
+import { AppContext } from "../context/AppContext";
 
 const DataVisualizationAndEngineering = () => {
+  const { uploadedFile } = useContext(AppContext);
 
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -12,7 +14,6 @@ const DataVisualizationAndEngineering = () => {
   const [selectAllColumns, setSelectAllColumns] = useState(false);
   const [treatmentMethod, setTreatmentMethod] = useState("mean");
   const [plotData, setPlotData] = useState(null);
-  const [file, setFile] = useState(null);
   const [intervals, setIntervals] = useState([]);
   const [analysisType, setAnalysisType] = useState(null);
   const [outlierMethod, setOutlierMethod] = useState("zscore");
@@ -40,11 +41,13 @@ const DataVisualizationAndEngineering = () => {
   }, [selectAllColumns, columns]);
 
   const fetchColumns = async () => {
-    const formData = new FormData();
-    formData.append("file", file);
-    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/upload`, formData);
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/get_columns`);
-    setColumns(response.data.columns);
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/get_columns`);
+      setColumns(response.data.columns);
+    } catch (error) {
+      console.error("Error fetching columns:", error);
+      alert("Failed to fetch columns. Check backend logs.");
+    }
   };
 
   const fetchIntervals = async () => {
@@ -58,21 +61,15 @@ const DataVisualizationAndEngineering = () => {
   };
 
   const fetchValueIntervals = async () => {
-    if (!selectedMissingValueColumn || typeof selectedMissingValueColumn !== "string") {
+    if (!selectedMissingValueColumn) {
       alert("Please select a valid column.");
       return;
     }
 
-    console.log("Column param sent to backend:", selectedMissingValueColumn);
-
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/missing_value_intervals`,
-        {
-          params: {
-            column: selectedMissingValueColumn,
-          },
-        }
+        { params: { column: selectedMissingValueColumn } }
       );
       setValueIntervals(response.data.intervals || []);
     } catch (err) {
@@ -84,20 +81,20 @@ const DataVisualizationAndEngineering = () => {
   const handleDownload = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/download`, {
-        responseType: 'blob',
+        responseType: "blob",
       });
 
-      const blob = new Blob([response.data], { type: 'text/csv' });
+      const blob = new Blob([response.data], { type: "text/csv" });
       const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = downloadUrl;
-      link.setAttribute('download', 'treated_data.csv');
+      link.setAttribute("download", "treated_data.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error("Error downloading treated file:", error);
-      alert("No data available for download or an error occurred.");
+      console.error("Error downloading file:", error);
+      alert("No data available for download.");
     }
   };
 
@@ -126,49 +123,42 @@ const DataVisualizationAndEngineering = () => {
   };
 
   const applyTreatment = async () => {
-    try {
-      const payload = {
-        columns: selectedColumns,
-        intervals: selectedIntervals.map((i) => intervals[i]),
-        method: treatmentMethod,
-      };
-
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/apply_treatment`, payload);
-      alert('Treatment applied successfully!');
-    } catch (error) {
-      console.error('Error applying treatment:', error);
-      alert('Failed to apply treatment. Please check console for details.');
-    }
-  };
-
-
-  const applyValueTreatment = async () => {
     const payload = {
-      column: selectedMissingValueColumn,
-      intervals: selectedValueIntervals.map(idx => valueIntervals[idx]),
+      columns: selectedColumns,
+      intervals: selectedIntervals.map((i) => intervals[i]),
       method: treatmentMethod,
     };
-    console.log("Sending payload to backend:", payload); // ✅ Add this line
 
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/apply_missing_value_treatment`,
-        payload
-      );
-      alert(response.data.message);
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/apply_treatment`, payload);
+      alert("Treatment applied successfully!");
     } catch (error) {
-      console.error("Error applying treatment:", error); // Logs error details
+      console.error("Error applying treatment:", error);
       alert("Failed to apply treatment.");
     }
   };
 
+  const applyValueTreatment = async () => {
+    const payload = {
+      column: selectedMissingValueColumn,
+      intervals: selectedValueIntervals.map((idx) => valueIntervals[idx]),
+      method: treatmentMethod,
+    };
+
+    try {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/apply_missing_value_treatment`, payload);
+      alert("Missing value treatment applied.");
+    } catch (error) {
+      console.error("Error applying value treatment:", error);
+      alert("Failed to apply missing value treatment.");
+    }
+  };
 
   return (
     <div>
       <h1>Manufacturing Analytics Tool</h1>
 
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-      <button onClick={fetchColumns}>Upload</button>
+      <button onClick={fetchColumns}>Load Columns</button>
       <button onClick={handleDownload}>Download Treated Data</button>
 
       <div>
@@ -208,12 +198,10 @@ const DataVisualizationAndEngineering = () => {
         {analysisType && (
           <div>
             {analysisType === "outlier" && showOutlierOptions && (
-              <>
-                <select value={outlierMethod} onChange={(e) => setOutlierMethod(e.target.value)}>
-                  <option value="zscore">Z-Score</option>
-                  <option value="iqr">IQR</option>
-                </select>
-              </>
+              <select value={outlierMethod} onChange={(e) => setOutlierMethod(e.target.value)}>
+                <option value="zscore">Z-Score</option>
+                <option value="iqr">IQR</option>
+              </select>
             )}
             <button onClick={handleAnalysis}>Run {analysisType} analysis</button>
           </div>
