@@ -4,6 +4,7 @@ import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import { Box, Typography, Tabs, Tab, Card, CardContent, Chip } from '@mui/material';
 import { DataObject, Insights, Build, PrecisionManufacturing } from '@mui/icons-material';
+import DataVisualizationAndEngineering from '../components/DataVisualizationAndEngineering';
 
 const tabLabels = [
   { label: "Data Visualization & Engineering", icon: <DataObject /> },
@@ -18,6 +19,19 @@ const MainPage = () => {
 
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue);
+  };
+
+  const renderTabContent = () => {
+    switch (currentTab) {
+      case 0:
+        return <DataVisualizationAndEngineering />;
+      default:
+        return (
+          <Typography variant="body1">
+            This section will contain features for <strong>{tabLabels[currentTab].label}</strong>. You can implement graphs, inputs, model config options, etc., here.
+          </Typography>
+        );
+    }
   };
 
   return (
@@ -76,10 +90,7 @@ const MainPage = () => {
             {tabLabels[currentTab].label}
           </Typography>
           <Box mt={2}>
-            <Typography variant="body1">
-              {/* Placeholder content */}
-              This section will contain features for <strong>{tabLabels[currentTab].label}</strong>. You can implement graphs, inputs, model config options, etc., here.
-            </Typography>
+            {renderTabContent()}
           </Box>
         </CardContent>
       </Card>
