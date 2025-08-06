@@ -320,10 +320,4 @@ const DataVisualizationAndEngineering = () => {
   );
 };
 
-
-  // [Paste your entire existing code here but replace `const App = () => {` with this line:]
-  // const DataVisualizationAndEngineering = () => {
-  // [Rest remains unchanged]
-};
-
 export default DataVisualizationAndEngineering;
