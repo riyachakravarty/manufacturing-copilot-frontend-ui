@@ -1,93 +1,88 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import React from 'react';
+import {
+  Container,
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Divider,
+} from '@mui/material';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 
-const HomePage = () => {
-  const [file, setFile] = useState(null);
-  const [modeSelection, setModeSelection] = useState("");
-  const navigate = useNavigate();
-  const { setUploadedFileName, setMode } = useAppContext();
+const Home = ({ onFileUpload, onModeSelect }) => {
+  const [selectedMode, setSelectedMode] = React.useState('');
+  const fileInputRef = React.useRef();
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) onFileUpload(file);
   };
 
-  const handleModeChange = (e) => {
-    setModeSelection(e.target.value);
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
   };
 
-  const handleStart = async () => {
-    if (!file || !modeSelection) {
-      alert("Please upload a file and select a mode to continue.");
-      return;
-    }
-
-    // Upload file to backend
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("https://manufacturing-copilot-backend.onrender.com/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("File upload failed");
-      }
-
-      // Store globally
-      setUploadedFileName(file.name);
-      setMode(modeSelection);
-
-      // Navigate to main page
-      navigate("/main");
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert("Failed to upload file. Please try again.");
-    }
+  const handleModeChange = (event) => {
+    setSelectedMode(event.target.value);
+    onModeSelect(event.target.value);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-      <h1 className="text-3xl font-bold mb-4">Manufacturing Co-Pilot</h1>
-      <p className="mb-6 text-gray-600">Upload your dataset and choose how you’d like to proceed.</p>
+    <Container maxWidth="md" sx={{ mt: 6 }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Welcome to Manufacturing Co-Pilot
+      </Typography>
+      <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4 }}>
+        Start by uploading your data and selecting how you'd like to proceed.
+      </Typography>
 
-      <input type="file" onChange={handleFileChange} className="mb-4" />
-
-      <div className="mb-6">
-        <label className="mr-4">
+      {/* File Upload Section */}
+      <Card sx={{ mb: 4, p: 2 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Step 1: Upload CSV File
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<UploadFileIcon />}
+            onClick={handleUploadClick}
+            sx={{ mt: 2 }}
+          >
+            Choose File
+          </Button>
           <input
-            type="radio"
-            name="mode"
-            value="click"
-            checked={modeSelection === "click"}
-            onChange={handleModeChange}
-            className="mr-2"
+            type="file"
+            accept=".csv"
+            style={{ display: 'none' }}
+            ref={fileInputRef}
+            onChange={handleFileChange}
           />
-          Click of a button
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="mode"
-            value="prompt"
-            checked={modeSelection === "prompt"}
-            onChange={handleModeChange}
-            className="mr-2"
-          />
-          Gen-AI led prompt
-        </label>
-      </div>
+        </CardContent>
+      </Card>
 
-      <button
-        onClick={handleStart}
-        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-      >
-        Start Exploring
-      </button>
-    </div>
+      {/* Mode Selection Section */}
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Step 2: Select Interaction Mode
+          </Typography>
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>Select Mode</InputLabel>
+            <Select value={selectedMode} label="Select Mode" onChange={handleModeChange}>
+              <MenuItem value="click">Click of a Button</MenuItem>
+              <MenuItem value="genai">Gen-AI Led Prompt</MenuItem>
+            </Select>
+          </FormControl>
+        </CardContent>
+      </Card>
+    </Container>
   );
 };
 
-export default HomePage;
+export default Home;
