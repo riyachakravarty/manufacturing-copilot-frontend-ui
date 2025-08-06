@@ -1,18 +1,21 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useState } from "react";
 
-const AppContext = createContext();
+export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [uploadedFileName, setUploadedFileName] = useState("");
-  const [mode, setMode] = useState("");
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [selectedMode, setSelectedMode] = useState("");
 
   return (
     <AppContext.Provider
-      value={{ uploadedFileName, setUploadedFileName, mode, setMode }}
+      value={{
+        uploadedFile,
+        setUploadedFile,
+        selectedMode,
+        setSelectedMode,
+      }}
     >
       {children}
     </AppContext.Provider>
   );
 };
-
-export const useAppContext = () => useContext(AppContext);
