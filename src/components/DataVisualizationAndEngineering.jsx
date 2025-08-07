@@ -42,7 +42,7 @@ const AnalysisCard = ({ title, children, expanded, onClick }) => (
 );
 
 const DataVisualizationAndEngineering = () => {
-  const { uploadedFile } = useContext(FileContext);
+  const { uploadedFile } = useContext(AppContext);
   const [expandedCard, setExpandedCard] = useState(null);
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
