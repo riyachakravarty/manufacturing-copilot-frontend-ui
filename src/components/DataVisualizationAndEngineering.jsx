@@ -1,137 +1,141 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from "react";
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-  Checkbox,
-  FormControlLabel,
-  Button,
-  CircularProgress,
   Box,
-  Grid,
-  Paper,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { AppContext } from '../context/AppContext';
-import axios from 'axios';
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  CircularProgress,
+} from "@mui/material";
+import Plot from "react-plotly.js";
+import { AppContext } from "../context/AppContext";
 
-const BASE_URL = 'https://your-backend-url.com'; // Replace with your actual backend URL
+const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const DataVisualizationAndEngineering = () => {
   const { uploadedFile } = useContext(AppContext);
-  const [expandedPanel, setExpandedPanel] = useState(false);
-
-  // For Variability Analysis
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
-  const [loadingColumns, setLoadingColumns] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [plotData, setPlotData] = useState(null);
+  const [plotLayout, setPlotLayout] = useState(null);
+  const [error, setError] = useState("");
 
-  const [plotImage, setPlotImage] = useState(null);
-  const [loadingPlot, setLoadingPlot] = useState(false);
-
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpandedPanel(isExpanded ? panel : false);
-
-    if (panel === 'variability' && isExpanded) {
-      fetchColumns();
+  // Fetch columns once file is available
+  useEffect(() => {
+    if (uploadedFile) {
+      fetch(`${BACKEND_URL}/get_columns`, {
+        method: "GET",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.columns) {
+            setColumns(data.columns);
+          } else {
+            setError("Failed to fetch columns");
+          }
+        })
+        .catch(() => setError("Error fetching columns"));
     }
-  };
+  }, [uploadedFile]);
 
-  const fetchColumns = async () => {
-    try {
-      setLoadingColumns(true);
-      const formData = new FormData();
-      formData.append('file', uploadedFile);
-
-      const response = await axios.post(`${BASE_URL}/get_columns`, formData);
-      setColumns(response.data.columns);
-    } catch (error) {
-      console.error('Error fetching columns:', error);
-    } finally {
-      setLoadingColumns(false);
-    }
-  };
-
-  const handleColumnToggle = (column) => {
+  const handleColumnChange = (event) => {
+    const column = event.target.name;
     setSelectedColumns((prev) =>
-      prev.includes(column)
-        ? prev.filter((col) => col !== column)
-        : [...prev, column]
+      event.target.checked
+        ? [...prev, column]
+        : prev.filter((col) => col !== column)
     );
   };
 
-  const runVariabilityAnalysis = async () => {
-    try {
-      setLoadingPlot(true);
-      const formData = new FormData();
-      formData.append('file', uploadedFile);
-      formData.append('selected_columns', JSON.stringify(selectedColumns));
-      formData.append('prompt', `variability analysis where selected variables are ${selectedColumns.join(', ')}`);
+  const handleRunVariabilityAnalysis = async () => {
+    setLoading(true);
+    setError("");
+    setPlotData(null);
+    setPlotLayout(null);
 
-      const response = await axios.post(`${BASE_URL}/chat`, formData, {
-        responseType: 'arraybuffer',
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadedFile);
+
+      const prompt = `Perform variability analysis where selected variable is ${selectedColumns.join(", ")}`;
+
+      const response = await fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        body: formData,
       });
 
-      const blob = new Blob([response.data], { type: 'image/png' });
-      const imageUrl = URL.createObjectURL(blob);
-      setPlotImage(imageUrl);
-    } catch (error) {
-      console.error('Error generating variability plot:', error);
+      const result = await response.json();
+
+      if (result.type === "plot" && result.data) {
+        const { data, layout } = result.data;
+        setPlotData(data);
+        setPlotLayout(layout);
+      } else {
+        setError("Unexpected response from server");
+      }
+    } catch (err) {
+      setError("Failed to perform variability analysis");
     } finally {
-      setLoadingPlot(false);
+      setLoading(false);
     }
   };
 
   return (
-    <Box p={2}>
-      <Accordion
-        expanded={expandedPanel === 'variability'}
-        onChange={handleAccordionChange('variability')}
-      >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Variability Analysis</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {loadingColumns ? (
-            <CircularProgress />
-          ) : (
-            <Grid container spacing={2}>
-              <Grid item xs={10}>
-                <Paper elevation={2} style={{ maxHeight: 200, overflowY: 'auto', padding: '10px' }}>
-                  {columns.map((col) => (
-                    <FormControlLabel
-                      key={col}
-                      control={
-                        <Checkbox
-                          checked={selectedColumns.includes(col)}
-                          onChange={() => handleColumnToggle(col)}
-                        />
-                      }
-                      label={col}
-                    />
-                  ))}
-                </Paper>
-              </Grid>
-              <Grid item xs={2} container alignItems="center">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={runVariabilityAnalysis}
-                  disabled={selectedColumns.length === 0 || loadingPlot}
-                >
-                  {loadingPlot ? <CircularProgress size={24} /> : 'Run Variability Analysis'}
-                </Button>
-              </Grid>
-            </Grid>
-          )}
-        </AccordionDetails>
-      </Accordion>
+    <Box display="flex" flexDirection="column" gap={2}>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Variability Analysis
+          </Typography>
 
-      {plotImage && (
-        <Box mt={3}>
-          <img src={plotImage} alt="Variability Plot" style={{ maxWidth: '100%' }} />
-        </Box>
+          {columns.length === 0 ? (
+            <Typography>Loading columns...</Typography>
+          ) : (
+            <FormGroup row>
+              {columns.map((column) => (
+                <FormControlLabel
+                  key={column}
+                  control={
+                    <Checkbox
+                      checked={selectedColumns.includes(column)}
+                      onChange={handleColumnChange}
+                      name={column}
+                    />
+                  }
+                  label={column}
+                />
+              ))}
+            </FormGroup>
+          )}
+
+          <Button
+            variant="contained"
+            sx={{ mt: 2 }}
+            onClick={handleRunVariabilityAnalysis}
+            disabled={loading || selectedColumns.length === 0}
+          >
+            {loading ? <CircularProgress size={24} /> : "Run Variability Analysis"}
+          </Button>
+
+          {error && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
+
+      {plotData && plotLayout && (
+        <Card>
+          <CardContent>
+            <Typography variant="h6">Analysis Result</Typography>
+            <Plot data={plotData} layout={plotLayout} style={{ width: "100%" }} />
+          </CardContent>
+        </Card>
       )}
     </Box>
   );
