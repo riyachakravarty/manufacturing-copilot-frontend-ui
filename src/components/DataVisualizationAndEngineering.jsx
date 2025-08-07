@@ -25,22 +25,45 @@ const DataVisualizationAndEngineering = () => {
   const [error, setError] = useState("");
 
   // Fetch columns once file is available
-  useEffect(() => {
-    if (uploadedFile) {
-      fetch(`${BACKEND_URL}/get_columns`, {
+useEffect(() => {
+  const uploadAndFetchColumns = async () => {
+    if (!uploadedFile) return;
+
+    const formData = new FormData();
+    formData.append("file", uploadedFile);
+
+    try {
+      // Upload file first
+      const uploadRes = await fetch(`${BACKEND_URL}/upload_file`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        setError("File upload failed");
+        return;
+      }
+
+      // Then fetch columns
+      const columnRes = await fetch(`${BACKEND_URL}/get_columns`, {
         method: "GET",
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.columns) {
-            setColumns(data.columns);
-          } else {
-            setError("Failed to fetch columns");
-          }
-        })
-        .catch(() => setError("Error fetching columns"));
+      });
+
+      const data = await columnRes.json();
+
+      if (data.columns) {
+        setColumns(data.columns);
+      } else {
+        setError("No columns found");
+      }
+    } catch (err) {
+      setError("Error uploading file or fetching columns");
     }
-  }, [uploadedFile]);
+  };
+
+  uploadAndFetchColumns();
+}, [uploadedFile]);
+
 
   const handleColumnChange = (event) => {
     const column = event.target.name;
