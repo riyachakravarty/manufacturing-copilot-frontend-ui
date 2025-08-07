@@ -1,310 +1,174 @@
-// src/components/DataVisualizationAndEngineering.jsx
-import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import Plot from "react-plotly.js";
-import { AppContext } from "../context/AppContext";
+import React, { useState, useContext } from 'react';
+import {
+  Box,
+  Grid,
+  Card,
+  CardHeader,
+  CardContent,
+  Collapse,
+  Checkbox,
+  FormControlLabel,
+  Button,
+  Typography,
+  FormGroup,
+  RadioGroup,
+  Radio,
+  FormControl,
+  FormLabel,
+  Select,
+  MenuItem,
+  InputLabel
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { FileContext } from '../context/FileContext';
+import axios from 'axios';
+
+const AnalysisCard = ({ title, children, expanded, onClick }) => (
+  <Card variant="outlined" sx={{ mb: 2 }}>
+    <CardHeader
+      title={title}
+      onClick={onClick}
+      sx={{
+        backgroundColor: '#004d66',
+        color: 'white',
+        cursor: 'pointer',
+        '&:hover': { backgroundColor: '#006680' }
+      }}
+    />
+    <Collapse in={expanded}>
+      <CardContent>{children}</CardContent>
+    </Collapse>
+  </Card>
+);
 
 const DataVisualizationAndEngineering = () => {
-  const { uploadedFile } = useContext(AppContext);
-
+  const { uploadedFile } = useContext(FileContext);
+  const [expandedCard, setExpandedCard] = useState(null);
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
-  const [selectedIntervals, setSelectedIntervals] = useState([]);
-  const [selectAllIntervals, setSelectAllIntervals] = useState(false);
-  const [selectAllColumns, setSelectAllColumns] = useState(false);
-  const [treatmentMethod, setTreatmentMethod] = useState("mean");
-  const [plotData, setPlotData] = useState(null);
-  const [intervals, setIntervals] = useState([]);
-  const [analysisType, setAnalysisType] = useState(null);
-  const [outlierMethod, setOutlierMethod] = useState("zscore");
-  const [showOutlierOptions, setShowOutlierOptions] = useState(false);
-  const [showAnomalyTreatmentOptions, setShowAnomalyTreatmentOptions] = useState(false);
-  const [anomalyTreatmentType, setAnomalyTreatmentType] = useState(null);
-  const [valueIntervals, setValueIntervals] = useState([]);
-  const [selectedValueIntervals, setSelectedValueIntervals] = useState([]);
-  const [selectedMissingValueColumn, setSelectedMissingValueColumn] = useState(null);
+  const [selectedOutlierColumn, setSelectedOutlierColumn] = useState('');
+  const [outputImage, setOutputImage] = useState(null);
 
-  useEffect(() => {
-    if (selectAllIntervals) {
-      setSelectedIntervals(intervals.map((_, idx) => idx));
-    } else {
-      setSelectedIntervals([]);
-    }
-  }, [selectAllIntervals, intervals]);
-
-  useEffect(() => {
-    if (selectAllColumns) {
-      setSelectedColumns(columns);
-    } else {
-      setSelectedColumns([]);
-    }
-  }, [selectAllColumns, columns]);
-
-  const fetchColumns = async () => {
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/get_columns`);
-      setColumns(response.data.columns);
-    } catch (error) {
-      console.error("Error fetching columns:", error);
-      alert("Failed to fetch columns. Check backend logs.");
-    }
+  const handleCardClick = (card) => {
+    setExpandedCard((prev) => (prev === card ? null : card));
   };
 
-  const fetchIntervals = async () => {
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/missing_datetime_intervals`);
-      setIntervals(response.data.intervals || []);
-    } catch (err) {
-      console.error("Error fetching datetime intervals:", err);
-      setIntervals([]);
-    }
+  const handleColumnChange = (col) => {
+    setSelectedColumns((prev) =>
+      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
+    );
   };
 
-  const fetchValueIntervals = async () => {
-    if (!selectedMissingValueColumn) {
-      alert("Please select a valid column.");
-      return;
-    }
-
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/missing_value_intervals`,
-        { params: { column: selectedMissingValueColumn } }
-      );
-      setValueIntervals(response.data.intervals || []);
-    } catch (err) {
-      console.error("Error fetching value intervals:", err);
-      setValueIntervals([]);
-    }
+  const loadColumns = async () => {
+    const formData = new FormData();
+    formData.append('file', uploadedFile);
+    const res = await axios.post('https://your-backend-url/get_columns', formData);
+    setColumns(res.data.columns);
   };
 
-  const handleDownload = async () => {
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/download`, {
-        responseType: "blob",
-      });
-
-      const blob = new Blob([response.data], { type: "text/csv" });
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      link.setAttribute("download", "treated_data.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      alert("No data available for download.");
-    }
+  const runVariabilityAnalysis = async () => {
+    const formData = new FormData();
+    formData.append('file', uploadedFile);
+    formData.append('selected_columns', JSON.stringify(selectedColumns));
+    const res = await axios.post('https://your-backend-url/variability_analysis', formData);
+    setOutputImage(`data:image/png;base64,${res.data.plot}`);
   };
 
-  const handlePrompt = async (prompt) => {
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/chat`, { prompt });
-      if (response.data.type === "plot") {
-        setPlotData(response.data.data);
-      } else {
-        alert(response.data.data);
-      }
-    } catch (err) {
-      alert("Error generating plot: " + err.message);
-    }
-  };
-
-  const handleAnalysis = () => {
-    if (!selectedColumns.length) return alert("Select a column first.");
-    if (analysisType === "variability") {
-      handlePrompt(`variability analysis where selected variable is '${selectedColumns[0]}'`);
-    } else if (analysisType === "anomaly") {
-      handlePrompt(`missing value analysis where selected variable is '${selectedColumns[0]}'`);
-    } else if (analysisType === "outlier") {
-      handlePrompt(`outlier analysis where selected variable is '${selectedColumns[0]}' using ${outlierMethod}`);
-    }
-  };
-
-  const applyTreatment = async () => {
-    const payload = {
-      columns: selectedColumns,
-      intervals: selectedIntervals.map((i) => intervals[i]),
-      method: treatmentMethod,
-    };
-
-    try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/apply_treatment`, payload);
-      alert("Treatment applied successfully!");
-    } catch (error) {
-      console.error("Error applying treatment:", error);
-      alert("Failed to apply treatment.");
-    }
-  };
-
-  const applyValueTreatment = async () => {
-    const payload = {
-      column: selectedMissingValueColumn,
-      intervals: selectedValueIntervals.map((idx) => valueIntervals[idx]),
-      method: treatmentMethod,
-    };
-
-    try {
-      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/apply_missing_value_treatment`, payload);
-      alert("Missing value treatment applied.");
-    } catch (error) {
-      console.error("Error applying value treatment:", error);
-      alert("Failed to apply missing value treatment.");
-    }
+  const runOutlierAnalysis = async () => {
+    const formData = new FormData();
+    formData.append('file', uploadedFile);
+    formData.append('column', selectedOutlierColumn);
+    formData.append('method', 'zscore'); // or 'iqr' if you add a dropdown
+    const res = await axios.post('https://your-backend-url/outlier_analysis', formData);
+    setOutputImage(`data:image/png;base64,${res.data.plot}`);
   };
 
   return (
-    <div>
-      <h1>Manufacturing Analytics Tool</h1>
+    <Box sx={{ flexGrow: 1, p: 2 }}>
+      <Grid container spacing={2}>
+        {/* Left panel */}
+        <Grid item xs={12} md={4}>
+          <AnalysisCard
+            title="Variability Analysis"
+            expanded={expandedCard === 'variability'}
+            onClick={() => {
+              handleCardClick('variability');
+              loadColumns();
+            }}
+          >
+            <FormGroup>
+              {columns.map((col) => (
+                <FormControlLabel
+                  key={col}
+                  control={
+                    <Checkbox
+                      checked={selectedColumns.includes(col)}
+                      onChange={() => handleColumnChange(col)}
+                    />
+                  }
+                  label={col}
+                />
+              ))}
+            </FormGroup>
+            <Button variant="contained" onClick={runVariabilityAnalysis} sx={{ mt: 2 }}>
+              Run Analysis
+            </Button>
+          </AnalysisCard>
 
-      <button onClick={fetchColumns}>Load Columns</button>
-      <button onClick={handleDownload}>Download Treated Data</button>
+          <AnalysisCard
+            title="Outlier Analysis"
+            expanded={expandedCard === 'outlier'}
+            onClick={() => {
+              handleCardClick('outlier');
+              loadColumns();
+            }}
+          >
+            <FormControl fullWidth>
+              <InputLabel>Column</InputLabel>
+              <Select
+                value={selectedOutlierColumn}
+                onChange={(e) => setSelectedOutlierColumn(e.target.value)}
+              >
+                {columns.map((col) => (
+                  <MenuItem key={col} value={col}>
+                    {col}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button variant="contained" onClick={runOutlierAnalysis} sx={{ mt: 2 }}>
+              Run Outlier Analysis
+            </Button>
+          </AnalysisCard>
 
-      <div>
-        <h2>Select Columns</h2>
-        <label>
-          <input
-            type="checkbox"
-            checked={selectAllColumns}
-            onChange={(e) => setSelectAllColumns(e.target.checked)}
-          />
-          Select All
-        </label>
-        {columns.map((col) => (
-          <label key={col}>
-            <input
-              type="checkbox"
-              checked={selectedColumns.includes(col)}
-              onChange={() =>
-                setSelectedColumns((prev) =>
-                  prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
-                )
-              }
+          {/* Add similar cards for:
+              - Missing Value Analysis
+              - Missing Value Treatment
+              - Outlier Treatment
+              These would follow the same structure:
+              loadColumns -> handle selection -> call backend API */}
+        </Grid>
+
+        {/* Right panel */}
+        <Grid item xs={12} md={8}>
+          <Card variant="outlined" sx={{ height: '100%' }}>
+            <CardHeader
+              title="Analysis Output"
+              sx={{ backgroundColor: '#004d66', color: 'white' }}
             />
-            {col}
-          </label>
-        ))}
-      </div>
-
-      <div>
-        <button onClick={() => setAnalysisType("variability")}>Variability Analysis</button>
-        <button onClick={() => setAnalysisType("anomaly")}>Anomaly Analysis</button>
-        <button onClick={() => {
-          setAnalysisType("outlier");
-          setShowOutlierOptions(true);
-        }}>Outlier Analysis</button>
-
-        {analysisType && (
-          <div>
-            {analysisType === "outlier" && showOutlierOptions && (
-              <select value={outlierMethod} onChange={(e) => setOutlierMethod(e.target.value)}>
-                <option value="zscore">Z-Score</option>
-                <option value="iqr">IQR</option>
-              </select>
-            )}
-            <button onClick={handleAnalysis}>Run {analysisType} analysis</button>
-          </div>
-        )}
-      </div>
-
-      <div>
-        <button onClick={() => setShowAnomalyTreatmentOptions(true)}>Anomaly Treatment</button>
-        {showAnomalyTreatmentOptions && (
-          <>
-            <button onClick={() => {
-              setAnomalyTreatmentType("datetime");
-              fetchIntervals();
-            }}>Missing Date Times</button>
-
-            <button onClick={() => setAnomalyTreatmentType("values")}>Missing Values</button>
-
-            {anomalyTreatmentType === "datetime" && (
-              <>
-                <h3>Select Intervals</h3>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={selectAllIntervals}
-                    onChange={(e) => setSelectAllIntervals(e.target.checked)}
-                  />
-                  Select All
-                </label>
-                {intervals.map((interval, idx) => (
-                  <label key={idx}>
-                    <input
-                      type="checkbox"
-                      checked={selectedIntervals.includes(idx)}
-                      onChange={() =>
-                        setSelectedIntervals((prev) =>
-                          prev.includes(idx)
-                            ? prev.filter((i) => i !== idx)
-                            : [...prev, idx]
-                        )
-                      }
-                    />
-                    {interval.start} to {interval.end}
-                  </label>
-                ))}
-                <select onChange={(e) => setTreatmentMethod(e.target.value)}>
-                  <option value="Mean">Mean</option>
-                  <option value="Median">Median</option>
-                  <option value="Forward fill">Forward Fill</option>
-                  <option value="Backward fill">Backward Fill</option>
-                  <option value="Delete rows">Delete Rows</option>
-                </select>
-                <button onClick={applyTreatment}>Apply Treatment</button>
-              </>
-            )}
-
-            {anomalyTreatmentType === "values" && (
-              <>
-                <h3>Select Column</h3>
-                <select onChange={(e) => setSelectedMissingValueColumn(e.target.value)}>
-                  <option value="">-- Select --</option>
-                  {columns.map((col) => (
-                    <option key={col} value={col}>{col}</option>
-                  ))}
-                </select>
-                <button onClick={fetchValueIntervals}>Load Missing Value Intervals</button>
-                {valueIntervals.map((interval, idx) => (
-                  <label key={idx}>
-                    <input
-                      type="checkbox"
-                      checked={selectedValueIntervals.includes(idx)}
-                      onChange={() =>
-                        setSelectedValueIntervals((prev) =>
-                          prev.includes(idx)
-                            ? prev.filter((i) => i !== idx)
-                            : [...prev, idx]
-                        )
-                      }
-                    />
-                    {interval.start} to {interval.end}
-                  </label>
-                ))}
-                <select onChange={(e) => setTreatmentMethod(e.target.value)}>
-                  <option value="Mean">Mean</option>
-                  <option value="Median">Median</option>
-                  <option value="Forward fill">Forward Fill</option>
-                  <option value="Backward fill">Backward Fill</option>
-                  <option value="Delete rows">Delete Rows</option>
-                </select>
-                <button onClick={applyValueTreatment}>Apply Missing Value Treatment</button>
-              </>
-            )}
-          </>
-        )}
-      </div>
-
-      {plotData && (
-        <Plot
-          data={plotData.data}
-          layout={plotData.layout}
-          config={{ responsive: true }}
-        />
-      )}
-    </div>
+            <CardContent>
+              {outputImage ? (
+                <img src={outputImage} alt="Analysis Result" style={{ width: '100%' }} />
+              ) : (
+                <Typography variant="body1">
+                  Run an analysis from the left panel to see results here.
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 
