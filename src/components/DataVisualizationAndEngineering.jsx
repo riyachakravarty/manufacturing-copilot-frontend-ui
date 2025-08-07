@@ -20,7 +20,7 @@ import {
   InputLabel
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { FileContext } from '../context/FileContext';
+import { AppContext } from '../context/AppContext';
 import axios from 'axios';
 
 const AnalysisCard = ({ title, children, expanded, onClick }) => (
