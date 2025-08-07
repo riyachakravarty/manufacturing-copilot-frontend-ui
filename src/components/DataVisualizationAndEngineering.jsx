@@ -1,173 +1,138 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
-  Box,
-  Grid,
-  Card,
-  CardHeader,
-  CardContent,
-  Collapse,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
   Checkbox,
   FormControlLabel,
   Button,
-  Typography,
-  FormGroup,
-  RadioGroup,
-  Radio,
-  FormControl,
-  FormLabel,
-  Select,
-  MenuItem,
-  InputLabel
+  CircularProgress,
+  Box,
+  Grid,
+  Paper,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { AppContext } from '../context/AppContext';
 import axios from 'axios';
 
-const AnalysisCard = ({ title, children, expanded, onClick }) => (
-  <Card variant="outlined" sx={{ mb: 2 }}>
-    <CardHeader
-      title={title}
-      onClick={onClick}
-      sx={{
-        backgroundColor: '#004d66',
-        color: 'white',
-        cursor: 'pointer',
-        '&:hover': { backgroundColor: '#006680' }
-      }}
-    />
-    <Collapse in={expanded}>
-      <CardContent>{children}</CardContent>
-    </Collapse>
-  </Card>
-);
+const BASE_URL = 'https://your-backend-url.com'; // Replace with your actual backend URL
 
 const DataVisualizationAndEngineering = () => {
   const { uploadedFile } = useContext(AppContext);
-  const [expandedCard, setExpandedCard] = useState(null);
+  const [expandedPanel, setExpandedPanel] = useState(false);
+
+  // For Variability Analysis
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
-  const [selectedOutlierColumn, setSelectedOutlierColumn] = useState('');
-  const [outputImage, setOutputImage] = useState(null);
+  const [loadingColumns, setLoadingColumns] = useState(false);
 
-  const handleCardClick = (card) => {
-    setExpandedCard((prev) => (prev === card ? null : card));
+  const [plotImage, setPlotImage] = useState(null);
+  const [loadingPlot, setLoadingPlot] = useState(false);
+
+  const handleAccordionChange = (panel) => (event, isExpanded) => {
+    setExpandedPanel(isExpanded ? panel : false);
+
+    if (panel === 'variability' && isExpanded) {
+      fetchColumns();
+    }
   };
 
-  const handleColumnChange = (col) => {
+  const fetchColumns = async () => {
+    try {
+      setLoadingColumns(true);
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+
+      const response = await axios.post(`${BASE_URL}/get_columns`, formData);
+      setColumns(response.data.columns);
+    } catch (error) {
+      console.error('Error fetching columns:', error);
+    } finally {
+      setLoadingColumns(false);
+    }
+  };
+
+  const handleColumnToggle = (column) => {
     setSelectedColumns((prev) =>
-      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
+      prev.includes(column)
+        ? prev.filter((col) => col !== column)
+        : [...prev, column]
     );
   };
 
-  const loadColumns = async () => {
-    const formData = new FormData();
-    formData.append('file', uploadedFile);
-    const res = await axios.post('https://your-backend-url/get_columns', formData);
-    setColumns(res.data.columns);
-  };
-
   const runVariabilityAnalysis = async () => {
-    const formData = new FormData();
-    formData.append('file', uploadedFile);
-    formData.append('selected_columns', JSON.stringify(selectedColumns));
-    const res = await axios.post('https://your-backend-url/variability_analysis', formData);
-    setOutputImage(`data:image/png;base64,${res.data.plot}`);
-  };
+    try {
+      setLoadingPlot(true);
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+      formData.append('selected_columns', JSON.stringify(selectedColumns));
+      formData.append('prompt', `variability analysis where selected variables are ${selectedColumns.join(', ')}`);
 
-  const runOutlierAnalysis = async () => {
-    const formData = new FormData();
-    formData.append('file', uploadedFile);
-    formData.append('column', selectedOutlierColumn);
-    formData.append('method', 'zscore'); // or 'iqr' if you add a dropdown
-    const res = await axios.post('https://your-backend-url/outlier_analysis', formData);
-    setOutputImage(`data:image/png;base64,${res.data.plot}`);
+      const response = await axios.post(`${BASE_URL}/chat`, formData, {
+        responseType: 'arraybuffer',
+      });
+
+      const blob = new Blob([response.data], { type: 'image/png' });
+      const imageUrl = URL.createObjectURL(blob);
+      setPlotImage(imageUrl);
+    } catch (error) {
+      console.error('Error generating variability plot:', error);
+    } finally {
+      setLoadingPlot(false);
+    }
   };
 
   return (
-    <Box sx={{ flexGrow: 1, p: 2 }}>
-      <Grid container spacing={2}>
-        {/* Left panel */}
-        <Grid item xs={12} md={4}>
-          <AnalysisCard
-            title="Variability Analysis"
-            expanded={expandedCard === 'variability'}
-            onClick={() => {
-              handleCardClick('variability');
-              loadColumns();
-            }}
-          >
-            <FormGroup>
-              {columns.map((col) => (
-                <FormControlLabel
-                  key={col}
-                  control={
-                    <Checkbox
-                      checked={selectedColumns.includes(col)}
-                      onChange={() => handleColumnChange(col)}
+    <Box p={2}>
+      <Accordion
+        expanded={expandedPanel === 'variability'}
+        onChange={handleAccordionChange('variability')}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Variability Analysis</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {loadingColumns ? (
+            <CircularProgress />
+          ) : (
+            <Grid container spacing={2}>
+              <Grid item xs={10}>
+                <Paper elevation={2} style={{ maxHeight: 200, overflowY: 'auto', padding: '10px' }}>
+                  {columns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      control={
+                        <Checkbox
+                          checked={selectedColumns.includes(col)}
+                          onChange={() => handleColumnToggle(col)}
+                        />
+                      }
+                      label={col}
                     />
-                  }
-                  label={col}
-                />
-              ))}
-            </FormGroup>
-            <Button variant="contained" onClick={runVariabilityAnalysis} sx={{ mt: 2 }}>
-              Run Analysis
-            </Button>
-          </AnalysisCard>
+                  ))}
+                </Paper>
+              </Grid>
+              <Grid item xs={2} container alignItems="center">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={runVariabilityAnalysis}
+                  disabled={selectedColumns.length === 0 || loadingPlot}
+                >
+                  {loadingPlot ? <CircularProgress size={24} /> : 'Run Variability Analysis'}
+                </Button>
+              </Grid>
+            </Grid>
+          )}
+        </AccordionDetails>
+      </Accordion>
 
-          <AnalysisCard
-            title="Outlier Analysis"
-            expanded={expandedCard === 'outlier'}
-            onClick={() => {
-              handleCardClick('outlier');
-              loadColumns();
-            }}
-          >
-            <FormControl fullWidth>
-              <InputLabel>Column</InputLabel>
-              <Select
-                value={selectedOutlierColumn}
-                onChange={(e) => setSelectedOutlierColumn(e.target.value)}
-              >
-                {columns.map((col) => (
-                  <MenuItem key={col} value={col}>
-                    {col}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button variant="contained" onClick={runOutlierAnalysis} sx={{ mt: 2 }}>
-              Run Outlier Analysis
-            </Button>
-          </AnalysisCard>
-
-          {/* Add similar cards for:
-              - Missing Value Analysis
-              - Missing Value Treatment
-              - Outlier Treatment
-              These would follow the same structure:
-              loadColumns -> handle selection -> call backend API */}
-        </Grid>
-
-        {/* Right panel */}
-        <Grid item xs={12} md={8}>
-          <Card variant="outlined" sx={{ height: '100%' }}>
-            <CardHeader
-              title="Analysis Output"
-              sx={{ backgroundColor: '#004d66', color: 'white' }}
-            />
-            <CardContent>
-              {outputImage ? (
-                <img src={outputImage} alt="Analysis Result" style={{ width: '100%' }} />
-              ) : (
-                <Typography variant="body1">
-                  Run an analysis from the left panel to see results here.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      {plotImage && (
+        <Box mt={3}>
+          <img src={plotImage} alt="Variability Plot" style={{ maxWidth: '100%' }} />
+        </Box>
+      )}
     </Box>
   );
 };
