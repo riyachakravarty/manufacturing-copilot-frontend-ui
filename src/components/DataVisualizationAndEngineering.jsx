@@ -44,21 +44,11 @@ export default function DataVisualizationAndEngineering() {
   const [treatmentMode, setTreatmentMode] = useState("datetime");
 
   // For treatment cards
-  const [treatmentMethod, setTreatmentMethod] = useState("mean");
+  const [treatmentMethod, setTreatmentMethod] = useState("Mean");
 
-  // Add state for missing datetime intervals
+  // Missing datetime intervals from backend
   const [missingDateTimeIntervals, setMissingDateTimeIntervals] = useState([]);
   const [loadingTreatment, setLoadingTreatment] = useState(false);
-
-  // Mock intervals for demonstration
-  const mockIntervals = [
-    "2025-08-01 10:00 to 2025-08-01 12:00",
-    "2025-08-02 14:00 to 2025-08-02 16:30",
-    "2025-08-03 09:15 to 2025-08-03 10:45",
-    "2025-08-04 11:00 to 2025-08-04 13:00",
-    "2025-08-05 15:30 to 2025-08-05 17:00",
-    "2025-08-06 08:00 to 2025-08-06 09:30",
-  ];
 
   // Selected items for treatment cards
   const [treatmentSelectedColumns, setTreatmentSelectedColumns] = useState([]);
@@ -68,8 +58,9 @@ export default function DataVisualizationAndEngineering() {
   const [outlierMethod, setOutlierMethod] = useState("zscore");
   const [outlierSelectedColumns, setOutlierSelectedColumns] = useState([]);
   const [outlierSelectedIntervals, setOutlierSelectedIntervals] = useState([]);
-  const [outlierTreatmentMethod, setOutlierTreatmentMethod] = useState("mean");
+  const [outlierTreatmentMethod, setOutlierTreatmentMethod] = useState("Mean");
 
+  // Fetch columns from backend on mount
   useEffect(() => {
     const fetchColumns = async () => {
       try {
@@ -89,22 +80,28 @@ export default function DataVisualizationAndEngineering() {
     fetchColumns();
   }, []);
 
+  // Fetch missing datetime intervals when treatment card expands & mode is datetime
   useEffect(() => {
     if (expanded === "missingTreatment" && treatmentMode === "datetime") {
-    // Fetch missing datetime intervals from backend when treatment card expands & mode is datetime
       const fetchIntervals = async () => {
         try {
           const res = await fetch(`${BACKEND_URL}/missing_datetime_intervals`);
           if (!res.ok) throw new Error("Failed to fetch missing datetime intervals");
           const data = await res.json();
           if (Array.isArray(data.intervals)) {
-            setMissingDateTimeIntervals(data.intervals);
+            // Expect intervals in [{start: ..., end: ...}, ...] format from backend
+            // Store as array of strings "start - end" for display and selection
+            const formattedIntervals = data.intervals.map(
+              (interval) => `${interval.start} - ${interval.end}`
+            );
+            setMissingDateTimeIntervals(formattedIntervals);
           } else {
             setMissingDateTimeIntervals([]);
           }
         } catch (err) {
           console.error(err);
           setError("Error fetching missing datetime intervals");
+          setMissingDateTimeIntervals([]);
         }
       };
       fetchIntervals();
@@ -156,39 +153,37 @@ export default function DataVisualizationAndEngineering() {
 
   // Missing Value Analysis handlers
   const runMissingValueAnalysis = async () => {
-  if (!missingValueColumn) {
-    setError("Please select a column for analysis.");
-    return;
-  }
-  setLoading(true);
-  setError("");
-  setPlotData(null);
-
-  try {
-    const prompt = `Missing value analysis where selected variable is ${missingValueColumn}`;
-    const response = await fetch(`${BACKEND_URL}/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-    if (!response.ok) throw new Error(`Server error: ${response.status}`);
-    const result = await response.json();
-
-    if (result.type === "plot" && result.data) {
-      setPlotData(result.data);
-      setExpanded(false); // Collapse left accordion to free space
-    } else {
-      setError("Unexpected response from server.");
+    if (!missingValueColumn) {
+      setError("Please select a column for analysis.");
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    setError("Error running missing value analysis.");
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    setError("");
+    setPlotData(null);
 
+    try {
+      const prompt = `Missing value analysis where selected variable is ${missingValueColumn}`;
+      const response = await fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      const result = await response.json();
 
+      if (result.type === "plot" && result.data) {
+        setPlotData(result.data);
+        setExpanded(false); // Collapse left accordion to free space
+      } else {
+        setError("Unexpected response from server.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Error running missing value analysis.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Treatment cards handlers
   const handleTreatmentColumnToggle = (col) => {
@@ -203,66 +198,60 @@ export default function DataVisualizationAndEngineering() {
     );
   };
 
-  const handleOutlierColumnToggle = (col) => {
-    setOutlierSelectedColumns((prev) =>
-      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
-    );
+  // Convert selected interval strings like "start - end" into {start, end} objects for backend
+  const parseIntervalsForBackend = (intervalStrings) => {
+    return intervalStrings.map((str) => {
+      const [start, end] = str.split(" - ").map((s) => s.trim());
+      return { start, end };
+    });
   };
 
-  const handleOutlierIntervalToggle = (interval) => {
-    setOutlierSelectedIntervals((prev) =>
-      prev.includes(interval) ? prev.filter((i) => i !== interval) : [...prev, interval]
-    );
+  // Apply Missing Value Treatment function
+  const applyMissingValueTreatment = async () => {
+    if (treatmentMode === "datetime") {
+      if (treatmentSelectedColumns.length === 0) {
+        setError("Please select at least one column for treatment.");
+        return;
+      }
+      if (treatmentSelectedIntervals.length === 0) {
+        setError("Please select at least one interval for treatment.");
+        return;
+      }
+      if (!treatmentMethod) {
+        setError("Please select a treatment method.");
+        return;
+      }
+
+      setLoadingTreatment(true);
+      setError("");
+      try {
+        const payload = {
+          columns: treatmentSelectedColumns,
+          intervals: parseIntervalsForBackend(treatmentSelectedIntervals),
+          method: treatmentMethod,
+        };
+        const res = await fetch(`${BACKEND_URL}/apply_treatment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(`Treatment failed with status ${res.status}`);
+        const result = await res.json();
+        // Show success message or update UI based on result here
+        setError("Treatment applied successfully.");
+        // Optionally, clear selections after success
+        setTreatmentSelectedColumns([]);
+        setTreatmentSelectedIntervals([]);
+      } catch (err) {
+        console.error(err);
+        setError("Error applying missing value treatment.");
+      } finally {
+        setLoadingTreatment(false);
+      }
+    } else {
+      setError("Treatment mode not implemented yet.");
+    }
   };
-
-  // Placeholder apply treatment function
-const applyMissingValueTreatment = async () => {
-  if (treatmentMode === "datetime") {
-    if (treatmentSelectedColumns.length === 0) {
-      setError("Please select at least one column for treatment.");
-      return;
-    }
-    if (treatmentSelectedIntervals.length === 0) {
-      setError("Please select at least one interval for treatment.");
-      return;
-    }
-    if (!treatmentMethod) {
-      setError("Please select a treatment method.");
-      return;
-    }
-
-    setLoadingTreatment(true);
-    setError("");
-    try {
-      const payload = {
-        //mode: treatmentMode,
-        columns: treatmentSelectedColumns,
-        intervals: treatmentSelectedIntervals,
-        method: treatmentMethod,
-      };
-      const res = await fetch(`${BACKEND_URL}/apply_treatment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(`Treatment failed with status ${res.status}`);
-      const result = await res.json();
-      // You can show success message or update UI based on result here
-      setError("Treatment applied successfully.");
-      // Optionally, clear selections
-      setTreatmentSelectedColumns([]);
-      setTreatmentSelectedIntervals([]);
-    } catch (err) {
-      console.error(err);
-      setError("Error applying missing value treatment.");
-    } finally {
-      setLoadingTreatment(false);
-    }
-  } else {
-    // Handle other treatment modes if needed
-    setError("Treatment mode not implemented yet.");
-  }
-};
 
   const applyOutlierTreatment = () => {
     console.log("Apply Outlier Treatment:", {
@@ -272,22 +261,32 @@ const applyMissingValueTreatment = async () => {
     });
   };
 
+  // Return JSX begins here ...
+
   return (
-    <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)", flexWrap: "nowrap" }}>
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        height: "calc(100vh - 100px)",
+        flexWrap: "nowrap",
+      }}
+    >
       {/* LEFT PANEL */}
       <Grid
         item
         xs={12}
-        md={4} // widened panel
+        md={4}
         sx={{
           height: "100%",
           display: "flex",
           flexDirection: "column",
           overflowY: "auto",
           px: 1,
-          fontSize: "0.85rem", // smaller font for entire panel
+          fontSize: "0.85rem",
           flexShrink: 0,
-          width: expanded ? 320 : 60, // Shrink width when accordion collapsed
+          minWidth: 280,            // maintain min width even when collapsed
+          width: expanded ? 320 : 280, // prevent shrinking below minWidth
           transition: "width 0.3s ease",
         }}
       >
@@ -300,7 +299,10 @@ const applyMissingValueTreatment = async () => {
           elevation={3}
         >
           {/* Variability Analysis */}
-          <Accordion expanded={expanded === "variability"} onChange={handleExpand("variability")}>
+          <Accordion
+            expanded={expanded === "variability"}
+            onChange={handleExpand("variability")}
+          >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                 Variability Analysis
@@ -323,171 +325,203 @@ const applyMissingValueTreatment = async () => {
                   />
                 ))}
               </FormGroup>
-              <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runVariabilityAnalysis}>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ mt: 1 }}
+                onClick={runVariabilityAnalysis}
+              >
                 Run Analysis
               </Button>
             </AccordionDetails>
           </Accordion>
 
           {/* Missing Value Analysis */}
-<Accordion
-  expanded={expanded === "missingAnalysis"}
-  onChange={handleExpand("missingAnalysis")}
->
-  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-    <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-      Missing Value Analysis
-    </Typography>
-  </AccordionSummary>
-  <AccordionDetails
-    sx={{
-      maxWidth: 300,           // limit width so it doesn't stretch too wide
-      overflowY: "auto",
-      maxHeight: 300,
-      pr: 1,
-    }}
-  >
-    <RadioGroup
-      value={missingValueColumn}
-      onChange={(e) => setMissingValueColumn(e.target.value)}
-      sx={{ maxWidth: '100%' }}
-    >
-      {columns.map((col) => (
-        <FormControlLabel
-          key={col}
-          value={col}
-          control={<Radio size="small" />}
-          label={col}
-          sx={{ fontSize: "0.85rem" }}
-        />
-      ))}
-    </RadioGroup>
-    <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runMissingValueAnalysis}>
-      Run Analysis
-    </Button>
-  </AccordionDetails>
-</Accordion>
-
+          <Accordion
+            expanded={expanded === "missingAnalysis"}
+            onChange={handleExpand("missingAnalysis")}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                Missing Value Analysis
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails
+              sx={{
+                maxWidth: "100%", // allow full width inside left panel
+                overflowY: "auto",
+                maxHeight: 300,
+                pr: 1,
+              }}
+            >
+              <RadioGroup
+                value={missingValueColumn}
+                onChange={(e) => setMissingValueColumn(e.target.value)}
+                sx={{ maxWidth: "100%" }}
+              >
+                {columns.map((col) => (
+                  <FormControlLabel
+                    key={col}
+                    value={col}
+                    control={<Radio size="small" />}
+                    label={col}
+                    sx={{ fontSize: "0.85rem" }}
+                  />
+                ))}
+              </RadioGroup>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ mt: 1 }}
+                onClick={runMissingValueAnalysis}
+              >
+                Run Analysis
+              </Button>
+            </AccordionDetails>
+          </Accordion>
 
           {/* Missing Value Treatment */}
-<AccordionDetails>
-  <RadioGroup
-    row
-    value={treatmentMode}
-    onChange={(e) => setTreatmentMode(e.target.value)}
-    sx={{ mb: 1 }}
-  >
-    <FormControlLabel
-      value="datetime"
-      control={<Radio size="small" />}
-      label="Missing Date Times"
-      sx={{ fontSize: "0.85rem" }}
-    />
-    <FormControlLabel
-      value="column"
-      control={<Radio size="small" />}
-      label="Missing Values in Column"
-      sx={{ fontSize: "0.85rem" }}
-    />
-  </RadioGroup>
-
-  {treatmentMode === "datetime" && (
-    <Grid container spacing={2}>
-      {/* Column List */}
-      <Grid
-        item
-        xs={4}
-        sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}
-      >
-        <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-          Columns
-        </Typography>
-        <FormGroup>
-          {columns.map((col) => (
-            <FormControlLabel
-              key={col}
-              control={
-                <Checkbox
-                  size="small"
-                  checked={treatmentSelectedColumns.includes(col)}
-                  onChange={() => handleTreatmentColumnToggle(col)}
+          <Accordion
+            expanded={expanded === "missingTreatment"}
+            onChange={handleExpand("missingTreatment")}
+            sx={{ mt: 2 }}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                Missing Value Treatment
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <RadioGroup
+                row
+                value={treatmentMode}
+                onChange={(e) => setTreatmentMode(e.target.value)}
+                sx={{ mb: 1 }}
+              >
+                <FormControlLabel
+                  value="datetime"
+                  control={<Radio size="small" />}
+                  label="Missing Date Times"
+                  sx={{ fontSize: "0.85rem" }}
                 />
-              }
-              label={col}
-              sx={{ fontSize: "0.85rem" }}
-            />
-          ))}
-        </FormGroup>
-      </Grid>
-
-      {/* Interval List */}
-      <Grid
-        item
-        xs={4}
-        sx={{
-          maxHeight: 200,
-          overflowY: "auto",
-          borderRight: "1px solid #ccc",
-          pl: 1,
-        }}
-      >
-        <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-          Intervals
-        </Typography>
-        <FormGroup>
-          {mockIntervals.map((interval) => (
-            <FormControlLabel
-              key={interval}
-              control={
-                <Checkbox
-                  size="small"
-                  checked={treatmentSelectedIntervals.includes(interval)}
-                  onChange={() => handleTreatmentIntervalToggle(interval)}
+                <FormControlLabel
+                  value="column"
+                  control={<Radio size="small" />}
+                  label="Missing Values in Column"
+                  sx={{ fontSize: "0.85rem" }}
                 />
-              }
-              label={interval}
-              sx={{ fontSize: "0.85rem" }}
-            />
-          ))}
-        </FormGroup>
-      </Grid>
+              </RadioGroup>
 
-      {/* Treatment Method */}
-      <Grid item xs={4}>
-        <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-          Treatment Method
-        </Typography>
-        <Select
-          size="small"
-          value={treatmentMethod}
-          onChange={(e) => setTreatmentMethod(e.target.value)}
-          fullWidth
-          sx={{ mt: 1 }}
-        >
-          <MenuItem value="Mean">Mean</MenuItem>
-          <MenuItem value="Median">Median</MenuItem>
-          <MenuItem value="Forward fill">Forward Fill</MenuItem>
-          <MenuItem value="Backward fill">Backward Fill</MenuItem>
-          <MenuItem value="Delete rows">Delete rows</MenuItem>
-        </Select>
+              {treatmentMode === "datetime" && (
+                <Grid container spacing={2}>
+                  {/* Column List */}
+                  <Grid
+                    item
+                    xs={6} // increased width for better layout
+                    sx={{
+                      maxHeight: 200,
+                      overflowY: "auto",
+                      borderRight: "1px solid #ccc",
+                      pr: 1,
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                      Columns
+                    </Typography>
+                    <FormGroup>
+                      {columns.map((col) => (
+                        <FormControlLabel
+                          key={col}
+                          control={
+                            <Checkbox
+                              size="small"
+                              checked={treatmentSelectedColumns.includes(col)}
+                              onChange={() => handleTreatmentColumnToggle(col)}
+                            />
+                          }
+                          label={col}
+                          sx={{ fontSize: "0.85rem" }}
+                        />
+                      ))}
+                    </FormGroup>
+                  </Grid>
 
-        <Button
-          variant="contained"
-          size="small"
-          sx={{ mt: 2 }}
-          onClick={applyMissingValueTreatment}
-        >
-          Apply Treatment
-        </Button>
-      </Grid>
-    </Grid>
-  )}
+                  {/* Interval List */}
+                  <Grid
+                    item
+                    xs={6} // side by side with columns
+                    sx={{
+                      maxHeight: 200,
+                      overflowY: "auto",
+                      pl: 1,
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                      Intervals
+                    </Typography>
+                    <FormGroup>
+                      {missingDateTimeIntervals.length > 0 ? (
+                        missingDateTimeIntervals.map((interval) => (
+                          <FormControlLabel
+                            key={interval}
+                            control={
+                              <Checkbox
+                                size="small"
+                                checked={treatmentSelectedIntervals.includes(interval)}
+                                onChange={() => handleTreatmentIntervalToggle(interval)}
+                              />
+                            }
+                            label={interval}
+                            sx={{ fontSize: "0.85rem" }}
+                          />
+                        ))
+                      ) : (
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          No intervals available
+                        </Typography>
+                      )}
+                    </FormGroup>
+                  </Grid>
+                </Grid>
+              )}
 
-</AccordionDetails>
+              {/* Treatment Method and Apply Button */}
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                  Treatment Method
+                </Typography>
+                <Select
+                  size="small"
+                  value={treatmentMethod}
+                  onChange={(e) => setTreatmentMethod(e.target.value)}
+                  fullWidth
+                  sx={{ mt: 1 }}
+                >
+                  <MenuItem value="Mean">Mean</MenuItem>
+                  <MenuItem value="Median">Median</MenuItem>
+                  <MenuItem value="Forward fill">Forward Fill</MenuItem>
+                  <MenuItem value="Backward fill">Backward Fill</MenuItem>
+                  <MenuItem value="Delete rows">Delete rows</MenuItem>
+                </Select>
 
+                <Button
+                  variant="contained"
+                  size="small"
+                  sx={{ mt: 2 }}
+                  onClick={applyMissingValueTreatment}
+                  disabled={loadingTreatment}
+                >
+                  {loadingTreatment ? "Applying..." : "Apply Treatment"}
+                </Button>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
 
           {/* Outlier Analysis */}
-          <Accordion expanded={expanded === "outlierAnalysis"} onChange={handleExpand("outlierAnalysis")}>
+          <Accordion
+            expanded={expanded === "outlierAnalysis"}
+            onChange={handleExpand("outlierAnalysis")}
+          >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                 Outlier Analysis
@@ -524,7 +558,10 @@ const applyMissingValueTreatment = async () => {
           </Accordion>
 
           {/* Outlier Treatment */}
-          <Accordion expanded={expanded === "outlierTreatment"} onChange={handleExpand("outlierTreatment")}>
+          <Accordion
+            expanded={expanded === "outlierTreatment"}
+            onChange={handleExpand("outlierTreatment")}
+          >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                 Outlier Treatment
@@ -626,7 +663,16 @@ const applyMissingValueTreatment = async () => {
       </Grid>
 
       {/* RIGHT PANEL */}
-      <Grid item xs={12} md={8} sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Grid
+        item
+        xs={12}
+        md={8}
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Paper
           sx={{
             p: 2,
@@ -642,9 +688,17 @@ const applyMissingValueTreatment = async () => {
           </Typography>
           <Divider sx={{ mb: 2 }} />
 
-          <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              overflowY: "auto",
+              minHeight: 0,
+              width: "100%",
+              minWidth: 0,
+            }}
+          >
             {loading && <CircularProgress />}
-            {error && <Alert severity="error">{error}</Alert>}
+            {error && <Alert severity={error === "Treatment applied successfully." ? "success" : "error"}>{error}</Alert>}
             {plotData ? (
               <Plot
                 data={plotData.data}
