@@ -131,14 +131,15 @@ export default function DataVisualizationAndEngineering() {
   // Missing Value Analysis handlers
   const runMissingValueAnalysis = async () => {
   if (!missingValueColumn) {
-    setError("Please select a column for missing value analysis.");
+    setError("Please select a column for analysis.");
     return;
   }
-  setError("");
   setLoading(true);
+  setError("");
   setPlotData(null);
+
   try {
-    const prompt = `Perform missing value analysis where selected variable is ${missingValueColumn}`;
+    const prompt = `Missing value analysis where selected variable is ${missingValueColumn}`;
     const response = await fetch(`${BACKEND_URL}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -146,8 +147,10 @@ export default function DataVisualizationAndEngineering() {
     });
     if (!response.ok) throw new Error(`Server error: ${response.status}`);
     const result = await response.json();
+
     if (result.type === "plot" && result.data) {
       setPlotData(result.data);
+      setExpanded(false); // Collapse left accordion to free space
     } else {
       setError("Unexpected response from server.");
     }
@@ -158,6 +161,7 @@ export default function DataVisualizationAndEngineering() {
     setLoading(false);
   }
 };
+
 
 
   // Treatment cards handlers
@@ -217,6 +221,9 @@ export default function DataVisualizationAndEngineering() {
           overflowY: "auto",
           px: 1,
           fontSize: "0.85rem", // smaller font for entire panel
+          flexShrink: 0,
+          width: expanded ? 320 : 60, // Shrink width when accordion collapsed
+          transition: "width 0.3s ease",
         }}
       >
         <Paper
@@ -290,12 +297,7 @@ export default function DataVisualizationAndEngineering() {
         />
       ))}
     </RadioGroup>
-    <Button
-      variant="contained"
-      size="small"
-      sx={{ mt: 1 }}
-      onClick={runMissingValueAnalysis}
-    >
+    <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runMissingValueAnalysis}>
       Run Analysis
     </Button>
   </AccordionDetails>
