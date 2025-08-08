@@ -255,6 +255,8 @@ export default function DataVisualizationAndEngineering() {
           intervals: formattedIntervals,
           method: treatmentMethod,
         };
+        console.log("Sending payload:", payload);
+
         const res = await fetch(`${BACKEND_URL}/apply_treatment`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -262,13 +264,14 @@ export default function DataVisualizationAndEngineering() {
         });
         if (!res.ok) throw new Error(`Treatment failed with status ${res.status}`);
         const result = await res.json();
+        console.log("Treatment response:", result);
         setError("Treatment applied successfully.");
         // Optionally clear selections
         setTreatmentSelectedColumns([]);
         setTreatmentSelectedIntervals([]);
       } catch (err) {
-        console.error(err);
-        setError("Error applying missing value treatment.");
+        console.error("Error applying treatment:", err);
+        setError("Error applying missing value treatment:"+ err.message);
       } finally {
         setLoadingTreatment(false);
       }
