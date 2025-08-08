@@ -46,7 +46,7 @@ export default function DataVisualizationAndEngineering() {
   // For treatment cards
   const [treatmentMethod, setTreatmentMethod] = useState("Mean");
 
-  // Missing datetime intervals from backend
+  // Missing datetime intervals fetched from backend
   const [missingDateTimeIntervals, setMissingDateTimeIntervals] = useState([]);
   const [loadingTreatment, setLoadingTreatment] = useState(false);
 
@@ -60,8 +60,18 @@ export default function DataVisualizationAndEngineering() {
   const [outlierSelectedIntervals, setOutlierSelectedIntervals] = useState([]);
   const [outlierTreatmentMethod, setOutlierTreatmentMethod] = useState("Mean");
 
-  // Fetch columns from backend on mount
+  // Mock intervals fallback (not used now but kept for legacy or testing)
+  const mockIntervals = [
+    "2025-08-01 10:00 to 2025-08-01 12:00",
+    "2025-08-02 14:00 to 2025-08-02 16:30",
+    "2025-08-03 09:15 to 2025-08-03 10:45",
+    "2025-08-04 11:00 to 2025-08-04 13:00",
+    "2025-08-05 15:30 to 2025-08-05 17:00",
+    "2025-08-06 08:00 to 2025-08-06 09:30",
+  ];
+
   useEffect(() => {
+    // Fetch columns on mount
     const fetchColumns = async () => {
       try {
         const response = await fetch(`${BACKEND_URL}/get_columns`);
@@ -80,8 +90,8 @@ export default function DataVisualizationAndEngineering() {
     fetchColumns();
   }, []);
 
-  // Fetch missing datetime intervals when treatment card expands & mode is datetime
   useEffect(() => {
+    // Fetch missing datetime intervals from backend when treatment card expands & mode is datetime
     if (expanded === "missingTreatment" && treatmentMode === "datetime") {
       const fetchIntervals = async () => {
         try {
@@ -89,19 +99,13 @@ export default function DataVisualizationAndEngineering() {
           if (!res.ok) throw new Error("Failed to fetch missing datetime intervals");
           const data = await res.json();
           if (Array.isArray(data.intervals)) {
-            // Expect intervals in [{start: ..., end: ...}, ...] format from backend
-            // Store as array of strings "start - end" for display and selection
-            const formattedIntervals = data.intervals.map(
-              (interval) => `${interval.start} - ${interval.end}`
-            );
-            setMissingDateTimeIntervals(formattedIntervals);
+            setMissingDateTimeIntervals(data.intervals);
           } else {
             setMissingDateTimeIntervals([]);
           }
         } catch (err) {
           console.error(err);
           setError("Error fetching missing datetime intervals");
-          setMissingDateTimeIntervals([]);
         }
       };
       fetchIntervals();
@@ -192,21 +196,25 @@ export default function DataVisualizationAndEngineering() {
     );
   };
 
-  const handleTreatmentIntervalToggle = (interval) => {
+  const handleTreatmentIntervalToggle = (intervalStr) => {
     setTreatmentSelectedIntervals((prev) =>
-      prev.includes(interval) ? prev.filter((i) => i !== interval) : [...prev, interval]
+      prev.includes(intervalStr) ? prev.filter((i) => i !== intervalStr) : [...prev, intervalStr]
     );
   };
 
-  // Convert selected interval strings like "start - end" into {start, end} objects for backend
-  const parseIntervalsForBackend = (intervalStrings) => {
-    return intervalStrings.map((str) => {
-      const [start, end] = str.split(" - ").map((s) => s.trim());
-      return { start, end };
-    });
+  const handleOutlierColumnToggle = (col) => {
+    setOutlierSelectedColumns((prev) =>
+      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
+    );
   };
 
-  // Apply Missing Value Treatment function
+  const handleOutlierIntervalToggle = (intervalStr) => {
+    setOutlierSelectedIntervals((prev) =>
+      prev.includes(intervalStr) ? prev.filter((i) => i !== intervalStr) : [...prev, intervalStr]
+    );
+  };
+
+  // Apply missing value treatment
   const applyMissingValueTreatment = async () => {
     if (treatmentMode === "datetime") {
       if (treatmentSelectedColumns.length === 0) {
@@ -224,10 +232,18 @@ export default function DataVisualizationAndEngineering() {
 
       setLoadingTreatment(true);
       setError("");
+
+      // Convert selected intervals (string) to [{start:..., end:...}, ...] format expected by backend
+      // Assuming intervals strings are like "2025-08-01 10:00 to 2025-08-01 12:00"
+      const formattedIntervals = treatmentSelectedIntervals.map((intervalStr) => {
+        const [start, end] = intervalStr.split(" to ");
+        return { start, end };
+      });
+
       try {
         const payload = {
           columns: treatmentSelectedColumns,
-          intervals: parseIntervalsForBackend(treatmentSelectedIntervals),
+          intervals: formattedIntervals,
           method: treatmentMethod,
         };
         const res = await fetch(`${BACKEND_URL}/apply_treatment`, {
@@ -237,9 +253,8 @@ export default function DataVisualizationAndEngineering() {
         });
         if (!res.ok) throw new Error(`Treatment failed with status ${res.status}`);
         const result = await res.json();
-        // Show success message or update UI based on result here
         setError("Treatment applied successfully.");
-        // Optionally, clear selections after success
+        // Optionally clear selections
         setTreatmentSelectedColumns([]);
         setTreatmentSelectedIntervals([]);
       } catch (err) {
@@ -253,6 +268,7 @@ export default function DataVisualizationAndEngineering() {
     }
   };
 
+  // Apply outlier treatment placeholder
   const applyOutlierTreatment = () => {
     console.log("Apply Outlier Treatment:", {
       columns: outlierSelectedColumns,
@@ -261,17 +277,8 @@ export default function DataVisualizationAndEngineering() {
     });
   };
 
-  // Return JSX begins here ...
-
   return (
-    <Grid
-      container
-      spacing={2}
-      sx={{
-        height: "calc(100vh - 100px)",
-        flexWrap: "nowrap",
-      }}
-    >
+    <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)", flexWrap: "nowrap" }}>
       {/* LEFT PANEL */}
       <Grid
         item
@@ -285,9 +292,9 @@ export default function DataVisualizationAndEngineering() {
           px: 1,
           fontSize: "0.85rem",
           flexShrink: 0,
-          minWidth: 280,            // maintain min width even when collapsed
-          width: expanded ? 320 : 280, // prevent shrinking below minWidth
+          minWidth: 320, // maintain minimum width even if collapsed
           transition: "width 0.3s ease",
+          width: expanded ? 320 : 320, // fixed width, no shrink on collapse to avoid UI issues
         }}
       >
         <Paper
@@ -299,10 +306,7 @@ export default function DataVisualizationAndEngineering() {
           elevation={3}
         >
           {/* Variability Analysis */}
-          <Accordion
-            expanded={expanded === "variability"}
-            onChange={handleExpand("variability")}
-          >
+          <Accordion expanded={expanded === "variability"} onChange={handleExpand("variability")}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                 Variability Analysis
@@ -325,12 +329,7 @@ export default function DataVisualizationAndEngineering() {
                   />
                 ))}
               </FormGroup>
-              <Button
-                variant="contained"
-                size="small"
-                sx={{ mt: 1 }}
-                onClick={runVariabilityAnalysis}
-              >
+              <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runVariabilityAnalysis}>
                 Run Analysis
               </Button>
             </AccordionDetails>
@@ -348,7 +347,7 @@ export default function DataVisualizationAndEngineering() {
             </AccordionSummary>
             <AccordionDetails
               sx={{
-                maxWidth: "100%", // allow full width inside left panel
+                maxWidth: 300,
                 overflowY: "auto",
                 maxHeight: 300,
                 pr: 1,
@@ -369,12 +368,7 @@ export default function DataVisualizationAndEngineering() {
                   />
                 ))}
               </RadioGroup>
-              <Button
-                variant="contained"
-                size="small"
-                sx={{ mt: 1 }}
-                onClick={runMissingValueAnalysis}
-              >
+              <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runMissingValueAnalysis}>
                 Run Analysis
               </Button>
             </AccordionDetails>
@@ -384,7 +378,6 @@ export default function DataVisualizationAndEngineering() {
           <Accordion
             expanded={expanded === "missingTreatment"}
             onChange={handleExpand("missingTreatment")}
-            sx={{ mt: 2 }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
@@ -417,7 +410,7 @@ export default function DataVisualizationAndEngineering() {
                   {/* Column List */}
                   <Grid
                     item
-                    xs={6} // increased width for better layout
+                    xs={4}
                     sx={{
                       maxHeight: 200,
                       overflowY: "auto",
@@ -449,90 +442,87 @@ export default function DataVisualizationAndEngineering() {
                   {/* Interval List */}
                   <Grid
                     item
-                    xs={6} // side by side with columns
+                    xs={4}
                     sx={{
                       maxHeight: 200,
                       overflowY: "auto",
+                      borderRight: "1px solid #ccc",
                       pl: 1,
                     }}
                   >
-                    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                    <Typography variant="caption" sx={{ fontWeight: "bold"}}>
                       Intervals
                     </Typography>
                     <FormGroup>
-                      {missingDateTimeIntervals.length > 0 ? (
-                        missingDateTimeIntervals.map((interval) => (
-                          <FormControlLabel
-                            key={interval}
-                            control={
-                              <Checkbox
-                                size="small"
-                                checked={treatmentSelectedIntervals.includes(interval)}
-                                onChange={() => handleTreatmentIntervalToggle(interval)}
-                              />
-                            }
-                            label={interval}
-                            sx={{ fontSize: "0.85rem" }}
-                          />
-                        ))
-                      ) : (
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                          No intervals available
-                        </Typography>
-                      )}
+                      {(missingDateTimeIntervals.length > 0
+                        ? missingDateTimeIntervals
+                        : mockIntervals
+                      ).map((interval) => (
+                        <FormControlLabel
+                          key={interval}
+                          control={
+                            <Checkbox
+                              size="small"
+                              checked={treatmentSelectedIntervals.includes(interval)}
+                              onChange={() => handleTreatmentIntervalToggle(interval)}
+                            />
+                          }
+                          label={interval}
+                          sx={{ fontSize: "0.85rem" }}
+                        />
+                      ))}
                     </FormGroup>
+                  </Grid>
+
+                  {/* Treatment Method */}
+                  <Grid item xs={4}>
+                    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                      Treatment Method
+                    </Typography>
+                    <Select
+                      size="small"
+                      value={treatmentMethod}
+                      onChange={(e) => setTreatmentMethod(e.target.value)}
+                      fullWidth
+                      sx={{ mt: 1 }}
+                    >
+                      <MenuItem value="Mean">Mean</MenuItem>
+                      <MenuItem value="Median">Median</MenuItem>
+                      <MenuItem value="Forward fill">Forward Fill</MenuItem>
+                      <MenuItem value="Backward fill">Backward Fill</MenuItem>
+                      <MenuItem value="Delete rows">Delete rows</MenuItem>
+                    </Select>
+
+                    <Button
+                      variant="contained"
+                      size="small"
+                      sx={{ mt: 2 }}
+                      onClick={applyMissingValueTreatment}
+                      disabled={loadingTreatment}
+                    >
+                      {loadingTreatment ? "Applying..." : "Apply Treatment"}
+                    </Button>
                   </Grid>
                 </Grid>
               )}
 
-              {/* Treatment Method and Apply Button */}
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                  Treatment Method
+              {treatmentMode === "column" && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                  Treatment mode "Missing Values in Column" not implemented yet.
                 </Typography>
-                <Select
-                  size="small"
-                  value={treatmentMethod}
-                  onChange={(e) => setTreatmentMethod(e.target.value)}
-                  fullWidth
-                  sx={{ mt: 1 }}
-                >
-                  <MenuItem value="Mean">Mean</MenuItem>
-                  <MenuItem value="Median">Median</MenuItem>
-                  <MenuItem value="Forward fill">Forward Fill</MenuItem>
-                  <MenuItem value="Backward fill">Backward Fill</MenuItem>
-                  <MenuItem value="Delete rows">Delete rows</MenuItem>
-                </Select>
-
-                <Button
-                  variant="contained"
-                  size="small"
-                  sx={{ mt: 2 }}
-                  onClick={applyMissingValueTreatment}
-                  disabled={loadingTreatment}
-                >
-                  {loadingTreatment ? "Applying..." : "Apply Treatment"}
-                </Button>
-              </Box>
+              )}
             </AccordionDetails>
           </Accordion>
 
           {/* Outlier Analysis */}
-          <Accordion
-            expanded={expanded === "outlierAnalysis"}
-            onChange={handleExpand("outlierAnalysis")}
-          >
+          <Accordion expanded={expanded === "outlierAnalysis"} onChange={handleExpand("outlierAnalysis")}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                 Outlier Analysis
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <RadioGroup
-                value={outlierMethod}
-                onChange={(e) => setOutlierMethod(e.target.value)}
-                row
-              >
+              <RadioGroup value={outlierMethod} onChange={(e) => setOutlierMethod(e.target.value)} row>
                 <FormControlLabel
                   value="zscore"
                   control={<Radio size="small" />}
@@ -546,22 +536,14 @@ export default function DataVisualizationAndEngineering() {
                   sx={{ fontSize: "0.85rem" }}
                 />
               </RadioGroup>
-              <Button
-                variant="contained"
-                size="small"
-                sx={{ mt: 1 }}
-                onClick={() => console.log("Run Outlier Analysis")}
-              >
+              <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={() => console.log("Run Outlier Analysis")}>
                 Run Analysis
               </Button>
             </AccordionDetails>
           </Accordion>
 
           {/* Outlier Treatment */}
-          <Accordion
-            expanded={expanded === "outlierTreatment"}
-            onChange={handleExpand("outlierTreatment")}
-          >
+          <Accordion expanded={expanded === "outlierTreatment"} onChange={handleExpand("outlierTreatment")}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                 Outlier Treatment
@@ -647,12 +629,7 @@ export default function DataVisualizationAndEngineering() {
                     <MenuItem value="Delete rows">Delete rows</MenuItem>
                   </Select>
 
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{ mt: 2 }}
-                    onClick={applyOutlierTreatment}
-                  >
+                  <Button variant="contained" size="small" sx={{ mt: 2 }} onClick={applyOutlierTreatment}>
                     Apply Treatment
                   </Button>
                 </Grid>
@@ -671,6 +648,8 @@ export default function DataVisualizationAndEngineering() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
+          minWidth: 0,
+          minHeight: 0,
         }}
       >
         <Paper
@@ -688,17 +667,9 @@ export default function DataVisualizationAndEngineering() {
           </Typography>
           <Divider sx={{ mb: 2 }} />
 
-          <Box
-            sx={{
-              flexGrow: 1,
-              overflowY: "auto",
-              minHeight: 0,
-              width: "100%",
-              minWidth: 0,
-            }}
-          >
+          <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
             {loading && <CircularProgress />}
-            {error && <Alert severity={error === "Treatment applied successfully." ? "success" : "error"}>{error}</Alert>}
+            {error && <Alert severity="error">{error}</Alert>}
             {plotData ? (
               <Plot
                 data={plotData.data}
@@ -707,8 +678,9 @@ export default function DataVisualizationAndEngineering() {
                   autosize: true,
                   paper_bgcolor: theme.palette.background.paper,
                   plot_bgcolor: theme.palette.background.default,
+                  margin: { t: 40, b: 40, l: 40, r: 40 },
                 }}
-                style={{ width: "100%", height: "100%" }}
+                style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
                 useResizeHandler
               />
             ) : (
