@@ -130,34 +130,35 @@ export default function DataVisualizationAndEngineering() {
 
   // Missing Value Analysis handlers
   const runMissingValueAnalysis = async () => {
-    if (!missingValueColumn) {
-      setError("Please select a column for missing value analysis.");
-      return;
+  if (!missingValueColumn) {
+    setError("Please select a column for missing value analysis.");
+    return;
+  }
+  setError("");
+  setLoading(true);
+  setPlotData(null);
+  try {
+    const prompt = `Perform missing value analysis where selected variable is ${missingValueColumn}`;
+    const response = await fetch(`${BACKEND_URL}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
+    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+    const result = await response.json();
+    if (result.type === "plot" && result.data) {
+      setPlotData(result.data);
+    } else {
+      setError("Unexpected response from server.");
     }
-    setError("");
-    setLoading(true);
-    setPlotData(null);
-    try {
-      const prompt = `missing value analysis where selected variable is ${missingValueColumn}`;
-      const response = await fetch(`${BACKEND_URL}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
-      if (!response.ok) throw new Error(`Server error: ${response.status}`);
-      const result = await response.json();
-      if (result.type === "plot" && result.data) {
-        setPlotData(result.data);
-      } else {
-        setError("Unexpected response from server.");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Error running missing value analysis.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err) {
+    console.error(err);
+    setError("Error running missing value analysis.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Treatment cards handlers
   const handleTreatmentColumnToggle = (col) => {
@@ -257,35 +258,49 @@ export default function DataVisualizationAndEngineering() {
           </Accordion>
 
           {/* Missing Value Analysis */}
-          <Accordion
-            expanded={expanded === "missingAnalysis"}
-            onChange={handleExpand("missingAnalysis")}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                Missing Value Analysis
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <RadioGroup
-                value={missingValueColumn}
-                onChange={(e) => setMissingValueColumn(e.target.value)}
-              >
-                {columns.map((col) => (
-                  <FormControlLabel
-                    key={col}
-                    value={col}
-                    control={<Radio size="small" />}
-                    label={col}
-                    sx={{ fontSize: "0.85rem" }}
-                  />
-                ))}
-              </RadioGroup>
-              <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runMissingValueAnalysis}>
-                Run Analysis
-              </Button>
-            </AccordionDetails>
-          </Accordion>
+<Accordion
+  expanded={expanded === "missingAnalysis"}
+  onChange={handleExpand("missingAnalysis")}
+>
+  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+    <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+      Missing Value Analysis
+    </Typography>
+  </AccordionSummary>
+  <AccordionDetails
+    sx={{
+      maxWidth: 300,           // limit width so it doesn't stretch too wide
+      overflowY: "auto",
+      maxHeight: 300,
+      pr: 1,
+    }}
+  >
+    <RadioGroup
+      value={missingValueColumn}
+      onChange={(e) => setMissingValueColumn(e.target.value)}
+      sx={{ maxWidth: '100%' }}
+    >
+      {columns.map((col) => (
+        <FormControlLabel
+          key={col}
+          value={col}
+          control={<Radio size="small" />}
+          label={col}
+          sx={{ fontSize: "0.85rem" }}
+        />
+      ))}
+    </RadioGroup>
+    <Button
+      variant="contained"
+      size="small"
+      sx={{ mt: 1 }}
+      onClick={runMissingValueAnalysis}
+    >
+      Run Analysis
+    </Button>
+  </AccordionDetails>
+</Accordion>
+
 
           {/* Missing Value Treatment */}
           <Accordion
