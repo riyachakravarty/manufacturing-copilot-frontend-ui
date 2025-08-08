@@ -1,106 +1,110 @@
 // src/pages/DataVisualizationAndEngineering.jsx
-import React, { useState, useEffect, useContext } from "react";
+
+import React, { useEffect, useState, useContext } from "react";
 import {
+  Box,
   Card,
   CardContent,
-  Typography,
-  Button,
-  CircularProgress,
+  CardHeader,
   Checkbox,
-  FormGroup,
   FormControlLabel,
+  Button,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
 import Plot from "react-plotly.js";
 import { AppContext } from "../context/AppContext";
 
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
-export default function DataVisualizationAndEngineering() {
+const DataVisualizationAndEngineering = () => {
   const { uploadedFile } = useContext(AppContext);
   const [columns, setColumns] = useState([]);
   const [selectedColumn, setSelectedColumn] = useState("");
   const [loadingColumns, setLoadingColumns] = useState(false);
-  const [loadingPlot, setLoadingPlot] = useState(false);
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [plotData, setPlotData] = useState(null);
+  const [error, setError] = useState("");
 
-  // Fetch columns — if backend has lost state, re-upload from context
-  const fetchColumns = async () => {
-    setLoadingColumns(true);
-    try {
-      let res = await fetch(`${BACKEND_URL}/get_columns`);
-      let data = await res.json();
+  // Fetch columns on mount
+  useEffect(() => {
+    if (!uploadedFile) {
+      setError("No file uploaded. Please upload a file on the Home page first.");
+      return;
+    }
 
-      if (data.error && uploadedFile) {
-        // Backend lost state — re-upload
-        const formData = new FormData();
-        formData.append("file", uploadedFile);
-        const uploadRes = await fetch(`${BACKEND_URL}/upload`, {
-          method: "POST",
-          body: formData,
+    const fetchColumns = async () => {
+      setLoadingColumns(true);
+      setError("");
+      try {
+        const response = await fetch(`${BACKEND_URL}/get_columns`, {
+          method: "GET",
         });
 
-        if (!uploadRes.ok) throw new Error("Re-upload failed");
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        // Try fetching columns again
-        res = await fetch(`${BACKEND_URL}/get_columns`);
-        data = await res.json();
+        const data = await response.json();
+        if (data.columns) {
+          setColumns(data.columns);
+        } else {
+          throw new Error("No columns found in response.");
+        }
+      } catch (err) {
+        console.error("Error fetching columns:", err);
+        setError("Failed to fetch columns from backend.");
+      } finally {
+        setLoadingColumns(false);
       }
+    };
 
-      if (data.columns) {
-        setColumns(data.columns);
-      } else {
-        console.error("No columns found:", data);
-      }
-    } catch (err) {
-      console.error("Error fetching columns:", err);
-    } finally {
-      setLoadingColumns(false);
-    }
-  };
-
-  useEffect(() => {
     fetchColumns();
-  }, []);
+  }, [uploadedFile]);
 
+  // Run variability analysis
   const handleRunAnalysis = async () => {
     if (!selectedColumn) return;
-    setLoadingPlot(true);
-    try {
-      const payload = {
-        prompt: `Perform variability analysis where selected variable is ${selectedColumn}`,
-      };
+    setLoadingAnalysis(true);
+    setError("");
+    setPlotData(null);
 
-      const res = await fetch(`${BACKEND_URL}/chat`, {
+    try {
+      const prompt = `Perform variability analysis where selected variable is ${selectedColumn}`;
+      const response = await fetch(`${BACKEND_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ prompt }),
       });
 
-      const data = await res.json();
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+      console.log("Chat response:", data);
+
       if (data.type === "plot" && data.data) {
         setPlotData(data.data);
       } else {
-        console.error("Unexpected response:", data);
+        setError("Unexpected response format from backend.");
       }
     } catch (err) {
       console.error("Error running analysis:", err);
+      setError("Failed to run variability analysis.");
     } finally {
-      setLoadingPlot(false);
+      setLoadingAnalysis(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Card sx={{ marginBottom: 3 }}>
+    <Box p={3}>
+      {/* Variability Analysis Card */}
+      <Card sx={{ mb: 3 }}>
+        <CardHeader title="Variability Analysis" />
         <CardContent>
-          <Typography variant="h5" gutterBottom>
-            Variability Analysis
-          </Typography>
-
           {loadingColumns ? (
             <CircularProgress size={24} />
+          ) : error ? (
+            <Typography color="error">{error}</Typography>
           ) : (
-            <FormGroup>
+            <>
               {columns.map((col) => (
                 <FormControlLabel
                   key={col}
@@ -113,32 +117,41 @@ export default function DataVisualizationAndEngineering() {
                   label={col}
                 />
               ))}
-            </FormGroup>
+              <Box mt={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleRunAnalysis}
+                  disabled={!selectedColumn || loadingAnalysis}
+                >
+                  {loadingAnalysis ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    "Run Analysis"
+                  )}
+                </Button>
+              </Box>
+            </>
           )}
-
-          <Button
-            variant="contained"
-            sx={{ mt: 2 }}
-            disabled={!selectedColumn || loadingPlot}
-            onClick={handleRunAnalysis}
-          >
-            {loadingPlot ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              "Run Analysis"
-            )}
-          </Button>
         </CardContent>
       </Card>
 
+      {/* Plotly Chart */}
       {plotData && (
         <Card>
+          <CardHeader title="Analysis Result" />
           <CardContent>
-            <Typography variant="h6">Analysis Result</Typography>
-            <Plot data={plotData.data} layout={plotData.layout} />
+            <Plot
+              data={plotData.data}
+              layout={plotData.layout}
+              config={{ responsive: true }}
+              style={{ width: "100%", height: "100%" }}
+            />
           </CardContent>
         </Card>
       )}
-    </div>
+    </Box>
   );
-}
+};
+
+export default DataVisualizationAndEngineering;
