@@ -196,10 +196,19 @@ export default function DataVisualizationAndEngineering() {
     );
   };
 
-  const handleTreatmentIntervalToggle = (intervalStr) => {
-    setTreatmentSelectedIntervals((prev) =>
-      prev.includes(intervalStr) ? prev.filter((i) => i !== intervalStr) : [...prev, intervalStr]
-    );
+  const handleTreatmentIntervalToggle = (interval) => {
+    setTreatmentSelectedIntervals((prev) => {
+      const exists = prev.some(
+        (i) => i.start === interval.start && i.end === interval.end
+      );
+      if (exists) {
+        return prev.filter(
+          (i) => !(i.start === interval.start && i.end === interval.end)
+        );
+      } else {
+        return [...prev, interval];
+      }
+    });
   };
 
   const handleOutlierColumnToggle = (col) => {
@@ -439,40 +448,49 @@ export default function DataVisualizationAndEngineering() {
                     </FormGroup>
                   </Grid>
 
-                  {/* Interval List */}
-                  <Grid
-                    item
-                    xs={4}
-                    sx={{
-                      maxHeight: 200,
-                      overflowY: "auto",
-                      borderRight: "1px solid #ccc",
-                      pl: 1,
-                    }}
-                  >
-                    <Typography variant="caption" sx={{ fontWeight: "bold"}}>
-                      Intervals
-                    </Typography>
-                    <FormGroup>
-                      {(missingDateTimeIntervals.length > 0
-                        ? missingDateTimeIntervals
-                        : mockIntervals
-                      ).map((interval) => (
-                        <FormControlLabel
-                          key={interval}
-                          control={
-                            <Checkbox
-                              size="small"
-                              checked={treatmentSelectedIntervals.includes(interval)}
-                              onChange={() => handleTreatmentIntervalToggle(interval)}
-                            />
-                          }
-                          label={interval}
-                          sx={{ fontSize: "0.85rem" }}
-                        />
-                      ))}
-                    </FormGroup>
-                  </Grid>
+{/* Interval List */}
+<Grid
+  item
+  xs={4}
+  sx={{
+    maxHeight: 200,
+    overflowY: "auto",
+    borderRight: "1px solid #ccc",
+    pl: 1,
+  }}
+>
+  <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+    Intervals
+  </Typography>
+  <FormGroup>
+    {missingDateTimeIntervals.length > 0 ? (
+      missingDateTimeIntervals.map((interval) => {
+        const label = `${interval.start} to ${interval.end}`;
+        const checked = treatmentSelectedIntervals.some(
+          (i) => i.start === interval.start && i.end === interval.end
+        );
+        return (
+          <FormControlLabel
+            key={label}
+            control={
+              <Checkbox
+                size="small"
+                checked={checked}
+                onChange={() => handleTreatmentIntervalToggle(interval)}
+              />
+            }
+            label={label}
+            sx={{ fontSize: "0.85rem" }}
+          />
+        );
+      })
+    ) : (
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        No missing datetime intervals found.
+      </Typography>
+    )}
+  </FormGroup>
+</Grid>
 
                   {/* Treatment Method */}
                   <Grid item xs={4}>
