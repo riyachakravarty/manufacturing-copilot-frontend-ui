@@ -99,99 +99,124 @@ export default function DataVisualizationAndEngineering() {
   };
 
   return (
-    <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)" }}>
-      {/* LEFT PANEL - Controls */}
-      <Grid item xs={12} md={3} sx={{ height: "100%" }}>
-        <Paper
-          sx={{
-            p: 2,
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            bgcolor: theme.palette.background.paper,
-          }}
-          elevation={3}
-        >
-          <Typography variant="h5" gutterBottom color="primary">
-            Data Visualization & Engineering
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
+  <Grid
+    container
+    spacing={2}
+    sx={{
+      height: "calc(100vh - 100px)",
+      flexWrap: "nowrap", // ✅ Prevent wrapping on desktop
+    }}
+  >
+    {/* LEFT PANEL - Controls */}
+    <Grid
+      item
+      xs={12}
+      md={3}
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Paper
+        sx={{
+          p: 2,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          bgcolor: theme.palette.background.paper,
+        }}
+        elevation={3}
+      >
+        <Typography variant="h5" gutterBottom color="primary">
+          Data Visualization & Engineering
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
 
-          <Typography variant="subtitle1" gutterBottom>
-            Variability Analysis
-          </Typography>
+        <Typography variant="subtitle1" gutterBottom>
+          Variability Analysis
+        </Typography>
 
-          <Box sx={{ flexGrow: 1, overflowY: "auto", pr: 1 }}>
-            <FormGroup>
-              {columns.map((col) => (
-                <FormControlLabel
-                  key={col}
-                  control={
-                    <Checkbox
-                      checked={selectedColumns.includes(col)}
-                      onChange={() => handleCheckboxChange(col)}
-                    />
-                  }
-                  label={col}
-                />
-              ))}
-            </FormGroup>
-          </Box>
-
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ mt: 2 }}
-            onClick={runAnalysis}
-          >
-            Run Analysis
-          </Button>
-        </Paper>
-      </Grid>
-
-      {/* RIGHT PANEL - Output */}
-      <Grid item xs={12} md={9} sx={{ height: "100%" }}>
-        <Paper
-          sx={{
-            p: 2,
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            bgcolor: theme.palette.background.paper,
-          }}
-          elevation={3}
-        >
-          <Typography variant="h6" gutterBottom color="primary">
-            Analysis Output
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-
-          <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
-            {loading && <CircularProgress />}
-            {error && <Alert severity="error">{error}</Alert>}
-            {plotData ? (
-              <Plot
-                data={plotData.data}
-                layout={{
-                  ...plotData.layout,
-                  autosize: true,
-                  paper_bgcolor: theme.palette.background.paper,
-                  plot_bgcolor: theme.palette.background.default,
-                }}
-                style={{ width: "100%", height: "100%" }}
-                useResizeHandler
+        <Box sx={{ flexGrow: 1, overflowY: "auto", pr: 1 }}>
+          <FormGroup>
+            {columns.map((col) => (
+              <FormControlLabel
+                key={col}
+                control={
+                  <Checkbox
+                    checked={selectedColumns.includes(col)}
+                    onChange={() => handleCheckboxChange(col)}
+                  />
+                }
+                label={col}
               />
-            ) : (
-              !loading &&
-              !error && (
-                <Typography variant="body2" color="text.secondary">
-                  No analysis results yet.
-                </Typography>
-              )
-            )}
-          </Box>
-        </Paper>
-      </Grid>
+            ))}
+          </FormGroup>
+        </Box>
+
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2 }}
+          onClick={runAnalysis}
+        >
+          Run Analysis
+        </Button>
+      </Paper>
     </Grid>
-  );
+
+    {/* RIGHT PANEL - Output */}
+    <Grid
+      item
+      xs={12}
+      md={9}
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Paper
+        sx={{
+          p: 2,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          bgcolor: theme.palette.background.paper,
+        }}
+        elevation={3}
+      >
+        <Typography variant="h6" gutterBottom color="primary">
+          Analysis Output
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+
+        <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+          {loading && <CircularProgress />}
+          {error && <Alert severity="error">{error}</Alert>}
+          {plotData ? (
+            <Plot
+              data={plotData.data}
+              layout={{
+                ...plotData.layout,
+                autosize: true,
+                paper_bgcolor: theme.palette.background.paper,
+                plot_bgcolor: theme.palette.background.default,
+              }}
+              style={{ width: "100%", height: "100%" }}
+              useResizeHandler
+            />
+          ) : (
+            !loading &&
+            !error && (
+              <Typography variant="body2" color="text.secondary">
+                No analysis results yet.
+              </Typography>
+            )
+          )}
+        </Box>
+      </Paper>
+    </Grid>
+  </Grid>
+);
 }
