@@ -244,15 +244,16 @@ export default function DataVisualizationAndEngineering() {
 
       // Convert selected intervals (string) to [{start:..., end:...}, ...] format expected by backend
       // Assuming intervals strings are like "2025-08-01 10:00 to 2025-08-01 12:00"
-      const formattedIntervals = treatmentSelectedIntervals.map((intervalStr) => {
-        const [start, end] = intervalStr.split(" to ");
-        return { start, end };
-      });
+      
+      //const formattedIntervals = treatmentSelectedIntervals.map((intervalStr) => {
+        //const [start, end] = intervalStr.split(" to ");
+        //return { start, end };
+      //});
 
       try {
         const payload = {
           columns: treatmentSelectedColumns,
-          intervals: formattedIntervals,
+          intervals: treatmentSelectedIntervals,
           method: treatmentMethod,
         };
         console.log("Sending payload:", payload);
