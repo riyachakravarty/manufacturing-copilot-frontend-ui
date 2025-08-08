@@ -1,17 +1,4 @@
-// src/pages/DataVisualizationAndEngineering.jsx
-
 import React, { useEffect, useState, useContext } from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  Checkbox,
-  FormControlLabel,
-  Button,
-  Typography,
-  CircularProgress,
-} from "@mui/material";
 import Plot from "react-plotly.js";
 import { AppContext } from "../context/AppContext";
 
@@ -21,50 +8,44 @@ const DataVisualizationAndEngineering = () => {
   const { uploadedFile } = useContext(AppContext);
   const [columns, setColumns] = useState([]);
   const [selectedColumn, setSelectedColumn] = useState("");
-  const [loadingColumns, setLoadingColumns] = useState(false);
-  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [plotData, setPlotData] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Fetch columns on mount
+  // Get column names from backend
   useEffect(() => {
-    if (!uploadedFile) {
-      setError("No file uploaded. Please upload a file on the Home page first.");
-      return;
-    }
-
     const fetchColumns = async () => {
-      setLoadingColumns(true);
-      setError("");
       try {
         const response = await fetch(`${BACKEND_URL}/get_columns`, {
           method: "GET",
         });
-
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
+        if (!response.ok) {
+          throw new Error("Failed to fetch columns");
+        }
         const data = await response.json();
         if (data.columns) {
           setColumns(data.columns);
         } else {
-          throw new Error("No columns found in response.");
+          setError(data.error || "No columns found.");
         }
       } catch (err) {
-        console.error("Error fetching columns:", err);
-        setError("Failed to fetch columns from backend.");
-      } finally {
-        setLoadingColumns(false);
+        console.error(err);
+        setError("Error fetching columns.");
       }
     };
 
     fetchColumns();
-  }, [uploadedFile]);
+  }, []);
 
   // Run variability analysis
-  const handleRunAnalysis = async () => {
-    if (!selectedColumn) return;
-    setLoadingAnalysis(true);
+  const runAnalysis = async () => {
+    if (!selectedColumn) {
+      setError("Please select a column for analysis.");
+      return;
+    }
+
     setError("");
+    setLoading(true);
     setPlotData(null);
 
     try {
@@ -75,82 +56,71 @@ const DataVisualizationAndEngineering = () => {
         body: JSON.stringify({ prompt }),
       });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
 
-      const data = await response.json();
-      console.log("Chat response:", data);
+      const result = await response.json();
 
-      if (data.type === "plot" && data.data) {
-        setPlotData(data.data);
+      if (result.type === "plot" && result.data) {
+        setPlotData(result.data);
       } else {
-        setError("Unexpected response format from backend.");
+        setError("Unexpected response from server.");
       }
     } catch (err) {
-      console.error("Error running analysis:", err);
-      setError("Failed to run variability analysis.");
+      console.error(err);
+      setError("Error running variability analysis.");
     } finally {
-      setLoadingAnalysis(false);
+      setLoading(false);
     }
   };
 
   return (
-    <Box p={3}>
-      {/* Variability Analysis Card */}
-      <Card sx={{ mb: 3 }}>
-        <CardHeader title="Variability Analysis" />
-        <CardContent>
-          {loadingColumns ? (
-            <CircularProgress size={24} />
-          ) : error ? (
-            <Typography color="error">{error}</Typography>
-          ) : (
-            <>
-              {columns.map((col) => (
-                <FormControlLabel
-                  key={col}
-                  control={
-                    <Checkbox
-                      checked={selectedColumn === col}
-                      onChange={() => setSelectedColumn(col)}
-                    />
-                  }
-                  label={col}
-                />
-              ))}
-              <Box mt={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleRunAnalysis}
-                  disabled={!selectedColumn || loadingAnalysis}
-                >
-                  {loadingAnalysis ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : (
-                    "Run Analysis"
-                  )}
-                </Button>
-              </Box>
-            </>
-          )}
-        </CardContent>
-      </Card>
+    <div className="card">
+      <h2>Data Visualization & Engineering</h2>
+      <div className="card">
+        <h3>Variability Analysis</h3>
 
-      {/* Plotly Chart */}
-      {plotData && (
-        <Card>
-          <CardHeader title="Analysis Result" />
-          <CardContent>
-            <Plot
-              data={plotData.data}
-              layout={plotData.layout}
-              config={{ responsive: true }}
-              style={{ width: "100%", height: "100%" }}
-            />
-          </CardContent>
-        </Card>
-      )}
-    </Box>
+        {uploadedFile && uploadedFile.name && (
+          <p>
+            <strong>File:</strong> {uploadedFile.name}
+          </p>
+        )}
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        {columns.length > 0 ? (
+          <>
+            <label>Select Column: </label>
+            <select
+              value={selectedColumn}
+              onChange={(e) => setSelectedColumn(e.target.value)}
+            >
+              <option value="">--Select--</option>
+              {columns.map((col) => (
+                <option key={col} value={col}>
+                  {col}
+                </option>
+              ))}
+            </select>
+
+            <button onClick={runAnalysis} disabled={loading}>
+              {loading ? "Running..." : "Run Analysis"}
+            </button>
+          </>
+        ) : (
+          <p>No columns available. Please upload a file first.</p>
+        )}
+
+        {plotData && (
+          <Plot
+            data={plotData.data}
+            layout={plotData.layout}
+            config={{ responsive: true }}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 
