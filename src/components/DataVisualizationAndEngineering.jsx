@@ -6,8 +6,6 @@ import {
   Box,
   Grid,
   Paper,
-  Card,
-  CardContent,
   Typography,
   FormGroup,
   FormControlLabel,
@@ -17,7 +15,7 @@ import {
   Alert,
   Divider,
 } from "@mui/material";
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from "@mui/material/styles";
 
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
@@ -55,17 +53,11 @@ export default function DataVisualizationAndEngineering() {
   }, []);
 
   // Handle checkbox toggle
-  const handleColumnToggle = (column) => {
+  const handleCheckboxChange = (column) => {
     setSelectedColumns((prev) =>
       prev.includes(column)
         ? prev.filter((c) => c !== column)
         : [...prev, column]
-    );
-  };
-
-  const handleCheckboxChange = (column) => {
-    setSelectedColumns((prev) =>
-      prev.includes(column) ? prev.filter((c) => c !== column) : [...prev, column]
     );
   };
 
@@ -81,7 +73,7 @@ export default function DataVisualizationAndEngineering() {
     setPlotData(null);
 
     try {
-      // Only run for the first selected column for now (as per original code)
+      // Only run for the first selected column for now
       const prompt = `Perform variability analysis where selected variable is ${selectedColumns[0]}`;
       const response = await fetch(`${BACKEND_URL}/chat`, {
         method: "POST",
@@ -106,32 +98,46 @@ export default function DataVisualizationAndEngineering() {
     }
   };
 
-   return (
-    <Grid container spacing={2} sx={{ height: '100%' }}>
-      {/* LEFT PANEL */}
-      <Grid item xs={3} sx={{ height: '100%' }}>
-        <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h5" gutterBottom>
+  return (
+    <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)" }}>
+      {/* LEFT PANEL - Controls */}
+      <Grid item xs={12} md={3} sx={{ height: "100%" }}>
+        <Paper
+          sx={{
+            p: 2,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            bgcolor: theme.palette.background.paper,
+          }}
+          elevation={3}
+        >
+          <Typography variant="h5" gutterBottom color="primary">
             Data Visualization & Engineering
           </Typography>
           <Divider sx={{ mb: 2 }} />
+
           <Typography variant="subtitle1" gutterBottom>
             Variability Analysis
           </Typography>
-          <FormGroup sx={{ flexGrow: 1, overflowY: 'auto' }}>
-            {columns.map((col) => (
-              <FormControlLabel
-                key={col}
-                control={
-                  <Checkbox
-                    checked={selectedColumns.includes(col)}
-                    onChange={() => handleCheckboxChange(col)}
-                  />
-                }
-                label={col}
-              />
-            ))}
-          </FormGroup>
+
+          <Box sx={{ flexGrow: 1, overflowY: "auto", pr: 1 }}>
+            <FormGroup>
+              {columns.map((col) => (
+                <FormControlLabel
+                  key={col}
+                  control={
+                    <Checkbox
+                      checked={selectedColumns.includes(col)}
+                      onChange={() => handleCheckboxChange(col)}
+                    />
+                  }
+                  label={col}
+                />
+              ))}
+            </FormGroup>
+          </Box>
+
           <Button
             variant="contained"
             color="primary"
@@ -143,25 +149,41 @@ export default function DataVisualizationAndEngineering() {
         </Paper>
       </Grid>
 
-      {/* RIGHT PANEL */}
-      <Grid item xs={9} sx={{ height: '100%' }}>
-        <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="h6" gutterBottom>
+      {/* RIGHT PANEL - Output */}
+      <Grid item xs={12} md={9} sx={{ height: "100%" }}>
+        <Paper
+          sx={{
+            p: 2,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            bgcolor: theme.palette.background.paper,
+          }}
+          elevation={3}
+        >
+          <Typography variant="h6" gutterBottom color="primary">
             Analysis Output
           </Typography>
           <Divider sx={{ mb: 2 }} />
-          <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+
+          <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
             {loading && <CircularProgress />}
             {error && <Alert severity="error">{error}</Alert>}
             {plotData ? (
               <Plot
                 data={plotData.data}
-                layout={{ ...plotData.layout, autosize: true }}
-                style={{ width: '100%', height: '100%' }}
+                layout={{
+                  ...plotData.layout,
+                  autosize: true,
+                  paper_bgcolor: theme.palette.background.paper,
+                  plot_bgcolor: theme.palette.background.default,
+                }}
+                style={{ width: "100%", height: "100%" }}
                 useResizeHandler
               />
             ) : (
-              !loading && !error && (
+              !loading &&
+              !error && (
                 <Typography variant="body2" color="text.secondary">
                   No analysis results yet.
                 </Typography>
