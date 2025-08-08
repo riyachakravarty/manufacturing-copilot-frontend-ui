@@ -5,6 +5,7 @@ import { AppContext } from "../context/AppContext";
 import {
   Box,
   Grid,
+  Paper,
   Card,
   CardContent,
   Typography,
@@ -16,11 +17,13 @@ import {
   Alert,
   Divider,
 } from "@mui/material";
+import { useTheme } from '@mui/material/styles';
 
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
-const DataVisualizationAndEngineering = () => {
+export default function DataVisualizationAndEngineering() {
   const { uploadedFile } = useContext(AppContext);
+  const theme = useTheme();
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [plotData, setPlotData] = useState(null);
@@ -57,6 +60,12 @@ const DataVisualizationAndEngineering = () => {
       prev.includes(column)
         ? prev.filter((c) => c !== column)
         : [...prev, column]
+    );
+  };
+
+  const handleCheckboxChange = (column) => {
+    setSelectedColumns((prev) =>
+      prev.includes(column) ? prev.filter((c) => c !== column) : [...prev, column]
     );
   };
 
@@ -97,106 +106,70 @@ const DataVisualizationAndEngineering = () => {
     }
   };
 
-  return (
-    <Box sx={{ flexGrow: 1, height: "calc(100vh - 64px)", p: 2 }}>
-      <Grid container spacing={2} sx={{ height: "100%" }}>
-        {/* Left Panel */}
-        <Grid
-          item
-          xs={12}
-          md={3}
-          sx={{
-            height: "100%",
-            overflowY: "auto",
-          }}
-        >
-          <Card>
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Data Visualization & Engineering
-              </Typography>
-
-              {uploadedFile && uploadedFile.name && (
-                <Typography variant="body2" color="text.secondary">
-                  File: {uploadedFile.name}
-                </Typography>
-              )}
-
-              <Divider sx={{ my: 2 }} />
-
-              <Typography variant="h6">Variability Analysis</Typography>
-
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
-
-              <FormGroup>
-                {columns.length > 0 ? (
-                  columns.map((col) => (
-                    <FormControlLabel
-                      key={col}
-                      control={
-                        <Checkbox
-                          checked={selectedColumns.includes(col)}
-                          onChange={() => handleColumnToggle(col)}
-                        />
-                      }
-                      label={col}
-                    />
-                  ))
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    No columns available. Please upload a file first.
-                  </Typography>
-                )}
-              </FormGroup>
-
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                onClick={runAnalysis}
-                disabled={loading}
-                sx={{ mt: 2 }}
-              >
-                {loading ? <CircularProgress size={24} /> : "Run Analysis"}
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Right Panel */}
-        <Grid
-          item
-          xs={12}
-          md={9}
-          sx={{
-            height: "100%",
-            overflowY: "auto",
-          }}
-        >
-          <Card>
-            <CardContent>
-              {plotData ? (
-                <Plot
-                  data={plotData.data}
-                  layout={plotData.layout}
-                  config={{ responsive: true }}
-                  style={{ width: "100%", height: "100%" }}
-                />
-              ) : (
-                <Typography variant="body1" color="text.secondary">
-                  Run an analysis to see results here.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+   return (
+    <Grid container spacing={2} sx={{ height: '100%' }}>
+      {/* LEFT PANEL */}
+      <Grid item xs={3} sx={{ height: '100%' }}>
+        <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h5" gutterBottom>
+            Data Visualization & Engineering
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+          <Typography variant="subtitle1" gutterBottom>
+            Variability Analysis
+          </Typography>
+          <FormGroup sx={{ flexGrow: 1, overflowY: 'auto' }}>
+            {columns.map((col) => (
+              <FormControlLabel
+                key={col}
+                control={
+                  <Checkbox
+                    checked={selectedColumns.includes(col)}
+                    onChange={() => handleCheckboxChange(col)}
+                  />
+                }
+                label={col}
+              />
+            ))}
+          </FormGroup>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2 }}
+            onClick={runAnalysis}
+          >
+            Run Analysis
+          </Button>
+        </Paper>
       </Grid>
-    </Box>
-  );
-};
 
-export default DataVisualizationAndEngineering;
+      {/* RIGHT PANEL */}
+      <Grid item xs={9} sx={{ height: '100%' }}>
+        <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h6" gutterBottom>
+            Analysis Output
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+          <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+            {loading && <CircularProgress />}
+            {error && <Alert severity="error">{error}</Alert>}
+            {plotData ? (
+              <Plot
+                data={plotData.data}
+                layout={{ ...plotData.layout, autosize: true }}
+                style={{ width: '100%', height: '100%' }}
+                useResizeHandler
+              />
+            ) : (
+              !loading && !error && (
+                <Typography variant="body2" color="text.secondary">
+                  No analysis results yet.
+                </Typography>
+              )
+            )}
+          </Box>
+        </Paper>
+      </Grid>
+    </Grid>
+  );
+}
