@@ -87,7 +87,8 @@ export default function DataVisualizationAndEngineering() {
 
   const handleExpand = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
-    // Reset errors/output when switching panels if desired
+    setError("");
+    setPlotData(null);
   };
 
   // Variability Analysis handlers
@@ -122,6 +123,37 @@ export default function DataVisualizationAndEngineering() {
     } catch (err) {
       console.error(err);
       setError("Error running variability analysis.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Missing Value Analysis handlers
+  const runMissingValueAnalysis = async () => {
+    if (!missingValueColumn) {
+      setError("Please select a column for missing value analysis.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    setPlotData(null);
+    try {
+      const prompt = `missing value analysis where selected variable is ${missingValueColumn}`;
+      const response = await fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      const result = await response.json();
+      if (result.type === "plot" && result.data) {
+        setPlotData(result.data);
+      } else {
+        setError("Unexpected response from server.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Error running missing value analysis.");
     } finally {
       setLoading(false);
     }
@@ -249,7 +281,7 @@ export default function DataVisualizationAndEngineering() {
                   />
                 ))}
               </RadioGroup>
-              <Button variant="contained" size="small" sx={{ mt: 1 }}>
+              <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runMissingValueAnalysis}>
                 Run Analysis
               </Button>
             </AccordionDetails>
@@ -288,7 +320,11 @@ export default function DataVisualizationAndEngineering() {
 
               <Grid container spacing={2}>
                 {/* Column List */}
-                <Grid item xs={4} sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}>
+                <Grid
+                  item
+                  xs={4}
+                  sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}
+                >
                   <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                     Columns
                   </Typography>
@@ -399,7 +435,12 @@ export default function DataVisualizationAndEngineering() {
                   sx={{ fontSize: "0.85rem" }}
                 />
               </RadioGroup>
-              <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={() => console.log("Run Outlier Analysis")}>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ mt: 1 }}
+                onClick={() => console.log("Run Outlier Analysis")}
+              >
                 Run Analysis
               </Button>
             </AccordionDetails>
@@ -415,7 +456,11 @@ export default function DataVisualizationAndEngineering() {
             <AccordionDetails>
               <Grid container spacing={2}>
                 {/* Column List */}
-                <Grid item xs={4} sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}>
+                <Grid
+                  item
+                  xs={4}
+                  sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}
+                >
                   <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                     Columns
                   </Typography>
