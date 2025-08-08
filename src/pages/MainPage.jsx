@@ -86,9 +86,6 @@ const MainPage = () => {
       {/* Tab Content Area */}
       <Card sx={{ borderRadius: 4, p: 3, boxShadow: 3 }}>
         <CardContent>
-          <Typography variant="h6" sx={{ color: 'text.secondary' }}>
-            {tabLabels[currentTab].label}
-          </Typography>
           <Box mt={2}>
             {renderTabContent()}
           </Box>

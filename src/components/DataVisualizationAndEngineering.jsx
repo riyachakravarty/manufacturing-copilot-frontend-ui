@@ -128,11 +128,7 @@ export default function DataVisualizationAndEngineering() {
         }}
         elevation={3}
       >
-        <Typography variant="h5" gutterBottom color="primary">
-          Data Visualization & Engineering
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
-
+        
         <Typography variant="subtitle1" gutterBottom>
           Variability Analysis
         </Typography>
