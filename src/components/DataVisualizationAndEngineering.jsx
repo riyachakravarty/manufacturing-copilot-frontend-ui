@@ -42,6 +42,9 @@ export default function DataVisualizationAndEngineering() {
   // Other UI states
   const [missingValueColumn, setMissingValueColumn] = useState("");
   const [treatmentMode, setTreatmentMode] = useState("datetime");
+  const [outlierColumn, setOutlierColumn] = useState("");
+  const [outlierMethod, setOutlierMethod] = useState("zscore");
+  const [outlierPlot, setOutlierPlot] = useState(null);
 
   // For treatment cards
   const [treatmentMethod, setTreatmentMethod] = useState("Mean");
@@ -55,7 +58,7 @@ export default function DataVisualizationAndEngineering() {
   const [treatmentSelectedIntervals, setTreatmentSelectedIntervals] = useState([]);
 
   // Outlier treatment states
-  const [outlierMethod, setOutlierMethod] = useState("zscore");
+  //const [outlierMethod, setOutlierMethod] = useState("zscore");
   const [outlierSelectedColumns, setOutlierSelectedColumns] = useState([]);
   const [outlierSelectedIntervals, setOutlierSelectedIntervals] = useState([]);
   const [outlierTreatmentMethod, setOutlierTreatmentMethod] = useState("Mean");
@@ -186,6 +189,33 @@ export default function DataVisualizationAndEngineering() {
       setError("Error running missing value analysis.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const runOutlierAnalysis = async () => {
+    if (!outlierColumn) {
+      alert("Please select a column for outlier analysis.");
+      return;
+    }
+
+    try {
+      const prompt = `outlier analysis where selected variable is ${outlierColumn} using method ${outlierMethod}`;
+      const response = await fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const result = await response.json();
+
+      if (result.type === "plot" && result.data) {
+        setPlotData(result.data);   // Same as missing value analysis
+        setExpanded(false);         // Collapse left panel like before
+      } else {
+        console.error("Unexpected response format:", result);
+      }
+    } catch (err) {
+      console.error("Error running outlier analysis:", err.message);
     }
   };
 
@@ -543,8 +573,37 @@ export default function DataVisualizationAndEngineering() {
                 Outlier Analysis
               </Typography>
             </AccordionSummary>
-            <AccordionDetails>
-              <RadioGroup value={outlierMethod} onChange={(e) => setOutlierMethod(e.target.value)} row>
+            <AccordionDetails
+              sx={{
+                maxWidth: 300,
+                overflowY: "auto",
+                maxHeight: 300,
+                pr: 1,
+              }}
+            >
+              {/* Column Selection */}
+              <RadioGroup
+                value={outlierColumn}
+                onChange={(e) => setOutlierColumn(e.target.value)}
+                sx={{ maxWidth: "100%" }}
+              >
+                {columns.map((col) => (
+                  <FormControlLabel
+                    key={col}
+                    value={col}
+                    control={<Radio size="small" />}
+                    label={col}
+                    sx={{ fontSize: "0.85rem" }}
+                  />
+                ))}
+              </RadioGroup>
+
+              {/* Method Selection */}
+              <RadioGroup
+                value={outlierMethod}
+                onChange={(e) => setOutlierMethod(e.target.value)}
+                row
+              >
                 <FormControlLabel
                   value="zscore"
                   control={<Radio size="small" />}
@@ -558,11 +617,19 @@ export default function DataVisualizationAndEngineering() {
                   sx={{ fontSize: "0.85rem" }}
                 />
               </RadioGroup>
-              <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={() => console.log("Run Outlier Analysis")}>
+
+              {/* Run Button */}
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ mt: 1 }}
+                onClick={runOutlierAnalysis}
+              >
                 Run Analysis
               </Button>
             </AccordionDetails>
           </Accordion>
+
 
           {/* Outlier Treatment */}
           <Accordion expanded={expanded === "outlierTreatment"} onChange={handleExpand("outlierTreatment")}>
