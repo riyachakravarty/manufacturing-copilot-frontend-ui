@@ -137,6 +137,21 @@ export default function DataVisualizationAndEngineering() {
   };
 
 
+  //Post treatment output panel
+  // To trigger the popup after treatment
+  const [showPostTreatmentPrompt, setShowPostTreatmentPrompt] = useState(false);
+
+  // Column selection for updated missing value plot
+  const [postTreatmentSelectedColumn, setPostTreatmentSelectedColumn] = useState("");
+
+  // Data for updated missing value plot
+  const [postTreatmentPlotData, setPostTreatmentPlotData] = useState(null);
+
+  // To store latest augmented dataframe for download
+  const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
+
+
+
   useEffect(() => {
     // Fetch columns on mount
     const fetchColumns = async () => {
@@ -404,6 +419,61 @@ export default function DataVisualizationAndEngineering() {
     }
   };
 
+  //Function to trigger post-treatment prompt
+  const handlePostTreatmentFlow = (augmentedDf) => {
+    // Save latest augmented dataframe
+    setLatestAugmentedDf(augmentedDf);
+
+    // Show pop-up prompt
+    setShowPostTreatmentPrompt(true);
+
+    // Load columns automatically from augmentedDf
+    setPostTreatmentColumns(Object.keys(augmentedDf));
+};
+
+//Handler for user selection in pop-up
+  const handlePostTreatmentPromptAnswer = (answer) => {
+    setShowPostTreatmentPrompt(false);
+
+    if (answer === "yes") {
+      // Optionally, clear previous selection & plot
+      setPostTreatmentSelectedColumn("");
+      setPostTreatmentPlotData(null);
+    }
+  };
+
+  //Handler to load missing value plot for selected column
+  const loadPostTreatmentMissingValuePlot = async () => {
+  if (!postTreatmentSelectedColumn) {
+      setError("Please select a column for analysis.");
+      return;
+    }
+
+    try {
+      const prompt = `Post treatment missing value plot where selected variable is ${postTreatmentSelectedColumn}`;
+      const response = await fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      const result = await response.json();
+
+      if (result.type === "plot" && result.data) {
+        setPlotData(result.data);
+        setExpanded(false); // Collapse left accordion to free space
+      } else {
+        setError("Unexpected response from server.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Error running missing value analysis.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   // Apply missing value treatment
   const applyMissingValueTreatment = async () => {
     let endpoint = "";
@@ -486,6 +556,9 @@ export default function DataVisualizationAndEngineering() {
         setSelectedMissingValueIntervals([]);
       }
 
+      // Trigger post-treatment prompt
+      handlePostTreatmentFlow(data.augmented_df);
+
     } catch (error) {
       console.error("Error applying missing value treatment:", error);
       setError("Error applying missing value treatment: " + error.message);
@@ -493,8 +566,6 @@ export default function DataVisualizationAndEngineering() {
       setLoadingTreatment(false);
     }
   };
-
-
 
   // Apply outlier treatment placeholder
   const applyOutlierTreatment = () => {
@@ -504,6 +575,7 @@ export default function DataVisualizationAndEngineering() {
       method: outlierTreatmentMethod,
     });
   };
+
 
 
 
@@ -1025,60 +1097,138 @@ export default function DataVisualizationAndEngineering() {
       </Grid>
 
       {/* RIGHT PANEL */}
-      <Grid
-        item
-        xs={12}
-        md={8}
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          minWidth: 0,
-          minHeight: 0,
-        }}
-      >
-        <Paper
-          sx={{
-            p: 2,
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            bgcolor: theme.palette.background.paper,
-          }}
-          elevation={3}
-        >
-          <Typography variant="h6" gutterBottom color="primary">
-            Analysis Output
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
+      
+<Grid
+  item
+  xs={12}
+  md={8}
+  sx={{
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    minHeight: 0,
+  }}
+>
+  <Paper
+    sx={{
+      p: 2,
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      bgcolor: theme.palette.background.paper,
+    }}
+    elevation={3}
+  >
+    <Typography variant="h6" gutterBottom color="primary">
+      Analysis Output
+    </Typography>
+    <Divider sx={{ mb: 2 }} />
 
-          <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
-            {loading && <CircularProgress />}
-            {error && <Alert severity="error">{error}</Alert>}
-            {plotData ? (
-              <Plot
-                data={plotData.data}
-                layout={{
-                  ...plotData.layout,
-                  autosize: true,
-                  paper_bgcolor: theme.palette.background.paper,
-                  plot_bgcolor: theme.palette.background.default,
-                  margin: { t: 40, b: 40, l: 40, r: 40 },
-                }}
-                style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
-                useResizeHandler
+    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
+
+      {plotData ? (
+        <Plot
+          data={plotData.data}
+          layout={{
+            ...plotData.layout,
+            autosize: true,
+            paper_bgcolor: theme.palette.background.paper,
+            plot_bgcolor: theme.palette.background.default,
+            margin: { t: 40, b: 40, l: 40, r: 40 },
+          }}
+          style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
+          useResizeHandler
+        />
+      ) : (
+        !loading &&
+        !error && (
+          <Typography variant="body2" color="text.secondary">
+            No analysis results yet.
+          </Typography>
+        )
+      )}
+
+      {/* Post-Treatment Prompt Dialog */}
+      <Dialog open={showPostTreatmentPrompt} onClose={() => setShowPostTreatmentPrompt(false)}>
+        <DialogTitle>View Updated Missing Value Plot?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Do you want to select a column and view updated missing value plot?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handlePostTreatmentPromptAnswer("no")}>No</Button>
+          <Button onClick={() => handlePostTreatmentPromptAnswer("yes")} autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Post-Treatment Column Selection & Plot */}
+      {postTreatmentColumns?.length > 0 && postTreatmentSelectedColumn !== null && (
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+            Select Column for Updated Missing Value Plot
+          </Typography>
+          <FormGroup>
+            {postTreatmentColumns.map((col) => (
+              <FormControlLabel
+                key={col}
+                control={
+                  <Radio
+                    size="small"
+                    checked={postTreatmentSelectedColumn === col}
+                    onChange={() => setPostTreatmentSelectedColumn(col)}
+                  />
+                }
+                label={col}
+                sx={{ fontSize: "0.85rem" }}
               />
-            ) : (
-              !loading &&
-              !error && (
-                <Typography variant="body2" color="text.secondary">
-                  No analysis results yet.
-                </Typography>
-              )
-            )}
-          </Box>
-        </Paper>
-      </Grid>
-    </Grid>
+            ))}
+          </FormGroup>
+          <Button
+            variant="contained"
+            size="small"
+            sx={{ mt: 1 }}
+            onClick={loadPostTreatmentMissingValuePlot}
+          >
+            Load Missing Value Analysis
+          </Button>
+        </Box>
+      )}
+
+      {/* Latest Augmented Data Download */}
+      {latestAugmentedDf && (
+        <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/download`);
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "treated_data.csv"; // same name as backend header
+      link.click();
+    } catch (err) {
+      console.error(err);
+      setError("Failed to download file from server.");
+    }
+  }}
+          >
+            Download Latest Data
+          </Button>
+        </Box>
+      )}
+    </Box>
+  </Paper>
+</Grid>
+</Grid>
   );
 }
