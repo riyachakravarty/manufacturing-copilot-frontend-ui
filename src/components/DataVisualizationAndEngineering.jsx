@@ -280,7 +280,7 @@ export default function DataVisualizationAndEngineering() {
       return;
     }
     try {
-      const res = await fetch(`${BACKEND_URL}/get_missing_value_intervals?column=${encodeURIComponent(selectedMissingValueColumn)}`);
+      const res = await fetch(`${BACKEND_URL}/missing_value_intervals?column=${encodeURIComponent(selectedMissingValueColumn)}`);
       const data = await res.json();
       setMissingValueIntervals(data.intervals || []);
     } catch (err) {
