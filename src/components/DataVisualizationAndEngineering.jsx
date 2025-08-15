@@ -70,7 +70,7 @@ export default function DataVisualizationAndEngineering() {
   const [selectedMissingValueColumn, setSelectedMissingValueColumn] = useState("");
   const [missingValueIntervals, setMissingValueIntervals] = useState([]);
   const [selectedMissingValueIntervals, setSelectedMissingValueIntervals] = useState([]);
-  const [missingValueTreatmentMethod, setMissingValueTreatmentMethod] = useState("forward_fill");
+  const [missingValueTreatmentMethod, setMissingValueTreatmentMethod] = useState("Mean");
 
   // Mock intervals fallback (not used now but kept for legacy or testing)
   const mockIntervals = [
@@ -128,6 +128,67 @@ export default function DataVisualizationAndEngineering() {
     setExpanded(isExpanded ? panel : false);
     setError("");
     setPlotData(null);
+  };
+
+  // Auto-load columns when "Missing Values in Column" mode is selected
+  useEffect(() => {
+    if (expanded === "missingTreatment" && treatmentMode === "column") {
+      const fetchColumns = async () => {
+        try {
+          const res = await fetch(`${BACKEND_URL}/get_columns`);
+          if (!res.ok) throw new Error("Failed to fetch columns");
+          const data = await res.json();
+          if (data.columns) {
+            setMissingValueColumns(data.columns);
+          }
+        } catch (err) {
+          console.error("Error loading columns:", err);
+          setError("Error loading columns for Missing Values in Column mode");
+        }
+      };
+      fetchColumns();
+    }
+  }, [expanded, treatmentMode]);
+
+  // Auto-load missing intervals when a column is selected
+  useEffect(() => {
+    if (selectedMissingValueColumn) {
+      const fetchIntervals = async () => {
+        try {
+          const res = await fetch(
+            `${BACKEND_URL}/missing_value_intervals?column=${selectedMissingValueColumn}`
+          );
+          if (!res.ok) throw new Error("Failed to fetch missing value intervals");
+          const data = await res.json();
+          if (data.intervals) {
+            setMissingValueIntervals(data.intervals);
+          }
+        } catch (err) {
+          console.error("Error loading missing value intervals:", err);
+          setMissingValueIntervals([]);
+        }
+      };
+      fetchIntervals();
+    } else {
+      setMissingValueIntervals([]);
+      setSelectedMissingValueIntervals([]);
+    }
+  }, [selectedMissingValueColumn]);
+
+  // Toggle for interval checkboxes in "Missing Values in Column" mode
+  const handleMissingValueIntervalToggle = (interval) => {
+    setSelectedMissingValueIntervals((prev) => {
+      const exists = prev.find(
+        (i) => i.start === interval.start && i.end === interval.end
+      );
+      if (exists) {
+        return prev.filter(
+          (i) => !(i.start === interval.start && i.end === interval.end)
+        );
+      } else {
+        return [...prev, interval];
+      }
+    });
   };
 
   // Variability Analysis handlers
@@ -490,230 +551,277 @@ export default function DataVisualizationAndEngineering() {
           </Accordion>
 
           {/* Missing Value Treatment */}
-          <Accordion
-            expanded={expanded === "missingTreatment"}
-            onChange={handleExpand("missingTreatment")}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                Missing Value Treatment
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <RadioGroup
-                row
-                value={treatmentMode}
-                onChange={(e) => setTreatmentMode(e.target.value)}
-                sx={{ mb: 1 }}
-              >
-                <FormControlLabel
-                  value="datetime"
-                  control={<Radio size="small" />}
-                  label="Missing Date Times"
-                  sx={{ fontSize: "0.85rem" }}
-                />
-                <FormControlLabel
-                  value="column"
-                  control={<Radio size="small" />}
-                  label="Missing Values in Column"
-                  sx={{ fontSize: "0.85rem" }}
-                />
-              </RadioGroup>
-
-              {treatmentMode === "datetime" && (
-                <Grid container spacing={2}>
-                  {/* Column List */}
-                  <Grid
-                    item
-                    xs={4}
-                    sx={{
-                      maxHeight: 200,
-                      overflowY: "auto",
-                      borderRight: "1px solid #ccc",
-                      pr: 1,
-                    }}
-                  >
-                    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                      Columns
-                    </Typography>
-                    <FormGroup>
-                      {columns.map((col) => (
-                        <FormControlLabel
-                          key={col}
-                          control={
-                            <Checkbox
-                              size="small"
-                              checked={treatmentSelectedColumns.includes(col)}
-                              onChange={() => handleTreatmentColumnToggle(col)}
-                            />
-                          }
-                          label={col}
-                          sx={{ fontSize: "0.85rem" }}
-                        />
-                      ))}
-                    </FormGroup>
-                  </Grid>
-
-{/* Interval List */}
-<Grid
-  item
-  xs={4}
-  sx={{
-    maxHeight: 200,
-    overflowY: "auto",
-    borderRight: "1px solid #ccc",
-    pl: 1,
-  }}
+<Accordion
+  expanded={expanded === "missingTreatment"}
+  onChange={handleExpand("missingTreatment")}
 >
-  <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-    Intervals
-  </Typography>
-  <FormGroup>
-    {missingDateTimeIntervals.length > 0 ? (
-      missingDateTimeIntervals.map((interval) => {
-        const label = `${interval.start} to ${interval.end}`;
-        const checked = treatmentSelectedIntervals.some(
-          (i) => i.start === interval.start && i.end === interval.end
-        );
-        return (
-          <FormControlLabel
-            key={label}
-            control={
-              <Checkbox
-                size="small"
-                checked={checked}
-                onChange={() => handleTreatmentIntervalToggle(interval)}
-              />
-            }
-            label={label}
-            sx={{ fontSize: "0.85rem" }}
-          />
-        );
-      })
-    ) : (
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        No missing datetime intervals found.
-      </Typography>
-    )}
-  </FormGroup>
-</Grid>
-
-                  {/* Treatment Method */}
-                  <Grid item xs={4}>
-                    <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                      Treatment Method
-                    </Typography>
-                    <Select
-                      size="small"
-                      value={treatmentMethod}
-                      onChange={(e) => setTreatmentMethod(e.target.value)}
-                      fullWidth
-                      sx={{ mt: 1 }}
-                    >
-                      <MenuItem value="Mean">Mean</MenuItem>
-                      <MenuItem value="Median">Median</MenuItem>
-                      <MenuItem value="Forward fill">Forward Fill</MenuItem>
-                      <MenuItem value="Backward fill">Backward Fill</MenuItem>
-                      <MenuItem value="Delete rows">Delete rows</MenuItem>
-                    </Select>
-
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{ mt: 2 }}
-                      onClick={applyMissingValueTreatment}
-                      disabled={loadingTreatment}
-                    >
-                      {loadingTreatment ? "Applying..." : "Apply Treatment"}
-                    </Button>
-                  </Grid>
-                </Grid>
-              )}
-
-              {treatmentMode === "column" && (
-                <Box sx={{ mt: 2 }}>
-  {/* Step 1: Select Column */}
-  <FormControl fullWidth size="small">
-    <InputLabel>Select Column</InputLabel>
-    <Select
-      value={selectedMissingValueColumn}
-      onChange={(e) => setSelectedMissingValueColumn(e.target.value)}
+  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+    <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+      Missing Value Treatment
+    </Typography>
+  </AccordionSummary>
+  <AccordionDetails>
+    <RadioGroup
+      row
+      value={treatmentMode}
+      onChange={(e) => setTreatmentMode(e.target.value)}
+      sx={{ mb: 1 }}
     >
-      {missingValueColumns.map((col) => (
-        <MenuItem key={col} value={col}>
-          {col}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-  <Button
-    variant="outlined"
-    sx={{ mt: 1 }}
-    onClick={loadMissingValueColumns}
-  >
-    Load Columns
-  </Button>
-
-  {/* Step 2: Load Missing Intervals */}
-  <Button
-    variant="outlined"
-    sx={{ mt: 1, ml: 1 }}
-    onClick={loadMissingValueIntervals}
-  >
-    Load Missing Value Intervals
-  </Button>
-
-  {/* Step 3: Show intervals with checkboxes */}
-  <FormGroup sx={{ mt: 1 }}>
-    {missingValueIntervals.map((interval, idx) => (
       <FormControlLabel
-        key={idx}
-        control={
-          <Checkbox
-            checked={selectedMissingValueIntervals.includes(interval)}
-            onChange={(e) => {
-              if (e.target.checked) {
-                setSelectedMissingValueIntervals((prev) => [...prev, interval]);
-              } else {
-                setSelectedMissingValueIntervals((prev) =>
-                  prev.filter((i) => i !== interval)
-                );
-              }
-            }}
-          />
-        }
-        label={`${interval.start} → ${interval.end}`}
+        value="datetime"
+        control={<Radio size="small" />}
+        label="Missing Date Times"
+        sx={{ fontSize: "0.85rem" }}
       />
-    ))}
-  </FormGroup>
+      <FormControlLabel
+        value="column"
+        control={<Radio size="small" />}
+        label="Missing Values in Column"
+        sx={{ fontSize: "0.85rem" }}
+      />
+    </RadioGroup>
 
-  {/* Step 4: Select treatment method */}
-  <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-    <InputLabel>Treatment Method</InputLabel>
-    <Select
-      value={missingValueTreatmentMethod}
-      onChange={(e) => setMissingValueTreatmentMethod(e.target.value)}
-    >
-      <MenuItem value="Forward fill">Forward Fill</MenuItem>
-      <MenuItem value="Backward fill">Backward Fill</MenuItem>
-      <MenuItem value="Mean">Mean</MenuItem>
-      <MenuItem value="Median">Median</MenuItem>
-      <MenuItem value="Delete rows">Delete rows</MenuItem>
-    </Select>
-  </FormControl>
+    {treatmentMode === "datetime" && (
+      <Grid container spacing={2}>
+        {/* Columns */}
+        <Grid
+          item
+          xs={4}
+          sx={{
+            maxHeight: 200,
+            overflowY: "auto",
+            borderRight: "1px solid #ccc",
+            pr: 1,
+          }}
+        >
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+            Columns
+          </Typography>
+          <FormGroup>
+            {columns.map((col) => (
+              <FormControlLabel
+                key={col}
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={treatmentSelectedColumns.includes(col)}
+                    onChange={() => handleTreatmentColumnToggle(col)}
+                  />
+                }
+                label={col}
+                sx={{ fontSize: "0.85rem" }}
+              />
+            ))}
+          </FormGroup>
+        </Grid>
 
-  {/* Step 5: Apply treatment */}
-  <Button
-    variant="contained"
-    sx={{ mt: 2 }}
-    onClick={applyMissingValueTreatment}
-  >
-    Apply Treatment
-  </Button>
-</Box>
-              )}
-            </AccordionDetails>
-          </Accordion>
+        {/* Intervals */}
+        <Grid
+          item
+          xs={4}
+          sx={{
+            maxHeight: 200,
+            overflowY: "auto",
+            borderRight: "1px solid #ccc",
+            pl: 1,
+          }}
+        >
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+            Intervals
+          </Typography>
+          <FormGroup>
+            {missingDateTimeIntervals.length > 0 ? (
+              missingDateTimeIntervals.map((interval) => {
+                const label = `${interval.start} to ${interval.end}`;
+                const checked = treatmentSelectedIntervals.some(
+                  (i) => i.start === interval.start && i.end === interval.end
+                );
+                return (
+                  <FormControlLabel
+                    key={label}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={checked}
+                        onChange={() =>
+                          handleTreatmentIntervalToggle(interval)
+                        }
+                      />
+                    }
+                    label={label}
+                    sx={{ fontSize: "0.85rem" }}
+                  />
+                );
+              })
+            ) : (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
+                No missing datetime intervals found.
+              </Typography>
+            )}
+          </FormGroup>
+        </Grid>
+
+        {/* Treatment Method */}
+        <Grid item xs={4}>
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+            Treatment Method
+          </Typography>
+          <Select
+            size="small"
+            value={treatmentMethod}
+            onChange={(e) => setTreatmentMethod(e.target.value)}
+            fullWidth
+            sx={{ mt: 1 }}
+          >
+            <MenuItem value="Mean">Mean</MenuItem>
+            <MenuItem value="Median">Median</MenuItem>
+            <MenuItem value="Forward fill">Forward Fill</MenuItem>
+            <MenuItem value="Backward fill">Backward Fill</MenuItem>
+            <MenuItem value="Delete rows">Delete rows</MenuItem>
+          </Select>
+
+          <Button
+            variant="contained"
+            size="small"
+            sx={{ mt: 2 }}
+            onClick={applyMissingValueTreatment}
+            disabled={loadingTreatment}
+          >
+            {loadingTreatment ? "Applying..." : "Apply Treatment"}
+          </Button>
+        </Grid>
+      </Grid>
+    )}
+
+    {treatmentMode === "column" && (
+      <Grid container spacing={2}>
+        {/* Column selection */}
+        <Grid
+          item
+          xs={4}
+          sx={{
+            maxHeight: 200,
+            overflowY: "auto",
+            borderRight: "1px solid #ccc",
+            pr: 1,
+          }}
+        >
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+            Columns
+          </Typography>
+          <FormGroup>
+            {missingValueColumns.length > 0 ? (
+              missingValueColumns.map((col) => (
+                <FormControlLabel
+                  key={col}
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={selectedMissingValueColumn === col}
+                      onChange={() => setSelectedMissingValueColumn(col)}
+                    />
+                  }
+                  label={col}
+                  sx={{ fontSize: "0.85rem" }}
+                />
+              ))
+            ) : (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
+                No columns found.
+              </Typography>
+            )}
+          </FormGroup>
+        </Grid>
+
+        {/* Intervals */}
+        <Grid
+          item
+          xs={4}
+          sx={{
+            maxHeight: 200,
+            overflowY: "auto",
+            borderRight: "1px solid #ccc",
+            pl: 1,
+          }}
+        >
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+            Intervals
+          </Typography>
+          <FormGroup>
+            {missingValueIntervals.length > 0 ? (
+              missingValueIntervals.map((interval, idx) => (
+                <FormControlLabel
+                  key={idx}
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={selectedMissingValueIntervals.some(
+                        (i) =>
+                          i.start === interval.start && i.end === interval.end
+                      )}
+                      onChange={() =>
+                        handleMissingValueIntervalToggle(interval)
+                      }
+                    />
+                  }
+                  label={`${interval.start} → ${interval.end}`}
+                  sx={{ fontSize: "0.85rem" }}
+                />
+              ))
+            ) : (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
+                No missing intervals found.
+              </Typography>
+            )}
+          </FormGroup>
+        </Grid>
+
+        {/* Treatment Method */}
+        <Grid item xs={4}>
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+            Treatment Method
+          </Typography>
+          <Select
+            size="small"
+            value={missingValueTreatmentMethod}
+            onChange={(e) => setMissingValueTreatmentMethod(e.target.value)}
+            fullWidth
+            sx={{ mt: 1 }}
+          >
+            <MenuItem value="Mean">Mean</MenuItem>
+            <MenuItem value="Median">Median</MenuItem>
+            <MenuItem value="Forward fill">Forward Fill</MenuItem>
+            <MenuItem value="Backward fill">Backward Fill</MenuItem>
+            <MenuItem value="Delete rows">Delete rows</MenuItem>
+          </Select>
+
+          <Button
+            variant="contained"
+            size="small"
+            sx={{ mt: 2 }}
+            onClick={applyMissingValueTreatment}
+            disabled={loadingTreatment}
+          >
+            {loadingTreatment ? "Applying..." : "Apply Treatment"}
+          </Button>
+        </Grid>
+      </Grid>
+    )}
+  </AccordionDetails>
+</Accordion>
+
 
           {/* Outlier Analysis */}
           <Accordion expanded={expanded === "outlierAnalysis"} onChange={handleExpand("outlierAnalysis")}>
