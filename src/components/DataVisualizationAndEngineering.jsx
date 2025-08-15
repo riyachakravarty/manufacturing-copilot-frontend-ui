@@ -82,6 +82,61 @@ export default function DataVisualizationAndEngineering() {
     "2025-08-06 08:00 to 2025-08-06 09:30",
   ];
 
+    // Select All states
+  const [selectAllColumns, setSelectAllColumns] = useState(false);
+  const [selectAllDateTimeIntervals, setSelectAllDateTimeIntervals] = useState(false);
+  const [selectAllMissingValueIntervals, setSelectAllMissingValueIntervals] = useState(false);
+
+  // Handlers for "Select All" checkboxes
+
+  // For Columns in Missing Date Times
+  const handleSelectAllColumns = (e) => {
+    const checked = e.target.checked;
+    setSelectAllColumns(checked);
+    if (checked) {
+      setTreatmentSelectedColumns([...columns]);
+    } else {
+      setTreatmentSelectedColumns([]);
+    }
+  };
+
+  // For Intervals in Missing Date Times
+  const handleSelectAllDateTimeIntervals = (e) => {
+    const checked = e.target.checked;
+    setSelectAllDateTimeIntervals(checked);
+    if (checked) {
+      setTreatmentSelectedIntervals([...missingDateTimeIntervals]);
+    } else {
+      setTreatmentSelectedIntervals([]);
+    }
+  };
+
+  // For Intervals in Missing Values in Column
+  const handleSelectAllMissingValueIntervals = (e) => {
+    const checked = e.target.checked;
+    setSelectAllMissingValueIntervals(checked);
+    if (checked) {
+      setSelectedMissingValueIntervals([...missingValueIntervals]);
+    } else {
+      setSelectedMissingValueIntervals([]);
+    }
+  };
+
+  // Individual interval toggle for "Missing Values in Column"
+  const handleMissingValueIntervalToggle = (interval) => {
+    const exists = selectedMissingValueIntervals.some(
+      (i) => i.start === interval.start && i.end === interval.end
+    );
+    if (exists) {
+      setSelectedMissingValueIntervals((prev) =>
+        prev.filter((i) => !(i.start === interval.start && i.end === interval.end))
+      );
+    } else {
+      setSelectedMissingValueIntervals((prev) => [...prev, interval]);
+    }
+  };
+
+
   useEffect(() => {
     // Fetch columns on mount
     const fetchColumns = async () => {
@@ -176,20 +231,20 @@ export default function DataVisualizationAndEngineering() {
   }, [selectedMissingValueColumn]);
 
   // Toggle for interval checkboxes in "Missing Values in Column" mode
-  const handleMissingValueIntervalToggle = (interval) => {
-    setSelectedMissingValueIntervals((prev) => {
-      const exists = prev.find(
-        (i) => i.start === interval.start && i.end === interval.end
-      );
-      if (exists) {
-        return prev.filter(
-          (i) => !(i.start === interval.start && i.end === interval.end)
-        );
-      } else {
-        return [...prev, interval];
-      }
-    });
-  };
+  //const handleMissingValueIntervalToggle = (interval) => {
+    //setSelectedMissingValueIntervals((prev) => {
+      //const exists = prev.find(
+        //(i) => i.start === interval.start && i.end === interval.end
+      //);
+      //if (exists) {
+        //return prev.filter(
+         // (i) => !(i.start === interval.start && i.end === interval.end)
+        //);
+      //} else {
+        //return [...prev, interval];
+      //}
+    //});
+  //};
 
   // Variability Analysis handlers
   const handleCheckboxChange = (column) => {
