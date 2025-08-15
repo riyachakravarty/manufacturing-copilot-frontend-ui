@@ -63,6 +63,13 @@ export default function DataVisualizationAndEngineering() {
   const [outlierSelectedIntervals, setOutlierSelectedIntervals] = useState([]);
   const [outlierTreatmentMethod, setOutlierTreatmentMethod] = useState("Mean");
 
+  // Missing value in column treatment mode 
+  const [missingValueColumns, setMissingValueColumns] = useState([]);
+  const [selectedMissingValueColumn, setSelectedMissingValueColumn] = useState("");
+  const [missingValueIntervals, setMissingValueIntervals] = useState([]);
+  const [selectedMissingValueIntervals, setSelectedMissingValueIntervals] = useState([]);
+  const [missingValueTreatmentMethod, setMissingValueTreatmentMethod] = useState("forward_fill");
+
   // Mock intervals fallback (not used now but kept for legacy or testing)
   const mockIntervals = [
     "2025-08-01 10:00 to 2025-08-01 12:00",
@@ -253,63 +260,123 @@ export default function DataVisualizationAndEngineering() {
     );
   };
 
+    // Load columns for Missing Values mode
+  const loadMissingValueColumns = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/get_columns`);
+      const data = await res.json();
+      setMissingValueColumns(data.columns || []);
+    } catch (err) {
+      console.error("Error loading missing value columns:", err);
+    }
+  };
+
+  // Load missing value intervals for selected column
+  const loadMissingValueIntervals = async () => {
+    if (!selectedMissingValueColumn) {
+      alert("Please select a column first");
+      return;
+    }
+    try {
+      const res = await fetch(`${BACKEND_URL}/get_missing_value_intervals?column=${encodeURIComponent(selectedMissingValueColumn)}`);
+      const data = await res.json();
+      setMissingValueIntervals(data.intervals || []);
+    } catch (err) {
+      console.error("Error loading missing value intervals:", err);
+    }
+  };
+
   // Apply missing value treatment
   const applyMissingValueTreatment = async () => {
-    if (treatmentMode === "datetime") {
-      if (treatmentSelectedColumns.length === 0) {
-        setError("Please select at least one column for treatment.");
-        return;
-      }
-      if (treatmentSelectedIntervals.length === 0) {
-        setError("Please select at least one interval for treatment.");
-        return;
-      }
-      if (!treatmentMethod) {
-        setError("Please select a treatment method.");
-        return;
-      }
+    let endpoint = "";
+    let payload = {};
 
-      setLoadingTreatment(true);
-      setError("");
+    try {
+      if (treatmentMode === "datetime") {
+        // Missing Date Times mode
+        if (treatmentSelectedColumns.length === 0) {
+          setError("Please select at least one column for treatment.");
+          return;
+        }
+        if (treatmentSelectedIntervals.length === 0) {
+          setError("Please select at least one interval for treatment.");
+          return;
+        }
+        if (!treatmentMethod) {
+          setError("Please select a treatment method.");
+          return;
+        }
 
-      // Convert selected intervals (string) to [{start:..., end:...}, ...] format expected by backend
-      // Assuming intervals strings are like "2025-08-01 10:00 to 2025-08-01 12:00"
-      
-      //const formattedIntervals = treatmentSelectedIntervals.map((intervalStr) => {
-        //const [start, end] = intervalStr.split(" to ");
-        //return { start, end };
-      //});
+        setLoadingTreatment(true);
+        setError("");
 
-      try {
-        const payload = {
+        payload = {
           columns: treatmentSelectedColumns,
           intervals: treatmentSelectedIntervals,
           method: treatmentMethod,
         };
-        console.log("Sending payload:", payload);
+        endpoint = `${BACKEND_URL}/apply_treatment`;
 
-        const res = await fetch(`${BACKEND_URL}/apply_treatment`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(`Treatment failed with status ${res.status}`);
-        const result = await res.json();
-        console.log("Treatment response:", result);
-        setError("Treatment applied successfully.");
-        // Optionally clear selections
+      } else if (treatmentMode === "column") {
+        // Missing Values in Column mode
+        if (!selectedMissingValueColumn) {
+          alert("Please select a column.");
+          return;
+        }
+        if (!selectedMissingValueIntervals.length) {
+          alert("Please select at least one missing value interval.");
+          return;
+        }
+        if (!treatmentMethod) {
+          alert("Please select a treatment method.");
+          return;
+        }
+
+        payload = {
+          column: selectedMissingValueColumn,
+          intervals: selectedMissingValueIntervals,
+          method: treatmentMethod,
+        };
+        endpoint = `${BACKEND_URL}/apply_missing_value_treatment`;
+
+      } else {
+        alert("Invalid treatment mode selected.");
+        return;
+      }
+
+      // Make API request
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error applying treatment: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      alert(data.message || "Treatment applied successfully!");
+      console.log("Treatment response:", data);
+
+      // Optionally reset selections
+      if (treatmentMode === "datetime") {
         setTreatmentSelectedColumns([]);
         setTreatmentSelectedIntervals([]);
-      } catch (err) {
-        console.error("Error applying treatment:", err);
-        setError("Error applying missing value treatment:"+ err.message);
-      } finally {
-        setLoadingTreatment(false);
+      } else if (treatmentMode === "column") {
+        setSelectedMissingValueColumn("");
+        setSelectedMissingValueIntervals([]);
       }
-    } else {
-      setError("Treatment mode not implemented yet.");
+
+    } catch (error) {
+      console.error("Error applying missing value treatment:", error);
+      setError("Error applying missing value treatment: " + error.message);
+    } finally {
+      setLoadingTreatment(false);
     }
   };
+
+
 
   // Apply outlier treatment placeholder
   const applyOutlierTreatment = () => {
@@ -319,6 +386,9 @@ export default function DataVisualizationAndEngineering() {
       method: outlierTreatmentMethod,
     });
   };
+
+
+
 
   return (
     <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)", flexWrap: "nowrap" }}>
@@ -559,9 +629,86 @@ export default function DataVisualizationAndEngineering() {
               )}
 
               {treatmentMode === "column" && (
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                  Treatment mode "Missing Values in Column" not implemented yet.
-                </Typography>
+                <Box sx={{ mt: 2 }}>
+  {/* Step 1: Select Column */}
+  <FormControl fullWidth size="small">
+    <InputLabel>Select Column</InputLabel>
+    <Select
+      value={selectedMissingValueColumn}
+      onChange={(e) => setSelectedMissingValueColumn(e.target.value)}
+    >
+      {missingValueColumns.map((col) => (
+        <MenuItem key={col} value={col}>
+          {col}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+  <Button
+    variant="outlined"
+    sx={{ mt: 1 }}
+    onClick={loadMissingValueColumns}
+  >
+    Load Columns
+  </Button>
+
+  {/* Step 2: Load Missing Intervals */}
+  <Button
+    variant="outlined"
+    sx={{ mt: 1, ml: 1 }}
+    onClick={loadMissingValueIntervals}
+  >
+    Load Missing Value Intervals
+  </Button>
+
+  {/* Step 3: Show intervals with checkboxes */}
+  <FormGroup sx={{ mt: 1 }}>
+    {missingValueIntervals.map((interval, idx) => (
+      <FormControlLabel
+        key={idx}
+        control={
+          <Checkbox
+            checked={selectedMissingValueIntervals.includes(interval)}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedMissingValueIntervals((prev) => [...prev, interval]);
+              } else {
+                setSelectedMissingValueIntervals((prev) =>
+                  prev.filter((i) => i !== interval)
+                );
+              }
+            }}
+          />
+        }
+        label={`${interval.start} → ${interval.end}`}
+      />
+    ))}
+  </FormGroup>
+
+  {/* Step 4: Select treatment method */}
+  <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+    <InputLabel>Treatment Method</InputLabel>
+    <Select
+      value={missingValueTreatmentMethod}
+      onChange={(e) => setMissingValueTreatmentMethod(e.target.value)}
+    >
+      <MenuItem value="Forward fill">Forward Fill</MenuItem>
+      <MenuItem value="Backward fill">Backward Fill</MenuItem>
+      <MenuItem value="Mean">Mean</MenuItem>
+      <MenuItem value="Median">Median</MenuItem>
+      <MenuItem value="Delete rows">Delete rows</MenuItem>
+    </Select>
+  </FormControl>
+
+  {/* Step 5: Apply treatment */}
+  <Button
+    variant="contained"
+    sx={{ mt: 2 }}
+    onClick={applyMissingValueTreatment}
+  >
+    Apply Treatment
+  </Button>
+</Box>
               )}
             </AccordionDetails>
           </Accordion>
