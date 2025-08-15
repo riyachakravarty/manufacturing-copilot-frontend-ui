@@ -583,21 +583,23 @@ export default function DataVisualizationAndEngineering() {
 
     {treatmentMode === "datetime" && (
       <Grid container spacing={2}>
-        {/* Columns */}
+        {/* Columns List with Select All */}
         <Grid
           item
           xs={4}
-          sx={{
-            maxHeight: 200,
-            overflowY: "auto",
-            borderRight: "1px solid #ccc",
-            pr: 1,
-          }}
+          sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}
         >
           <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             Columns
           </Typography>
           <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox size="small" checked={selectAllColumns} onChange={handleSelectAllColumns} />
+              }
+              label="Select All"
+              sx={{ fontSize: "0.85rem" }}
+            />
             {columns.map((col) => (
               <FormControlLabel
                 key={col}
@@ -615,50 +617,49 @@ export default function DataVisualizationAndEngineering() {
           </FormGroup>
         </Grid>
 
-        {/* Intervals */}
+        {/* Intervals List with Select All */}
         <Grid
           item
           xs={4}
-          sx={{
-            maxHeight: 200,
-            overflowY: "auto",
-            borderRight: "1px solid #ccc",
-            pl: 1,
-          }}
+          sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pl: 1 }}
         >
           <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             Intervals
           </Typography>
           <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={selectAllDateTimeIntervals}
+                  onChange={handleSelectAllDateTimeIntervals}
+                />
+              }
+              label="Select All"
+              sx={{ fontSize: "0.85rem" }}
+            />
             {missingDateTimeIntervals.length > 0 ? (
               missingDateTimeIntervals.map((interval) => {
-                const label = `${interval.start} to ${interval.end}`;
                 const checked = treatmentSelectedIntervals.some(
                   (i) => i.start === interval.start && i.end === interval.end
                 );
                 return (
                   <FormControlLabel
-                    key={label}
+                    key={`${interval.start}-${interval.end}`}
                     control={
                       <Checkbox
                         size="small"
                         checked={checked}
-                        onChange={() =>
-                          handleTreatmentIntervalToggle(interval)
-                        }
+                        onChange={() => handleTreatmentIntervalToggle(interval)}
                       />
                     }
-                    label={label}
+                    label={`${interval.start} → ${interval.end}`}
                     sx={{ fontSize: "0.85rem" }}
                   />
                 );
               })
             ) : (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                 No missing datetime intervals found.
               </Typography>
             )}
@@ -683,7 +684,6 @@ export default function DataVisualizationAndEngineering() {
             <MenuItem value="Backward fill">Backward Fill</MenuItem>
             <MenuItem value="Delete rows">Delete rows</MenuItem>
           </Select>
-
           <Button
             variant="contained"
             size="small"
@@ -699,77 +699,65 @@ export default function DataVisualizationAndEngineering() {
 
     {treatmentMode === "column" && (
       <Grid container spacing={2}>
-        {/* Column selection */}
+        {/* Columns Radio List */}
         <Grid
           item
-          xs={4}
-          sx={{
-            maxHeight: 200,
-            overflowY: "auto",
-            borderRight: "1px solid #ccc",
-            pr: 1,
-          }}
+          xs={6}
+          sx={{ maxHeight: 150, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}
         >
           <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             Columns
           </Typography>
           <FormGroup>
-            {missingValueColumns.length > 0 ? (
-              missingValueColumns.map((col) => (
-                <FormControlLabel
-                  key={col}
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={selectedMissingValueColumn === col}
-                      onChange={() => setSelectedMissingValueColumn(col)}
-                    />
-                  }
-                  label={col}
-                  sx={{ fontSize: "0.85rem" }}
-                />
-              ))
-            ) : (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
-                No columns found.
-              </Typography>
-            )}
+            {missingValueColumns.map((col) => (
+              <FormControlLabel
+                key={col}
+                control={
+                  <Radio
+                    size="small"
+                    checked={selectedMissingValueColumn === col}
+                    onChange={() => setSelectedMissingValueColumn(col)}
+                  />
+                }
+                label={col}
+                sx={{ fontSize: "0.85rem" }}
+              />
+            ))}
           </FormGroup>
         </Grid>
 
-        {/* Intervals */}
+        {/* Intervals List with Select All */}
         <Grid
           item
-          xs={4}
-          sx={{
-            maxHeight: 200,
-            overflowY: "auto",
-            borderRight: "1px solid #ccc",
-            pl: 1,
-          }}
+          xs={6}
+          sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}
         >
           <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-            Intervals
+            Missing Value Intervals
           </Typography>
           <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={selectAllMissingValueIntervals}
+                  onChange={handleSelectAllMissingValueIntervals}
+                />
+              }
+              label="Select All"
+              sx={{ fontSize: "0.85rem" }}
+            />
             {missingValueIntervals.length > 0 ? (
               missingValueIntervals.map((interval, idx) => (
                 <FormControlLabel
-                  key={idx}
+                  key={`${interval.start}-${interval.end}`}
                   control={
                     <Checkbox
                       size="small"
                       checked={selectedMissingValueIntervals.some(
-                        (i) =>
-                          i.start === interval.start && i.end === interval.end
+                        (i) => i.start === interval.start && i.end === interval.end
                       )}
-                      onChange={() =>
-                        handleMissingValueIntervalToggle(interval)
-                      }
+                      onChange={() => handleMissingValueIntervalToggle(interval)}
                     />
                   }
                   label={`${interval.start} → ${interval.end}`}
@@ -777,19 +765,15 @@ export default function DataVisualizationAndEngineering() {
                 />
               ))
             ) : (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
-                No missing intervals found.
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                No missing value intervals found.
               </Typography>
             )}
           </FormGroup>
         </Grid>
 
         {/* Treatment Method */}
-        <Grid item xs={4}>
+        <Grid item xs={12}>
           <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             Treatment Method
           </Typography>
@@ -800,13 +784,12 @@ export default function DataVisualizationAndEngineering() {
             fullWidth
             sx={{ mt: 1 }}
           >
-            <MenuItem value="Mean">Mean</MenuItem>
-            <MenuItem value="Median">Median</MenuItem>
             <MenuItem value="Forward fill">Forward Fill</MenuItem>
             <MenuItem value="Backward fill">Backward Fill</MenuItem>
+            <MenuItem value="Mean">Mean</MenuItem>
+            <MenuItem value="Median">Median</MenuItem>
             <MenuItem value="Delete rows">Delete rows</MenuItem>
           </Select>
-
           <Button
             variant="contained"
             size="small"
@@ -821,6 +804,7 @@ export default function DataVisualizationAndEngineering() {
     )}
   </AccordionDetails>
 </Accordion>
+
 
 
           {/* Outlier Analysis */}
