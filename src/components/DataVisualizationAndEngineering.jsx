@@ -426,13 +426,16 @@ export default function DataVisualizationAndEngineering() {
   };
 
   //Function to trigger post-treatment prompt
-  const handlePostTreatmentFlow = (augmentedDf) => {
-  if (!augmentedDf) {
-    setError("No augmented data returned from backend.");
+  const handlePostTreatmentFlow = (backendResponse) => {
+  if (!backendResponse || !backendResponse.columns) {
+    setError("No column data returned from backend.");
     return;
   }
-  setLatestAugmentedDf(augmentedDf);
-  setPostTreatmentColumns(Object.keys(augmentedDf[0] || {})); // safe for array of records
+
+  // Set columns for post-treatment selection
+  setPostTreatmentColumns(backendResponse.columns);
+
+  // Show pop-up prompt
   setShowPostTreatmentPrompt(true);
 };
 
