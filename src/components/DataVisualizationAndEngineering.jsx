@@ -427,14 +427,13 @@ export default function DataVisualizationAndEngineering() {
 
   //Function to trigger post-treatment prompt
   const handlePostTreatmentFlow = (augmentedDf) => {
-    // Save latest augmented dataframe
-    setLatestAugmentedDf(augmentedDf);
-
-    // Show pop-up prompt
-    setShowPostTreatmentPrompt(true);
-
-    // Load columns automatically from augmentedDf
-    setPostTreatmentColumns(Object.keys(augmentedDf));
+  if (!augmentedDf) {
+    setError("No augmented data returned from backend.");
+    return;
+  }
+  setLatestAugmentedDf(augmentedDf);
+  setPostTreatmentColumns(Object.keys(augmentedDf[0] || {})); // safe for array of records
+  setShowPostTreatmentPrompt(true);
 };
 
 //Handler for user selection in pop-up
