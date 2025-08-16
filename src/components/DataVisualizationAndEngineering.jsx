@@ -3,6 +3,10 @@ import React, { useState, useContext, useEffect } from "react";
 import Plot from "react-plotly.js";
 import { AppContext } from "../context/AppContext";
 import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Box,
   Grid,
   Paper,
@@ -149,6 +153,8 @@ export default function DataVisualizationAndEngineering() {
 
   // To store latest augmented dataframe for download
   const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
+
+  const [postTreatmentColumns, setPostTreatmentColumns] = useState([]);
 
 
 
