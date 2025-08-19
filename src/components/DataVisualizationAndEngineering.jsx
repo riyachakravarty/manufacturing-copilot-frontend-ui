@@ -1133,7 +1133,7 @@ export default function DataVisualizationAndEngineering() {
     </Typography>
     <Divider sx={{ mb: 2 }} />
 
-    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+    <Box sx={{ flexGrow: 1, width: "100%", minHeight: 0 }}>
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
 
@@ -1143,11 +1143,13 @@ export default function DataVisualizationAndEngineering() {
           layout={{
             ...plotData.layout,
             autosize: true,
+            width: undefined,   // 🚨 clears backend width constraint
+            height: undefined, // 🚨 this line clears backend's fixed height
             paper_bgcolor: theme.palette.background.paper,
             plot_bgcolor: theme.palette.background.default,
             margin: { t: 40, b: 40, l: 40, r: 40 },
           }}
-          style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
+          style={{ width: "100%", height: "100%", minHeight: 500}}
           useResizeHandler
         />
       ) : (
