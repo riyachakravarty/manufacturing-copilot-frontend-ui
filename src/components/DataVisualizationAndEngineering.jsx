@@ -1147,22 +1147,21 @@ export default function DataVisualizationAndEngineering() {
       {error && <Alert severity="error">{error}</Alert>}
 
       {plotData ? (
-        <Box sx={{ flexGrow: 1, width: "100%", height: "100%" }}>
-          <Plot
-            data={plotData.data}
-            layout={{
-              ...plotData.layout,
-              autosize: true,
-              width: undefined, // let Plotly stretch to container width
-              height: undefined, // let Box control height
-              paper_bgcolor: theme.palette.background.paper,
-              plot_bgcolor: theme.palette.background.default,
-              margin: { t: 40, b: 40, l: 40, r: 40 },
-            }}
-            style={{ width: "100%", height: "100%" }}
-            useResizeHandler
-          />
-        </Box>
+      
+      <Plot
+        data={plotData.data}
+        layout={{
+          ...plotData.layout,
+          autosize: true,
+          //width: undefined, // let Plotly stretch to container width
+          //height: undefined, // let Box control height
+          paper_bgcolor: theme.palette.background.paper,
+          plot_bgcolor: theme.palette.background.default,
+          margin: { t: 40, b: 40, l: 40, r: 40 },
+        }}
+        style={{ width: "100%", height: "100%" }}
+        useResizeHandler
+      />
       ) : (
         !loading &&
         !error && (
