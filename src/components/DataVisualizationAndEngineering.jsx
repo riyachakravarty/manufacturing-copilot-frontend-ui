@@ -552,6 +552,7 @@ export default function DataVisualizationAndEngineering() {
       }
 
       const data = await response.json();
+      console.log("API returned:", data);
       alert(data.message || "Treatment applied successfully!");
       console.log("Treatment response:", data);
 
