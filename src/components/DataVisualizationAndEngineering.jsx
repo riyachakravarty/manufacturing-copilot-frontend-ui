@@ -1133,35 +1133,23 @@ export default function DataVisualizationAndEngineering() {
     </Typography>
     <Divider sx={{ mb: 2 }} />
 
-    <Box
-      sx={{
-        flexGrow: 1,
-        width: "100%",
-        height: "100%",
-        minHeight: 500,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
 
       {plotData ? (
-      
-      <Plot
-        data={plotData.data}
-        layout={{
-          ...plotData.layout,
-          autosize: true,
-          //width: undefined, // let Plotly stretch to container width
-          //height: undefined, // let Box control height
-          paper_bgcolor: theme.palette.background.paper,
-          plot_bgcolor: theme.palette.background.default,
-          margin: { t: 40, b: 40, l: 40, r: 40 },
-        }}
-        style={{ width: "100%", height: "100%" }}
-        useResizeHandler
-      />
+        <Plot
+          data={plotData.data}
+          layout={{
+            ...plotData.layout,
+            autosize: true,
+            paper_bgcolor: theme.palette.background.paper,
+            plot_bgcolor: theme.palette.background.default,
+            margin: { t: 40, b: 40, l: 40, r: 40 },
+          }}
+          style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
+          useResizeHandler
+        />
       ) : (
         !loading &&
         !error && (
@@ -1170,33 +1158,25 @@ export default function DataVisualizationAndEngineering() {
           </Typography>
         )
       )}
-    </Box>
 
-    {/* Post-Treatment Prompt Dialog */}
-    <Dialog
-      open={showPostTreatmentPrompt}
-      onClose={() => setShowPostTreatmentPrompt(false)}
-    >
-      <DialogTitle>View Updated Missing Value Plot?</DialogTitle>
-      <DialogContent>
-        <Typography>
-          Do you want to select a column and view updated missing value plot?
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => handlePostTreatmentPromptAnswer("no")}>No</Button>
-        <Button
-          onClick={() => handlePostTreatmentPromptAnswer("yes")}
-          autoFocus
-        >
-          Yes
-        </Button>
-      </DialogActions>
-    </Dialog>
+      {/* Post-Treatment Prompt Dialog */}
+      <Dialog open={showPostTreatmentPrompt} onClose={() => setShowPostTreatmentPrompt(false)}>
+        <DialogTitle>View Updated Missing Value Plot?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Do you want to select a column and view updated missing value plot?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handlePostTreatmentPromptAnswer("no")}>No</Button>
+          <Button onClick={() => handlePostTreatmentPromptAnswer("yes")} autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-    {/* Post-Treatment Column Selection & Plot */}
-    {postTreatmentColumns?.length > 0 &&
-      postTreatmentSelectedColumn !== null && (
+      {/* Post-Treatment Column Selection & Plot */}
+      {postTreatmentColumns?.length > 0 && postTreatmentSelectedColumn !== null && (
         <Box sx={{ mt: 2 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
             Select Column for Updated Missing Value Plot
@@ -1228,34 +1208,35 @@ export default function DataVisualizationAndEngineering() {
         </Box>
       )}
 
-    {/* Latest Augmented Data Download */}
-    {latestAugmentedDf && (
-      <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={async () => {
-            try {
-              const response = await fetch(`${BACKEND_URL}/download`);
-              if (!response.ok) throw new Error("Download failed");
-              const blob = await response.blob();
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement("a");
-              link.href = url;
-              link.download = "treated_data.csv"; // same name as backend header
-              link.click();
-            } catch (err) {
-              console.error(err);
-              setError("Failed to download file from server.");
-            }
-          }}
-        >
-          Download Latest Data
-        </Button>
-      </Box>
-    )}
+      {/* Latest Augmented Data Download */}
+      {latestAugmentedDf && (
+        <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/download`);
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "treated_data.csv"; // same name as backend header
+      link.click();
+    } catch (err) {
+      console.error(err);
+      setError("Failed to download file from server.");
+    }
+  }}
+          >
+            Download Latest Data
+          </Button>
+        </Box>
+      )}
+    </Box>
   </Paper>
 </Grid>
 </Grid>
-);
+  );
 }
