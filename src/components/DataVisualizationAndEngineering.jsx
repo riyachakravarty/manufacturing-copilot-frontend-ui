@@ -1161,6 +1161,33 @@ export default function DataVisualizationAndEngineering() {
         )
       )}
 
+      {/* Latest Augmented Data Download */}
+      {latestAugmentedDf && (
+        <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/download`);
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "treated_data.csv"; // same name as backend header
+      link.click();
+    } catch (err) {
+      console.error(err);
+      setError("Failed to download file from server.");
+    }
+  }}
+          >
+            Download Latest Data
+          </Button>
+        </Box>
+      )}
+
       {/* Post-Treatment Prompt Dialog */}
       <Dialog open={showPostTreatmentPrompt} onClose={() => setShowPostTreatmentPrompt(false)}>
         <DialogTitle>View Updated Missing Value Plot?</DialogTitle>
@@ -1210,32 +1237,7 @@ export default function DataVisualizationAndEngineering() {
         </Box>
       )}
 
-      {/* Latest Augmented Data Download */}
-      {latestAugmentedDf && (
-        <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={async () => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/download`);
-      if (!response.ok) throw new Error("Download failed");
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "treated_data.csv"; // same name as backend header
-      link.click();
-    } catch (err) {
-      console.error(err);
-      setError("Failed to download file from server.");
-    }
-  }}
-          >
-            Download Latest Data
-          </Button>
-        </Box>
-      )}
+      
     </Box>
   </Paper>
 </Grid>
