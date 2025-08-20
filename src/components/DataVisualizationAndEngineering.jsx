@@ -1130,63 +1130,66 @@ export default function DataVisualizationAndEngineering() {
     }}
     elevation={3}
   >
-    <Typography variant="h6" gutterBottom color="primary">
-      Analysis Output
-    </Typography>
-    <Divider sx={{ mb: 2 }} />
-
-    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
-      {loading && <CircularProgress />}
-      {error && <Alert severity="error">{error}</Alert>}
-
-      {plotData ? (
-        <Plot
-          data={plotData.data}
-          layout={{
-            ...plotData.layout,
-            autosize: true,
-            paper_bgcolor: theme.palette.background.paper,
-            plot_bgcolor: theme.palette.background.default,
-            margin: { t: 40, b: 40, l: 40, r: 40 },
-          }}
-          style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
-          useResizeHandler
-        />
-      ) : (
-        !loading &&
-        !error && (
-          <Typography variant="body2" color="text.secondary">
-            No analysis results yet.
-          </Typography>
-        )
-      )}
-
+    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+      <Typography variant="h6" gutterBottom color="primary">
+        Analysis Output
+      </Typography>
       {/* Latest Augmented Data Download */}
       {latestAugmentedDf && (
-        <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={async () => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/download`);
-      if (!response.ok) throw new Error("Download failed");
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "treated_data.csv"; // same name as backend header
-      link.click();
-    } catch (err) {
-      console.error(err);
-      setError("Failed to download file from server.");
-    }
-  }}
-          >
-            Download Latest Data
-          </Button>
-        </Box>
-      )}
+        
+        <Button
+          variant="contained"
+          color="secondary"
+          size="small"
+          onClick={async () => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/download`);
+    if (!response.ok) throw new Error("Download failed");
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "treated_data.csv"; // same name as backend header
+    link.click();
+  } catch (err) {
+    console.error(err);
+    setError("Failed to download file from server.");
+  }
+}}
+
+        >
+          Download Latest Data
+        </Button>
+    )}
+      </Box>
+      <Divider sx={{ mb: 2 }} />
+
+      <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+        {loading && <CircularProgress />}
+        {error && <Alert severity="error">{error}</Alert>}
+
+        {plotData ? (
+          <Plot
+            data={plotData.data}
+            layout={{
+              ...plotData.layout,
+              autosize: true,
+              paper_bgcolor: theme.palette.background.paper,
+              plot_bgcolor: theme.palette.background.default,
+              margin: { t: 40, b: 40, l: 40, r: 40 },
+            }}
+            style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
+            useResizeHandler
+          />
+        ) : (
+          !loading &&
+          !error && (
+            <Typography variant="body2" color="text.secondary">
+              No analysis results yet.
+            </Typography>
+          )
+        )}
+
 
       {/* Post-Treatment Prompt Dialog */}
       <Dialog open={showPostTreatmentPrompt} onClose={() => setShowPostTreatmentPrompt(false)}>
