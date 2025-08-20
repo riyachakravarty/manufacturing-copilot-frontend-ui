@@ -566,6 +566,7 @@ export default function DataVisualizationAndEngineering() {
 
       // Trigger post-treatment prompt
       handlePostTreatmentFlow(data);
+      setLatestAugmentedDf(response.data);
 
     } catch (error) {
       console.error("Error applying missing value treatment:", error);
