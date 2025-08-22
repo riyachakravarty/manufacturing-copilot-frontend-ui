@@ -65,7 +65,9 @@ export default function DataVisualizationAndEngineering() {
 
   // Outlier treatment states
   //const [outlierMethod, setOutlierMethod] = useState("zscore");
+  const [outlierColumns, setOutlierColumns] = useState([]);
   const [outlierSelectedColumns, setOutlierSelectedColumns] = useState([]);
+  const [outlierIntervals, setOutlierIntervals] = useState([]);
   const [outlierSelectedIntervals, setOutlierSelectedIntervals] = useState([]);
   const [outlierTreatmentMethod, setOutlierTreatmentMethod] = useState("Mean");
 
@@ -156,6 +158,7 @@ export default function DataVisualizationAndEngineering() {
 
   const [postTreatmentColumns, setPostTreatmentColumns] = useState([]);
 
+  const [postTreatmentMode, setPostTreatmentMode] = useState("missing"); // "missing" | "outlier"
 
 
   useEffect(() => {
@@ -250,6 +253,31 @@ export default function DataVisualizationAndEngineering() {
       setSelectedMissingValueIntervals([]);
     }
   }, [selectedMissingValueColumn]);
+
+  // Auto-load outlier intervals when a column is selected
+  useEffect(() => {
+    if (outlierSelectedColumns) {
+      const fetchIntervals = async () => {
+        try {
+          const res = await fetch(
+            `${BACKEND_URL}/outlier_intervals?column=${outlierSelectedColumns}`
+          );
+          if (!res.ok) throw new Error("Failed to fetch outlier intervals");
+          const data = await res.json();
+          if (data.intervals) {
+            setOutlierIntervals(data.intervals);
+          }
+        } catch (err) {
+          console.error("Error loading missing value intervals:", err);
+          setOutlierIntervals([]);
+        }
+      };
+      fetchIntervals();
+    } else {
+      setOutlierIntervals([]);
+      setOutlierSelectedIntervals([]);
+    }
+  }, [outlierSelectedColumns]);
 
   // Toggle for interval checkboxes in "Missing Values in Column" mode
   //const handleMissingValueIntervalToggle = (interval) => {
@@ -425,6 +453,21 @@ export default function DataVisualizationAndEngineering() {
     }
   };
 
+    // Load outlier intervals for selected column
+  const loadOutlierIntervals = async () => {
+    if (!outlierSelectedColumns) {
+      alert("Please select a column first");
+      return;
+    }
+    try {
+      const res = await fetch(`${BACKEND_URL}/outlier_intervals?column=${encodeURIComponent(outlierSelectedColumns)}`);
+      const data = await res.json();
+      setOutlierIntervals(data.intervals || []);
+    } catch (err) {
+      console.error("Error loading outlier intervals:", err);
+    }
+  };
+
   //Function to trigger post-treatment prompt
   const handlePostTreatmentFlow = (backendResponse) => {
   if (!backendResponse || !backendResponse.columns) {
@@ -476,6 +519,37 @@ export default function DataVisualizationAndEngineering() {
     } catch (err) {
       console.error(err);
       setError("Error running missing value analysis.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Handler to load missing value plot for selected column
+  const loadPostTreatmentOutlierPlot = async () => {
+  if (!postTreatmentSelectedColumn) {
+      setError("Please select a column for analysis.");
+      return;
+    }
+
+    try {
+      const prompt = `outlier analysis where selected variable is ${postTreatmentSelectedColumn}`;
+      const response = await fetch(`${BACKEND_URL}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      const result = await response.json();
+
+      if (result.type === "plot" && result.data) {
+        setPlotData(result.data);
+        setExpanded(false); // Collapse left accordion to free space
+      } else {
+        setError("Unexpected response from server.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Error running outlier analysis.");
     } finally {
       setLoading(false);
     }
@@ -566,6 +640,7 @@ export default function DataVisualizationAndEngineering() {
       }
 
       // Trigger post-treatment prompt
+      setPostTreatmentMode("missing");
       handlePostTreatmentFlow(data);
       setLatestAugmentedDf(data);
 
@@ -577,18 +652,60 @@ export default function DataVisualizationAndEngineering() {
     }
   };
 
-  // Apply outlier treatment placeholder
-  const applyOutlierTreatment = () => {
-    console.log("Apply Outlier Treatment:", {
-      columns: outlierSelectedColumns,
-      intervals: outlierSelectedIntervals,
-      method: outlierTreatmentMethod,
+// Apply outlier treatment
+  const applyOutlierTreatment = async () => {
+    let endpoint = "";
+    let payload = {};
+
+    try {
+        if (!outlierSelectedColumns) {
+          alert("Please select a column.");
+          return;
+        }
+        if (!outlierSelectedIntervals.length) {
+          alert("Please select at least one outlier interval.");
+          return;
+        }
+        if (!treatmentMethod) {
+          alert("Please select a treatment method.");
+          return;
+        }
+
+        payload = {
+          column: outlierSelectedColumns,
+          intervals: outlierSelectedIntervals,
+          method: outlierTreatmentMethod,
+        };
+        endpoint = `${BACKEND_URL}/apply_outlier_treatment`;
+
+      // Make API request
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
+
+      if (!response.ok) {
+        throw new Error(`Error applying treatment: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("API returned:", data);
+      alert(data.message || "Treatment applied successfully!");
+      console.log("Treatment response:", data);
+
+      // Trigger post-treatment prompt
+      setPostTreatmentMode("outlier");
+      handlePostTreatmentFlow(data);
+      setLatestAugmentedDf(data);
+
+    } catch (error) {
+      console.error("Error applying outlier treatment:", error);
+      setError("Error applying outlier treatment: " + error.message);
+    } finally {
+      setLoadingTreatment(false);
+    }
   };
-
-
-
-
 
   return (
     <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)", flexWrap: "nowrap" }}>
@@ -1193,10 +1310,10 @@ export default function DataVisualizationAndEngineering() {
 
       {/* Post-Treatment Prompt Dialog */}
       <Dialog open={showPostTreatmentPrompt} onClose={() => setShowPostTreatmentPrompt(false)}>
-        <DialogTitle>View Updated Missing Value Plot?</DialogTitle>
+        <DialogTitle>View Updated Plot post treatment?</DialogTitle>
         <DialogContent>
           <Typography>
-            Do you want to select a column and view updated missing value plot?
+            Do you want to select a column and view updated plot?
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -1211,7 +1328,9 @@ export default function DataVisualizationAndEngineering() {
       {postTreatmentColumns?.length > 0 && postTreatmentSelectedColumn !== null && (
         <Box sx={{ mt: 2 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-            Select Column for Updated Missing Value Plot
+            {postTreatmentMode === "missing"
+              ? "Select Column for Updated Missing Value Plot"
+              : "Select Column for Updated Outlier Plot"}
           </Typography>
           <FormGroup>
             {postTreatmentColumns.map((col) => (
@@ -1233,9 +1352,13 @@ export default function DataVisualizationAndEngineering() {
             variant="contained"
             size="small"
             sx={{ mt: 1 }}
-            onClick={loadPostTreatmentMissingValuePlot}
+            onClick={
+              postTreatmentMode === "missing"
+                ? loadPostTreatmentMissingValuePlot
+                : loadPostTreatmentOutlierPlot
+            }
           >
-            Load Missing Value Analysis
+            Load Updated Analysis
           </Button>
         </Box>
       )}
