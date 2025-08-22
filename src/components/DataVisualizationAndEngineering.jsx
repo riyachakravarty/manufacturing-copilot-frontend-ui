@@ -66,7 +66,7 @@ export default function DataVisualizationAndEngineering() {
   // Outlier treatment states
   //const [outlierMethod, setOutlierMethod] = useState("zscore");
   const [outlierColumns, setOutlierColumns] = useState([]);
-  const [outlierSelectedColumns, setOutlierSelectedColumns] = useState([]);
+  const [outlierSelectedColumns, setOutlierSelectedColumns] = useState("");
   const [outlierIntervals, setOutlierIntervals] = useState([]);
   const [outlierSelectedIntervals, setOutlierSelectedIntervals] = useState([]);
   const [outlierTreatmentMethod, setOutlierTreatmentMethod] = useState("Mean");
@@ -1144,22 +1144,20 @@ export default function DataVisualizationAndEngineering() {
                   <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                     Columns
                   </Typography>
-                  <FormGroup>
+                  <RadioGroup
+                    value={outlierSelectedColumns}
+                    onChange={(e) => setOutlierSelectedColumns(e.target.value)}
+                    >
                     {columns.map((col) => (
                       <FormControlLabel
                         key={col}
-                        control={
-                          <Checkbox
-                            size="small"
-                            checked={outlierSelectedColumns.includes(col)}
-                            onChange={() => handleOutlierColumnToggle(col)}
-                          />
-                        }
+                        value={col}
+                        control={<Radio size="small" />}
                         label={col}
                         sx={{ fontSize: "0.85rem" }}
                       />
                     ))}
-                  </FormGroup>
+                  </RadioGroup>
                 </Grid>
 
                 {/* Interval List */}
