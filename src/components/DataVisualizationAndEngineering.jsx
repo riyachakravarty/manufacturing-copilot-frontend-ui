@@ -433,10 +433,18 @@ export default function DataVisualizationAndEngineering() {
     );
   };
 
-  const handleOutlierIntervalToggle = (intervalStr) => {
-    setOutlierSelectedIntervals((prev) =>
-      prev.includes(intervalStr) ? prev.filter((i) => i !== intervalStr) : [...prev, intervalStr]
+  // Individual interval toggle for Outliers
+  const handleOutlierIntervalToggle = (interval) => {
+    const exists = outlierSelectedIntervals.some(
+      (i) => i.start === interval.start && i.end === interval.end
     );
+    if (exists) {
+      setOutlierSelectedIntervals((prev) =>
+        prev.filter((i) => !(i.start === interval.start && i.end === interval.end))
+      );
+    } else {
+      setOutlierSelectedIntervals((prev) => [...prev, interval]);
+    }
   };
 
     // Load columns for Missing Values mode
@@ -1150,26 +1158,28 @@ export default function DataVisualizationAndEngineering() {
                 {/* Column List */}
                 <Grid
                   item
-                  xs={4}
-                  sx={{ maxHeight: 200, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}
+                  xs={6}
+                  sx={{ maxHeight: 150, overflowY: "auto", borderRight: "1px solid #ccc", pr: 1 }}
                 >
                   <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                     Columns
                   </Typography>
-                  <RadioGroup
-                    value={outlierSelectedColumns}
-                    onChange={(e) => setOutlierSelectedColumns(e.target.value)}
-                    >
-                    {columns.map((col) => (
+                  <FormGroup>
+                    {missingValueColumns.map((col) => (
                       <FormControlLabel
                         key={col}
-                        value={col}
-                        control={<Radio size="small" />}
+                        control={
+                          <Radio
+                            size="small"
+                            checked={outlierSelectedColumns === col}
+                            onChange={() => setOutlierSelectedColumns(col)}
+                          />
+                        }
                         label={col}
                         sx={{ fontSize: "0.85rem" }}
                       />
-                    ))}
-                  </RadioGroup>
+                      ))}
+                  </FormGroup>
                 </Grid>
 
                 {/* Interval List */}
