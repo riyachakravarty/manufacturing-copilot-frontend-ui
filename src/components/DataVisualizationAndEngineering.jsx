@@ -427,11 +427,11 @@ export default function DataVisualizationAndEngineering() {
     });
   };
 
-  const handleOutlierColumnToggle = (col) => {
-    setOutlierSelectedColumns((prev) =>
-      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
-    );
-  };
+  //const handleOutlierColumnToggle = (col) => {
+    //setOutlierSelectedColumns((prev) =>
+      //prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
+    //);
+  //};
 
   // Individual interval toggle for Outliers
   const handleOutlierIntervalToggle = (interval) => {
@@ -1165,7 +1165,7 @@ export default function DataVisualizationAndEngineering() {
                     Columns
                   </Typography>
                   <FormGroup>
-                    {missingValueColumns.map((col) => (
+                    {outlierColumns.map((col) => (
                       <FormControlLabel
                         key={col}
                         control={
