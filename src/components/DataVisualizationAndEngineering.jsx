@@ -92,6 +92,7 @@ export default function DataVisualizationAndEngineering() {
   const [selectAllColumns, setSelectAllColumns] = useState(false);
   const [selectAllDateTimeIntervals, setSelectAllDateTimeIntervals] = useState(false);
   const [selectAllMissingValueIntervals, setSelectAllMissingValueIntervals] = useState(false);
+  const [selectAllOutlierIntervals, setSelectAllOutlierIntervals] = useState(false);
 
   // Handlers for "Select All" checkboxes
 
@@ -125,6 +126,17 @@ export default function DataVisualizationAndEngineering() {
       setSelectedMissingValueIntervals([...missingValueIntervals]);
     } else {
       setSelectedMissingValueIntervals([]);
+    }
+  };
+
+  // For Outlier Intervals in Column
+  const handleSelectAllOutlierIntervals = (e) => {
+    const checked = e.target.checked;
+    setSelectAllOutlierIntervals(checked);
+    if (checked) {
+      setSelectAllOutlierIntervals([...outlierIntervals]);
+    } else {
+      setSelectAllOutlierIntervals([]);
     }
   };
 
@@ -1163,32 +1175,51 @@ export default function DataVisualizationAndEngineering() {
                 {/* Interval List */}
                 <Grid
                   item
-                  xs={4}
+                  xs={6}
                   sx={{
                     maxHeight: 200,
                     overflowY: "auto",
                     borderRight: "1px solid #ccc",
-                    pl: 1,
+                    pr: 1,
                   }}
                 >
                   <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                    Intervals
+                    Outlier Intervals
                   </Typography>
                   <FormGroup>
-                    {mockIntervals.map((interval) => (
-                      <FormControlLabel
-                        key={interval}
-                        control={
-                          <Checkbox
-                            size="small"
-                            checked={outlierSelectedIntervals.includes(interval)}
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          size="small"
+                          checked={selectAllOutlierIntervals}
+                          onChange={handleSelectAllOutlierIntervals}
+                        />
+                      }
+                      label="Select All"
+                      sx={{ fontSize: "0.85rem" }}
+                    />
+                    {outlierIntervals.length > 0 ? (
+                      outlierIntervals.map((interval, idx) => (
+                        <FormControlLabel
+                          key={`${interval.start}-${interval.end}`}
+                          control={
+                            <Checkbox
+                              size="small"
+                              checked={outlierSelectedIntervals.some(
+                                (i) => i.start === interval.start && i.end === interval.end
+                              )}
                             onChange={() => handleOutlierIntervalToggle(interval)}
                           />
                         }
-                        label={interval}
+                        label={`${interval.start} → ${interval.end}`}
                         sx={{ fontSize: "0.85rem" }}
                       />
-                    ))}
+                    ))
+                  ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      No Outlier intervals found.
+                    </Typography>
+                  )}
                   </FormGroup>
                 </Grid>
 
