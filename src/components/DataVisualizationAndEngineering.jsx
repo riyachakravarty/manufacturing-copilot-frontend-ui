@@ -182,6 +182,7 @@ export default function DataVisualizationAndEngineering() {
         const data = await response.json();
         if (data.columns) {
           setColumns(data.columns);
+          setOutlierColumns(data.columns)
         } else {
           setError(data.error || "No columns found.");
         }
