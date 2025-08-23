@@ -269,19 +269,19 @@ export default function DataVisualizationAndEngineering() {
 
   // Auto-load outlier intervals when a column is selected
   useEffect(() => {
-    if (outlierSelectedColumns) {
+    if (outlierSelectedColumns && outlierTreatmentMethod) {
       const fetchIntervals = async () => {
         try {
           const res = await fetch(
-            `${BACKEND_URL}/outlier_intervals?column=${outlierSelectedColumns}`
+            `${BACKEND_URL}/outlier_intervals?column=${encodeURIComponent(outlierSelectedColumns)}&method=${encodeURIComponent(outlierTreatmentMethod)}`
           );
           if (!res.ok) throw new Error("Failed to fetch outlier intervals");
           const data = await res.json();
           if (data.intervals) {
-            setOutlierIntervals(data.intervals);
+            setOutlierIntervals(data.intervals || []);
           }
         } catch (err) {
-          console.error("Error loading missing value intervals:", err);
+          console.error("Error loading outlier intervals:", err);
           setOutlierIntervals([]);
         }
       };
@@ -290,7 +290,7 @@ export default function DataVisualizationAndEngineering() {
       setOutlierIntervals([]);
       setOutlierSelectedIntervals([]);
     }
-  }, [outlierSelectedColumns]);
+  }, [outlierSelectedColumns,outlierTreatmentMethod]);
 
   // Toggle for interval checkboxes in "Missing Values in Column" mode
   //const handleMissingValueIntervalToggle = (interval) => {
