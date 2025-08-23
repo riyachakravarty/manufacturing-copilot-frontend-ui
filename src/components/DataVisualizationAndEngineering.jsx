@@ -269,11 +269,11 @@ export default function DataVisualizationAndEngineering() {
 
   // Auto-load outlier intervals when a column is selected
   useEffect(() => {
-    if (outlierSelectedColumns && outlierTreatmentMethod) {
+    if (outlierSelectedColumns && outlierMethod) {
       const fetchIntervals = async () => {
         try {
           const res = await fetch(
-            `${BACKEND_URL}/outlier_intervals?column=${encodeURIComponent(outlierSelectedColumns)}&method=${encodeURIComponent(outlierTreatmentMethod)}`
+            `${BACKEND_URL}/outlier_intervals?column=${encodeURIComponent(outlierSelectedColumns)}&method=${encodeURIComponent(outlierMethod)}`
           );
           if (!res.ok) throw new Error("Failed to fetch outlier intervals");
           const data = await res.json();
@@ -1182,6 +1182,26 @@ export default function DataVisualizationAndEngineering() {
                       ))}
                   </FormGroup>
                 </Grid>
+
+                <Typography variant="caption" sx={{ fontWeight: "bold", mt: 2 }}>
+                  Outlier Detection Method
+                </Typography>
+                <RadioGroup
+                  value={outlierMethod}
+                  onChange={(e) => setOutlierMethod(e.target.value)}
+                >
+                  <FormControlLabel
+                    value="zscore"
+                    control={<Radio size="small" />}
+                    label="Z-Score"
+                  />
+                  <FormControlLabel
+                    value="iqr"
+                    control={<Radio size="small" />}
+                    label="IQR"
+                  />
+                </RadioGroup>
+
 
                 {/* Interval List */}
                 <Grid
