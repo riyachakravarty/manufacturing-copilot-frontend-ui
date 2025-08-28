@@ -1,182 +1,240 @@
+// src/components/ExploratoryDataAnalysis.jsx
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  Divider,
+  Grid,
   Card,
   CardContent,
-  IconButton,
-  Collapse,
-  Button,
-  FormControlLabel,
-  RadioGroup,
-  Radio,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  FormControl,
+  InputLabel,
   Select,
   MenuItem,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
   TextField,
-  CircularProgress,
-  Alert,
+  Divider,
+  Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Plot from "react-plotly.js";
 
 const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
-  const [expandedCard, setExpandedCard] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [plotData, setPlotData] = useState(null);
-
-  // Columns & Target
   const [columns, setColumns] = useState([]);
   const [targetColumn, setTargetColumn] = useState("");
+  const [expandedCard, setExpandedCard] = useState(false);
 
-  // Q-cut controls
-  const [selectedColumn, setSelectedColumn] = useState("");
-  const [qCut, setQCut] = useState(4);
-
-  // Fetch columns on tab load
+  // Load column names from backend
   useEffect(() => {
     const fetchColumns = async () => {
       try {
         const res = await fetch(`${BACKEND_URL}/get_columns`);
         const data = await res.json();
         setColumns(data.columns || []);
-        if (data.columns?.length > 0) {
-          setTargetColumn(data.columns[0]); // default
-        }
       } catch (err) {
-        console.error("Error loading columns:", err);
+        console.error("Error fetching columns:", err);
       }
     };
     fetchColumns();
   }, [BACKEND_URL]);
 
-  const handleExpand = (card) => {
-    setExpandedCard(expandedCard === card ? null : card);
-  };
-
-  const runAnalysis = async (endpoint, payload = {}) => {
-    try {
-      setLoading(true);
-      setError("");
-      const res = await fetch(`${BACKEND_URL}/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(`Failed to fetch: ${endpoint}`);
-      const data = await res.json();
-      setPlotData(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  // Card toggle
+  const handleAccordionChange = (panel) => (event, isExpanded) => {
+    setExpandedCard(isExpanded ? panel : false);
   };
 
   return (
-    <Box sx={{ display: "flex", gap: 2, height: "100%" }}>
+    <Grid container spacing={2}>
       {/* Left Panel */}
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-        
-        {/* Target / Objective Selector */}
-        <Card>
+      <Grid item xs={4}>
+        <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
           <CardContent>
-            <Typography variant="subtitle2" fontWeight="bold">
-              Target / Objective
-            </Typography>
-            <Select
-              fullWidth
-              size="small"
-              value={targetColumn}
-              onChange={(e) => setTargetColumn(e.target.value)}
-              sx={{ mt: 1 }}
-            >
-              {columns.map((col) => (
-                <MenuItem key={col} value={col}>
-                  {col}
-                </MenuItem>
-              ))}
-            </Select>
-          </CardContent>
-        </Card>
-
-        {/* Q-Cut Box Plots */}
-        <Card>
-          <CardContent>
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="subtitle1" fontWeight="bold">
-                Specialized Q-cut Box Plots
-              </Typography>
-              <IconButton size="small" onClick={() => handleExpand("qcut")}>
-                <ExpandMoreIcon />
-              </IconButton>
-            </Box>
-            <Collapse in={expandedCard === "qcut"}>
-              <Typography variant="caption">Select Column</Typography>
-              <RadioGroup
-                value={selectedColumn}
-                onChange={(e) => setSelectedColumn(e.target.value)}
+            {/* Target Dropdown */}
+            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+              <InputLabel>Target / Objective</InputLabel>
+              <Select
+                value={targetColumn}
+                label="Target / Objective"
+                onChange={(e) => setTargetColumn(e.target.value)}
               >
                 {columns.map((col) => (
-                  <FormControlLabel
-                    key={col}
-                    value={col}
-                    control={<Radio size="small" />}
-                    label={col}
-                  />
+                  <MenuItem key={col} value={col}>
+                    {col}
+                  </MenuItem>
                 ))}
-              </RadioGroup>
+              </Select>
+            </FormControl>
 
-              <TextField
-                label="Number of Quantiles"
-                type="number"
-                size="small"
-                fullWidth
-                value={qCut}
-                onChange={(e) => setQCut(Number(e.target.value))}
-                sx={{ mt: 1 }}
-              />
+            {/* Specialized Q-cut Box Plots */}
+            <Accordion
+              expanded={expandedCard === "qcut"}
+              onChange={handleAccordionChange("qcut")}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Specialized Q-cut Box Plots
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <RadioGroup>
+                  {columns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      value={col}
+                      control={<Radio size="small" />}
+                      label={col}
+                    />
+                  ))}
+                </RadioGroup>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Number of quantiles for Target"
+                  type="number"
+                  sx={{ mt: 2 }}
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  sx={{ mt: 2 }}
+                >
+                  Generate Analysis
+                </Button>
+              </AccordionDetails>
+            </Accordion>
 
-              <Button
-                variant="contained"
-                size="small"
-                sx={{ mt: 1 }}
-                onClick={() =>
-                  runAnalysis("eda_qcut_boxplot", {
-                    column: selectedColumn,
-                    q: qCut,
-                    target: targetColumn,
-                  })
-                }
-              >
-                Generate Analysis
-              </Button>
-            </Collapse>
+            {/* Dual Axes Box Plots */}
+            <Accordion
+              expanded={expandedCard === "dualAxes"}
+              onChange={handleAccordionChange("dualAxes")}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Dual Axes Box Plots
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Select two columns to compare:
+                </Typography>
+                <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                  <InputLabel>Column X</InputLabel>
+                  <Select>
+                    {columns.map((col) => (
+                      <MenuItem key={col} value={col}>
+                        {col}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                  <InputLabel>Column Y</InputLabel>
+                  <Select>
+                    {columns.map((col) => (
+                      <MenuItem key={col} value={col}>
+                        {col}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Button
+                  variant="contained"
+                  size="small"
+                >
+                  Run Dual Axes Plot
+                </Button>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Correlation Analysis */}
+            <Accordion
+              expanded={expandedCard === "correlation"}
+              onChange={handleAccordionChange("correlation")}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Correlation Analysis
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Button variant="contained" size="small">
+                  Run Correlation Analysis
+                </Button>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Custom Continuous Range Analysis */}
+            <Accordion
+              expanded={expandedCard === "range"}
+              onChange={handleAccordionChange("range")}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Custom Continuous Range Analysis
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Enter Range (e.g., 10-20)"
+                />
+                <Button
+                  variant="contained"
+                  size="small"
+                  sx={{ mt: 2 }}
+                >
+                  Run Range Analysis
+                </Button>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Multivariate Timeseries Analysis */}
+            <Accordion
+              expanded={expandedCard === "multivariate"}
+              onChange={handleAccordionChange("multivariate")}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Multivariate Timeseries Analysis
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Button variant="contained" size="small">
+                  Run Multivariate Analysis
+                </Button>
+              </AccordionDetails>
+            </Accordion>
           </CardContent>
         </Card>
-
-        {/* Other 3 cards will follow here... */}
-      </Box>
+      </Grid>
 
       {/* Right Panel */}
-      <Box sx={{ flex: 2, p: 2, border: "1px solid #ccc", borderRadius: 2 }}>
-        <Typography variant="h6" gutterBottom color="primary">
-          EDA Output
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
-        {loading && <CircularProgress />}
-        {error && <Alert severity="error">{error}</Alert>}
-        {plotData && (
-          <Plot
-            data={plotData.data}
-            layout={plotData.layout}
-            style={{ width: "100%", height: "100%", minHeight: 400 }}
-            useResizeHandler
-          />
-        )}
-      </Box>
-    </Box>
+      <Grid item xs={8}>
+        <Card sx={{ borderRadius: 3, boxShadow: 2, height: "100%" }}>
+          <CardContent>
+            <Typography
+              variant="h6"
+              gutterBottom
+              color="primary"
+            >
+              EDA Output
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+
+            <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+              <Typography variant="body2" color="text.secondary">
+                No analysis results yet.
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 };
 
