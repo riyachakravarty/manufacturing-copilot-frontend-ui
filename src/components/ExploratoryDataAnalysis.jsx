@@ -20,29 +20,55 @@ import {
   TextField,
   Divider,
   Button,
-  FormGroup
+  FormGroup,
+  Checkbox,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
-  const [columns, setColumns] = useState([]);
+  const [edaColumns, setEdaColumns] = useState([]);
   const [targetColumn, setTargetColumn] = useState("");
+  const [performanceDirection, setPerformanceDirection] = useState("higher");
   const [expandedCard, setExpandedCard] = useState(false);
-  const [selectedQcutColumn, setSelectedQcutColumn] = React.useState("");
-  const [qcutQuantiles, setQcutQuantiles] = React.useState(4); // default quantiles
 
+  // Q-cut state
+  const [selectedQcutColumn, setSelectedQcutColumn] = useState("");
+  const [qcutQuantiles, setQcutQuantiles] = useState(4);
 
-  // Load column names from backend
+  // Dual Axes Box Plots
+  const [dualAxisX, setDualAxisX] = useState("");
+  const [dualAxisY, setDualAxisY] = useState("");
+  const [dualAxisQuantiles, setDualAxisQuantiles] = useState(4);
+
+  // Correlation
+  const [selectedCorrColumns, setSelectedCorrColumns] = useState([]);
+  const [corrMethod, setCorrMethod] = useState("pearson");
+
+  // Continuous Range Analysis
+  const [minRangeDuration, setMinRangeDuration] = useState("");
+  const [spikeMin, setSpikeMin] = useState("");
+  const [spikeMax, setSpikeMax] = useState("");
+  const [minSpikeDuration, setMinSpikeDuration] = useState("");
+
+  // Multivariate Analysis
+  const [selectedMultiColumns, setSelectedMultiColumns] = useState([]);
+  const [multiMode, setMultiMode] = useState("continuous");
+
+  // Fetch column names from backend
   useEffect(() => {
     const fetchColumns = async () => {
       try {
         const res = await fetch(`${BACKEND_URL}/get_columns`);
+        if (!res.ok) throw new Error("Failed to fetch columns");
         const data = await res.json();
-        setColumns(data.columns || []);
+        setEdaColumns(data.columns || []);
       } catch (err) {
         console.error("Error fetching columns:", err);
       }
     };
+
     fetchColumns();
   }, [BACKEND_URL]);
 
@@ -65,13 +91,25 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
                 label="Target / Objective"
                 onChange={(e) => setTargetColumn(e.target.value)}
               >
-                {columns.map((col) => (
+                {edaColumns.map((col) => (
                   <MenuItem key={col} value={col}>
                     {col}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
+
+            {/* Performance Direction Toggle */}
+            <ToggleButtonGroup
+              value={performanceDirection}
+              exclusive
+              onChange={(e, val) => val && setPerformanceDirection(val)}
+              size="small"
+              sx={{ mb: 3 }}
+            >
+              <ToggleButton value="higher">Higher the better</ToggleButton>
+              <ToggleButton value="lower">Lower the better</ToggleButton>
+            </ToggleButtonGroup>
 
             {/* Specialized Q-cut Box Plots */}
             <Accordion
@@ -85,22 +123,22 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <FormGroup>
-                  {columns.map((col) => (
+                  {edaColumns.map((col) => (
                     <FormControlLabel
                       key={col}
                       control={
-                        <Radio 
-                            size="small"
-                            checked={selectedQcutColumn === col}
-                            onChange={() => setSelectedQcutColumn(col)}
-                            />
+                        <Radio
+                          size="small"
+                          checked={selectedQcutColumn === col}
+                          onChange={() => setSelectedQcutColumn(col)}
+                        />
                       }
                       label={col}
                       sx={{ fontSize: "0.85rem" }}
                     />
                   ))}
                 </FormGroup>
-                
+
                 <TextField
                   fullWidth
                   size="small"
@@ -110,12 +148,8 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
                   onChange={(e) => setQcutQuantiles(e.target.value)}
                   sx={{ mt: 2 }}
                 />
-                <Button
-                  variant="contained"
-                  size="small"
-                  sx={{ mt: 2 }}
-                >
-                  Generate Analysis
+                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                  Generate Q-cut Analysis
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -131,34 +165,46 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Select two columns to compare:
-                </Typography>
                 <FormControl fullWidth size="small" sx={{ mb: 2 }}>
                   <InputLabel>Column X</InputLabel>
-                  <Select>
-                    {columns.map((col) => (
+                  <Select
+                    value={dualAxisX}
+                    onChange={(e) => setDualAxisX(e.target.value)}
+                  >
+                    {edaColumns.map((col) => (
                       <MenuItem key={col} value={col}>
                         {col}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
+
                 <FormControl fullWidth size="small" sx={{ mb: 2 }}>
                   <InputLabel>Column Y</InputLabel>
-                  <Select>
-                    {columns.map((col) => (
+                  <Select
+                    value={dualAxisY}
+                    onChange={(e) => setDualAxisY(e.target.value)}
+                  >
+                    {edaColumns.map((col) => (
                       <MenuItem key={col} value={col}>
                         {col}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
-                <Button
-                  variant="contained"
+
+                <TextField
+                  fullWidth
                   size="small"
-                >
-                  Run Dual Axes Plot
+                  label="Number of quantiles for Column X"
+                  type="number"
+                  value={dualAxisQuantiles}
+                  onChange={(e) => setDualAxisQuantiles(e.target.value)}
+                  sx={{ mb: 2 }}
+                />
+
+                <Button variant="contained" size="small">
+                  Generate Dual Axes Plot
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -174,8 +220,54 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Button variant="contained" size="small">
-                  Run Correlation Analysis
+                <FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selectedCorrColumns.length === edaColumns.length}
+                        onChange={(e) =>
+                          setSelectedCorrColumns(
+                            e.target.checked ? edaColumns : []
+                          )
+                        }
+                      />
+                    }
+                    label="Select All"
+                  />
+                  {edaColumns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      control={
+                        <Checkbox
+                          checked={selectedCorrColumns.includes(col)}
+                          onChange={(e) =>
+                            setSelectedCorrColumns(
+                              e.target.checked
+                                ? [...selectedCorrColumns, col]
+                                : selectedCorrColumns.filter((c) => c !== col)
+                            )
+                          }
+                        />
+                      }
+                      label={col}
+                    />
+                  ))}
+                </FormGroup>
+
+                <FormControl fullWidth size="small" sx={{ mt: 2 }}>
+                  <InputLabel>Correlation Method</InputLabel>
+                  <Select
+                    value={corrMethod}
+                    onChange={(e) => setCorrMethod(e.target.value)}
+                  >
+                    <MenuItem value="pearson">Pearson</MenuItem>
+                    <MenuItem value="spearman">Spearman</MenuItem>
+                    <MenuItem value="kendall">Kendall</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                  Generate Correlation Analysis
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -194,14 +286,44 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
                 <TextField
                   fullWidth
                   size="small"
-                  label="Enter Range (e.g., 10-20)"
+                  label="Minimum duration of continuous range"
+                  value={minRangeDuration}
+                  onChange={(e) => setMinRangeDuration(e.target.value)}
+                  sx={{ mb: 2 }}
                 />
-                <Button
-                  variant="contained"
+
+                <Typography variant="body2">Threshold of spike for range break</Typography>
+                <Grid container spacing={1} sx={{ mb: 2 }}>
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Min"
+                      value={spikeMin}
+                      onChange={(e) => setSpikeMin(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      label="Max"
+                      value={spikeMax}
+                      onChange={(e) => setSpikeMax(e.target.value)}
+                    />
+                  </Grid>
+                </Grid>
+
+                <TextField
+                  fullWidth
                   size="small"
-                  sx={{ mt: 2 }}
-                >
-                  Run Range Analysis
+                  label="Minimum duration of spike for range break"
+                  value={minSpikeDuration}
+                  onChange={(e) => setMinSpikeDuration(e.target.value)}
+                />
+
+                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                  Generate Range Analysis
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -217,8 +339,40 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Button variant="contained" size="small">
-                  Run Multivariate Analysis
+                <FormGroup>
+                  {edaColumns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      control={
+                        <Checkbox
+                          checked={selectedMultiColumns.includes(col)}
+                          onChange={(e) =>
+                            setSelectedMultiColumns(
+                              e.target.checked
+                                ? [...selectedMultiColumns, col]
+                                : selectedMultiColumns.filter((c) => c !== col)
+                            )
+                          }
+                        />
+                      }
+                      label={col}
+                    />
+                  ))}
+                </FormGroup>
+
+                <ToggleButtonGroup
+                  value={multiMode}
+                  exclusive
+                  onChange={(e, val) => val && setMultiMode(val)}
+                  size="small"
+                  sx={{ mt: 2 }}
+                >
+                  <ToggleButton value="continuous">Continuous ranges</ToggleButton>
+                  <ToggleButton value="all">All timestamps</ToggleButton>
+                </ToggleButtonGroup>
+
+                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                  Generate Multivariate Analysis
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -230,15 +384,10 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
       <Grid item xs={8}>
         <Card sx={{ borderRadius: 3, boxShadow: 2, height: "100%" }}>
           <CardContent>
-            <Typography
-              variant="h6"
-              gutterBottom
-              color="primary"
-            >
+            <Typography variant="h6" gutterBottom color="primary">
               EDA Output
             </Typography>
             <Divider sx={{ mb: 2 }} />
-
             <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
               <Typography variant="body2" color="text.secondary">
                 No analysis results yet.
