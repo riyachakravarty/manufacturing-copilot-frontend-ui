@@ -27,6 +27,8 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
+
 const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
   const [edaColumns, setEdaColumns] = useState([]);
   const [targetColumn, setTargetColumn] = useState("");
