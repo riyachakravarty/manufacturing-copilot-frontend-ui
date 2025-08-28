@@ -27,6 +27,9 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
   const [columns, setColumns] = useState([]);
   const [targetColumn, setTargetColumn] = useState("");
   const [expandedCard, setExpandedCard] = useState(false);
+  const [selectedQcutColumn, setSelectedQcutColumn] = React.useState("");
+  const [qcutQuantiles, setQcutQuantiles] = React.useState(4); // default quantiles
+
 
   // Load column names from backend
   useEffect(() => {
@@ -80,21 +83,30 @@ const ExploratoryDataAnalysis = ({ BACKEND_URL }) => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <RadioGroup>
+                <FormGroup>
                   {columns.map((col) => (
                     <FormControlLabel
                       key={col}
-                      value={col}
-                      control={<Radio size="small" />}
+                      control={
+                        <Radio 
+                            size="small"
+                            checked={selectedQcutColumn === col}
+                            onChange={() => setSelectedQcutColumn(col)}
+                            />
+                      }
                       label={col}
+                      sx={{ fontSize: "0.85rem" }}
                     />
                   ))}
-                </RadioGroup>
+                </FormGroup>
+                
                 <TextField
                   fullWidth
                   size="small"
                   label="Number of quantiles for Target"
                   type="number"
+                  value={qcutQuantiles}
+                  onChange={(e) => setQcutQuantiles(e.target.value)}
                   sx={{ mt: 2 }}
                 />
                 <Button
