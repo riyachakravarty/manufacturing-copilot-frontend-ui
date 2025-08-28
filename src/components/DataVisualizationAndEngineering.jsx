@@ -781,7 +781,7 @@ export default function DataVisualizationAndEngineering() {
                 ))}
               </FormGroup>
               <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runVariabilityAnalysis}>
-                Run Analysis
+                Run Variability Analysis
               </Button>
             </AccordionDetails>
           </Accordion>
@@ -820,7 +820,7 @@ export default function DataVisualizationAndEngineering() {
                 ))}
               </RadioGroup>
               <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runMissingValueAnalysis}>
-                Run Analysis
+                Run Missing Value Analysis
               </Button>
             </AccordionDetails>
           </Accordion>
