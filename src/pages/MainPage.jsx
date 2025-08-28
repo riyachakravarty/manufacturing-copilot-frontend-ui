@@ -5,6 +5,8 @@ import { AppContext } from '../context/AppContext';
 import { Box, Typography, Tabs, Tab, Card, CardContent, Chip } from '@mui/material';
 import { DataObject, Insights, Build, PrecisionManufacturing } from '@mui/icons-material';
 import DataVisualizationAndEngineering from '../components/DataVisualizationAndEngineering';
+import ExploratoryDataAnalysis from "../components/ExploratoryDataAnalysis";
+
 
 const tabLabels = [
   { label: "Data Visualization & Engineering", icon: <DataObject /> },
@@ -25,6 +27,8 @@ const MainPage = () => {
     switch (currentTab) {
       case 0:
         return <DataVisualizationAndEngineering />;
+      case 1:
+        return <ExploratoryDataAnalysis />;
       default:
         return (
           <Typography variant="body1">
