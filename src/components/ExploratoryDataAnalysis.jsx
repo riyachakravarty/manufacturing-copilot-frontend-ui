@@ -111,8 +111,10 @@ const generateQcutBoxPlots = async () => {
 
     // 🔑 Example: if backend returns {"type": "plot", "data": ...}
     if (data.type === "plot") {
-      // TODO: Replace with state that renders in right panel
-      setEdaOutput(data.data);
+      setEdaOutput({
+        data: data.data,
+        layout: data.layout,
+      });
     }
   } catch (err) {
     console.error("Error generating Q-cut box plots:", err);
