@@ -85,7 +85,7 @@ const ExploratoryDataAnalysis = () => {
   // Function to call backend and fetch Q-cut box plots
 const generateQcutBoxPlots = async () => {
   try {
-    if (!selectedTarget || selectedQcutColumns.length === 0) {
+    if (!targetColumn || selectedQcutColumns.length === 0) {
       console.error("Target or columns not selected for Q-cut analysis");
       return;
     }
@@ -94,7 +94,7 @@ const generateQcutBoxPlots = async () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        target: selectedTarget,
+        target: targetColumn,
         quantiles: Number(qcutQuantiles),
         columns: selectedQcutColumns,
       }),
