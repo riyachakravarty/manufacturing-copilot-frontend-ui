@@ -474,32 +474,15 @@ const generateQcutBoxPlots = async () => {
         Analysis Output
       </Typography>
       {/* Latest Augmented Data Download */}
-      {latestAugmentedDf && (
         
         <Button
           variant="contained"
           color="secondary"
           size="small"
-          onClick={async () => {
-  try {
-    const response = await fetch(`${BACKEND_URL}/download`);
-    if (!response.ok) throw new Error("Download failed");
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "treated_data.csv"; // same name as backend header
-    link.click();
-  } catch (err) {
-    console.error(err);
-    setError("Failed to download file from server.");
-  }
-}}
 
         >
           Download Latest Plots
         </Button>
-    )}
       </Box>
       <Divider sx={{ mb: 2 }} />
 
