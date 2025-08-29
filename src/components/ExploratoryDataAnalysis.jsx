@@ -90,14 +90,10 @@ const generateQcutBoxPlots = async () => {
       return;
     }
 
-    const res = await fetch(`${BACKEND_URL}/eda/qcut_boxplot`, {
+    const res = await fetch(`${BACKEND_URL}/eda/qcut_boxplot?target=${targetColumn}&quantiles=${qcutQuantiles}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        target: targetColumn,
-        quantiles: Number(qcutQuantiles),
-        columns: selectedQcutColumns,
-      }),
+      body: JSON.stringify(selectedQcutColumns),
     });
 
     if (!res.ok) {
