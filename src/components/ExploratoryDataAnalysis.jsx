@@ -1,6 +1,7 @@
 // src/components/ExploratoryDataAnalysis.jsx
 
 import React, { useState, useEffect } from "react";
+import Plot from "react-plotly.js";
 import {
   Box,
   Typography,
@@ -32,12 +33,14 @@ const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 const ExploratoryDataAnalysis = () => {
   const [edaColumns, setEdaColumns] = useState([]);
   const [targetColumn, setTargetColumn] = useState("");
+  const [edaOutput, setEdaOutput] = useState(null);
   const [performanceDirection, setPerformanceDirection] = useState("higher");
   const [expandedCard, setExpandedCard] = useState(false);
 
   // Q-cut state
-  const [selectedQcutColumn, setSelectedQcutColumn] = useState("");
+  const [selectedQcutColumns, setSelectedQcutColumns] = useState([]);
   const [qcutQuantiles, setQcutQuantiles] = useState(4);
+  
 
   // Dual Axes Box Plots
   const [dualAxisX, setDualAxisX] = useState("");
@@ -78,6 +81,43 @@ const ExploratoryDataAnalysis = () => {
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedCard(isExpanded ? panel : false);
   };
+
+  // Function to call backend and fetch Q-cut box plots
+const generateQcutBoxPlots = async () => {
+  try {
+    if (!selectedTarget || selectedQcutColumns.length === 0) {
+      console.error("Target or columns not selected for Q-cut analysis");
+      return;
+    }
+
+    const res = await fetch(`${BACKEND_URL}/eda/qcut_boxplot`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        target: selectedTarget,
+        quantiles: Number(qcutQuantiles),
+        columns: selectedQcutColumns,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Backend error:", errorText);
+      return;
+    }
+
+    const data = await res.json();
+    console.log("Q-cut plot response:", data);
+
+    // 🔑 Example: if backend returns {"type": "plot", "data": ...}
+    if (data.type === "plot") {
+      // TODO: Replace with state that renders in right panel
+      setEdaOutput(data.data);
+    }
+  } catch (err) {
+    console.error("Error generating Q-cut box plots:", err);
+  }
+};
 
   return (
     <Grid container spacing={2}>
@@ -138,15 +178,22 @@ const ExploratoryDataAnalysis = () => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
+                {/* Multi-select column list */}
                 <FormGroup>
                   {edaColumns.map((col) => (
                     <FormControlLabel
                       key={col}
                       control={
-                        <Radio
+                        <Checkbox
                           size="small"
-                          checked={selectedQcutColumn === col}
-                          onChange={() => setSelectedQcutColumn(col)}
+                          checked={selectedQcutColumns.includes(col)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedQcutColumns([...selectedQcutColumns, col]);
+                            } else {
+                              setSelectedQcutColumns(selectedQcutColumns.filter((c) => c !== col));
+                            }
+                          }}
                         />
                       }
                       label={col}
@@ -164,8 +211,9 @@ const ExploratoryDataAnalysis = () => {
                   onChange={(e) => setQcutQuantiles(e.target.value)}
                   sx={{ mt: 2 }}
                 />
-                <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                  Generate Q-cut Analysis
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
+                onClick={generateQcutBoxPlots}>
+      Generate Q-cut Analysis
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -397,21 +445,32 @@ const ExploratoryDataAnalysis = () => {
       </Grid>
 
       {/* Right Panel */}
-      <Grid item xs={8}>
-        <Card sx={{ borderRadius: 3, boxShadow: 2, height: "100%" }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom color="primary">
-              EDA Output
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
-              <Typography variant="body2" color="text.secondary">
-                No analysis results yet.
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
-      </Grid>
+<Grid item xs={8}>
+  <Card sx={{ borderRadius: 3, boxShadow: 2, height: "100%" }}>
+    <CardContent>
+      <Typography variant="h6" gutterBottom color="primary">
+        EDA Output
+      </Typography>
+      <Divider sx={{ mb: 2 }} />
+
+      <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+        {edaOutput ? (
+          <Plot
+            data={edaOutput.data}
+            layout={edaOutput.layout}
+            style={{ width: "100%", height: "100%" }}
+            config={{ responsive: true }}
+          />
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            No analysis results yet.
+          </Typography>
+        )}
+      </Box>
+    </CardContent>
+  </Card>
+</Grid>
+
     </Grid>
   );
 };
