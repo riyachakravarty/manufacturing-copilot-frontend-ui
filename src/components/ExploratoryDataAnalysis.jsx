@@ -82,8 +82,22 @@ const ExploratoryDataAnalysis = () => {
   return (
     <Grid container spacing={2}>
       {/* Left Panel */}
-      <Grid item xs={4}>
-        <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+      <Grid item 
+        xs={12}
+        md={4}
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+          px: 1,
+          fontSize: "0.85rem",
+          flexShrink: 0,
+          minWidth: 320,
+          transition: "width 0.3s ease",
+          width: 320, // fixed like DVE
+  }}>
+        <Card sx={{ borderRadius: 3, boxShadow: 2, flexGrow: 1 }}>
           <CardContent>
             {/* Target Dropdown */}
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
