@@ -447,32 +447,91 @@ const generateQcutBoxPlots = async () => {
       </Grid>
 
       {/* Right Panel */}
-<Grid item xs={8}>
-  <Card sx={{ borderRadius: 3, boxShadow: 2, height: "100%" }}>
-    <CardContent>
+<Grid
+  item
+  xs={12}
+  md={8}
+  sx={{
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    minHeight: 0,
+  }}
+>
+  <Paper
+    sx={{
+      p: 2,
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      bgcolor: theme.palette.background.paper,
+    }}
+    elevation={3}
+  >
+    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
       <Typography variant="h6" gutterBottom color="primary">
-        EDA Output
+        Analysis Output
       </Typography>
+      {/* Latest Augmented Data Download */}
+      {latestAugmentedDf && (
+        
+        <Button
+          variant="contained"
+          color="secondary"
+          size="small"
+          onClick={async () => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/download`);
+    if (!response.ok) throw new Error("Download failed");
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "treated_data.csv"; // same name as backend header
+    link.click();
+  } catch (err) {
+    console.error(err);
+    setError("Failed to download file from server.");
+  }
+}}
+
+        >
+          Download Latest Plots
+        </Button>
+    )}
+      </Box>
       <Divider sx={{ mb: 2 }} />
 
       <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+        {loading && <CircularProgress />}
+        {error && <Alert severity="error">{error}</Alert>}
+
         {edaOutput ? (
           <Plot
             data={edaOutput.data}
-            layout={edaOutput.layout}
-            style={{ width: "100%", height: "100%" }}
-            config={{ responsive: true }}
+            layout={{
+              ...edaOutput.layout,
+              autosize: true,
+              paper_bgcolor: theme.palette.background.paper,
+              plot_bgcolor: theme.palette.background.default,
+              margin: { t: 40, b: 40, l: 40, r: 40 },
+            }}
+            style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
+            useResizeHandler
           />
         ) : (
-          <Typography variant="body2" color="text.secondary">
-            No analysis results yet.
-          </Typography>
+          !loading &&
+          !error && (
+            <Typography variant="body2" color="text.secondary">
+              No analysis results yet.
+            </Typography>
+          )
         )}
-      </Box>
-    </CardContent>
-  </Card>
-</Grid>
 
+    </Box>
+  </Paper>
+</Grid>
     </Grid>
   );
 };
