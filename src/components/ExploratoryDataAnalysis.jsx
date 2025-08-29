@@ -4,6 +4,9 @@ import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
 import {
   Box,
+  Paper, 
+  CircularProgress,
+  Alert,
   Typography,
   Grid,
   Card,
@@ -27,6 +30,7 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useTheme } from "@mui/material/styles";
 
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
@@ -34,8 +38,11 @@ const ExploratoryDataAnalysis = () => {
   const [edaColumns, setEdaColumns] = useState([]);
   const [targetColumn, setTargetColumn] = useState("");
   const [edaOutput, setEdaOutput] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [performanceDirection, setPerformanceDirection] = useState("higher");
   const [expandedCard, setExpandedCard] = useState(false);
+  const theme = useTheme();
+  const [error, setError] = useState("");
 
   // Q-cut state
   const [selectedQcutColumns, setSelectedQcutColumns] = useState([]);
