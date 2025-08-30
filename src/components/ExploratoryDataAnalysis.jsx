@@ -109,13 +109,13 @@ const generateQcutBoxPlots = async () => {
       return;
     }
 
-    const data = await res.json();
+    const result = await res.json();
     console.log("Q-cut plot response:", data);
 
     // 🔑 Example: if backend returns {"type": "plot", "data": ...}
-    if (data.type === "plot") {
+    if (result.type === "plot") {
       setEdaOutput({
-        data: data.data,
+        data: result.data,
         //layout: data.layout,
       });
     }
@@ -453,22 +453,22 @@ const generateQcutBoxPlots = async () => {
 <Grid
   item
   xs={12}
-  md={8}
-  sx={{
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    minWidth: 0,
-    minHeight: 0,
-  }}
+  //md={8}
+  //sx={{
+    //height: "100%",
+    //display: "flex",
+    //flexDirection: "column",
+    //minWidth: 0,
+    //minHeight: 0,
+  //}}
 >
   <Paper
     sx={{
       p: 2,
       height: "100%",
       display: "flex",
-      flexDirection: "column",
-      bgcolor: theme.palette.background.paper,
+      //flexDirection: "column",
+      //bgcolor: theme.palette.background.paper,
     }}
     elevation={3}
   >
