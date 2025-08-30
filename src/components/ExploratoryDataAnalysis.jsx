@@ -498,13 +498,16 @@ const generateQcutBoxPlots = async () => {
             data={edaOutput.data}
             layout={{
               ...edaOutput.layout,
-              autosize: true,
-              paper_bgcolor: theme.palette.background.paper,
-              plot_bgcolor: theme.palette.background.default,
-              margin: { t: 40, b: 40, l: 40, r: 40 },
+              //autosize: true,
+              //paper_bgcolor: theme.palette.background.paper,
+              //plot_bgcolor: theme.palette.background.default,
+              //margin: { t: 40, b: 40, l: 40, r: 40 },
             }}
-            style={{ width: "100%", height: "100%", minHeight: 400, minWidth: 400 }}
-            useResizeHandler
+            style={{ width: "100%", height: "100%", 
+              //minHeight: 400, minWidth: 400 
+              }}
+            //useResizeHandler
+            config={{ responsive: true }}
           />
         ) : (
           !loading &&
