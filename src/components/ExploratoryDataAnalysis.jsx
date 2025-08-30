@@ -495,9 +495,9 @@ const generateQcutBoxPlots = async () => {
 
         {edaOutput ? (
           <Plot
-            data={edaOutput.data}
+            data={edaOutput.data.data}
             layout={{
-              ...edaOutput.layout,
+              ...edaOutput.data.layout,
               autosize: true,
               paper_bgcolor: theme.palette.background.paper,
               plot_bgcolor: theme.palette.background.default,
