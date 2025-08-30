@@ -110,7 +110,7 @@ const generateQcutBoxPlots = async () => {
     }
 
     const result = await res.json();
-    console.log("Q-cut plot response:", data);
+    console.log("Q-cut plot response:", result);
 
     // 🔑 Example: if backend returns {"type": "plot", "data": ...}
     if (result.type === "plot") {
