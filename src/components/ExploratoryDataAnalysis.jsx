@@ -116,7 +116,7 @@ const generateQcutBoxPlots = async () => {
     if (data.type === "plot") {
       setEdaOutput({
         data: data.data,
-        layout: data.layout,
+        //layout: data.layout,
       });
     }
   } catch (err) {
