@@ -489,7 +489,7 @@ const generateQcutBoxPlots = async () => {
       </Box>
       <Divider sx={{ mb: 2 }} />
 
-      <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 1200 }}>
+      <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
         {loading && <CircularProgress />}
         {error && <Alert severity="error">{error}</Alert>}
 
@@ -503,9 +503,8 @@ const generateQcutBoxPlots = async () => {
               plot_bgcolor: theme.palette.background.default,
               margin: { t: 40, b: 40, l: 40, r: 40 },
             }}
-            style={{ width: "100%", height: "1200px",
-              //height: "100%", 
-              //minHeight: 400, minWidth: 400 
+            style={{ width: "100%", height: "100%", 
+              minHeight: 400, minWidth: 400 
               }}
             useResizeHandler
             //config={{ responsive: true }}
