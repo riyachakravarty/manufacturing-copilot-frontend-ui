@@ -234,33 +234,25 @@ const generateQcutBoxPlots = async () => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                  <InputLabel>Column X</InputLabel>
-                  <Select
-                    value={dualAxisX}
-                    onChange={(e) => setDualAxisX(e.target.value)}
-                  >
-                    {edaColumns.map((col) => (
-                      <MenuItem key={col} value={col}>
-                        {col}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <FormLabel>Select Column X</FormLabel>
+                {columns.map((col) => (
+                <FormControlLabel
+                  key={col}
+                  value={col}
+                  control={<Radio checked={selectedX === col} onChange={() => setSelectedX(col)} />}
+                  label={col}
+                  />
+                ))}
 
-                <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                  <InputLabel>Column Y</InputLabel>
-                  <Select
-                    value={dualAxisY}
-                    onChange={(e) => setDualAxisY(e.target.value)}
-                  >
-                    {edaColumns.map((col) => (
-                      <MenuItem key={col} value={col}>
-                        {col}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <FormLabel>Select Column Y</FormLabel>
+                {columns.map((col) => (
+                <FormControlLabel
+                  key={col}
+                  value={col}
+                  control={<Radio checked={selectedX === col} onChange={() => setSelectedX(col)} />}
+                  label={col}
+                  />
+                ))}
 
                 <TextField
                   fullWidth
