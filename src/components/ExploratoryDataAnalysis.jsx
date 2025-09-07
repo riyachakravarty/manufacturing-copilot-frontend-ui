@@ -50,9 +50,11 @@ const ExploratoryDataAnalysis = () => {
   
 
   // Dual Axes Box Plots
-  const [dualAxisX, setDualAxisX] = useState("");
-  const [dualAxisY, setDualAxisY] = useState("");
-  const [dualAxisQuantiles, setDualAxisQuantiles] = useState(4);
+  const [selectedX, setSelectedX] = useState("");
+  const [selectedY, setSelectedY] = useState("");
+  const [boxPlotMode, setBoxPlotMode] = useState("auto"); // auto | quantile
+  const [numQuantiles, setNumQuantiles] = useState(4); // default 4
+  
 
   // Correlation
   const [selectedCorrColumns, setSelectedCorrColumns] = useState([]);
@@ -234,35 +236,76 @@ const generateQcutBoxPlots = async () => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <FormLabel>Select Column X</FormLabel>
-                {columns.map((col) => (
-                <FormControlLabel
-                  key={col}
-                  value={col}
-                  control={<Radio checked={selectedX === col} onChange={() => setSelectedX(col)} />}
-                  label={col}
-                  />
-                ))}
+                {/* Column X Selection */}
+                <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: "bold" }}>
+                  Select Column X
+                </Typography>
+                <RadioGroup
+                  value={selectedX}
+                  onChange={(e) => setSelectedX(e.target.value)}
+                >
+                  {columns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      value={col}
+                      control={<Radio />}
+                      label={col}
+                    />
+                  ))}
+                </RadioGroup>
 
-                <FormLabel>Select Column Y</FormLabel>
-                {columns.map((col) => (
-                <FormControlLabel
-                  key={col}
-                  value={col}
-                  control={<Radio checked={selectedX === col} onChange={() => setSelectedX(col)} />}
-                  label={col}
-                  />
-                ))}
+                {/* Column Y Selection */}
+                <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: "bold" }}>
+                  Select Column Y
+                </Typography>
+                <RadioGroup
+                  value={selectedY}
+                  onChange={(e) => setSelectedY(e.target.value)}
+                >
+                  {columns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      value={col}
+                      control={<Radio />}
+                      label={col}
+                    />
+                  ))}
+                </RadioGroup>
 
-                <TextField
-                  fullWidth
-                  size="small"
-                  label="Number of quantiles for Column X"
-                  type="number"
-                  value={dualAxisQuantiles}
-                  onChange={(e) => setDualAxisQuantiles(e.target.value)}
-                  sx={{ mb: 2 }}
-                />
+                {/* Box Plot Mode Toggle */}
+                <Typography variant="subtitle1" sx={{ mt: 3, fontWeight: "bold" }}>
+                  Select Box Plot Type
+                </Typography>
+                <RadioGroup
+                  value={boxPlotMode}
+                  onChange={(e) => setBoxPlotMode(e.target.value)}
+                  row
+                >
+                  <FormControlLabel
+                    value="auto"
+                    control={<Radio />}
+                    label="Auto-detect ranges"
+                  />
+                  <FormControlLabel
+                    value="quantile"
+                    control={<Radio />}
+                    label="Quantile-based"
+                  />
+                </RadioGroup>
+
+                {/* Show quantile input only when quantile mode is selected */}
+                {boxPlotMode === "quantile" && (
+                  <Box sx={{ mt: 2 }}>
+                    <TextField
+                      label="Number of Quantiles"
+                      type="number"
+                      size="small"
+                      value={numQuantiles}
+                      onChange={(e) => setNumQuantiles(Number(e.target.value))}
+                      inputProps={{ min: 2, max: 20 }}
+                    />
+                  </Box>
+                )}
 
                 <Button variant="contained" size="small">
                   Generate Dual Axes Plot
