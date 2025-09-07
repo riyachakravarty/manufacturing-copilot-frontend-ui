@@ -244,7 +244,7 @@ const generateQcutBoxPlots = async () => {
                   value={selectedX}
                   onChange={(e) => setSelectedX(e.target.value)}
                 >
-                  {columns.map((col) => (
+                  {edaColumns.map((col) => (
                     <FormControlLabel
                       key={col}
                       value={col}
@@ -262,7 +262,7 @@ const generateQcutBoxPlots = async () => {
                   value={selectedY}
                   onChange={(e) => setSelectedY(e.target.value)}
                 >
-                  {columns.map((col) => (
+                  {edaColumns.map((col) => (
                     <FormControlLabel
                       key={col}
                       value={col}
