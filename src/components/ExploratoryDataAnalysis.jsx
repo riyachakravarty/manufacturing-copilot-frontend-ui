@@ -52,8 +52,8 @@ const ExploratoryDataAnalysis = () => {
   // Dual Axes Box Plots
   const [selectedX, setSelectedX] = useState("");
   const [selectedY, setSelectedY] = useState("");
-  const [boxPlotMode, setBoxPlotMode] = useState("auto"); // auto | quantile
-  const [numQuantiles, setNumQuantiles] = useState(4); // default 4
+  const [plotType, setPlotType] = useState("quantile"); 
+  const [numBins, setNumBins] = useState(5); // default quantiles/bins
   
 
   // Correlation
@@ -123,6 +123,45 @@ const generateQcutBoxPlots = async () => {
     }
   } catch (err) {
     console.error("Error generating Q-cut box plots:", err);
+  }
+};
+
+// Function to call backend and fetch Dual Axes box plots
+const generateDualAxesBoxPlots = async () => {
+  try {
+    if (!selectedX || !selectedY) {
+      console.error("Please select both X and Y columns");
+      return;
+    }
+
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/eda/dualaxes_boxplot`,
+      {
+        column_x: selectedX,
+        column_y: selectedY,
+        plot_type: plotType,            // "quantile" or "auto"
+        num_bins_quantiles: numBins,    // user input number (used for both)
+      }
+    );
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Backend error:", errorText);
+      return;
+    }
+
+    const result = await res.json();
+    console.log("Dual axes box plot response:", result);
+
+    // 🔑 Example: if backend returns {"type": "plot", "data": ...}
+    if (result.type === "plot") {
+      setEdaOutput({
+        data: result.data,
+        //layout: data.layout,
+      });
+    }
+  } catch (err) {
+    console.error("Error generating Dual axes box plots:", err);
   }
 };
 
@@ -277,41 +316,42 @@ const generateQcutBoxPlots = async () => {
                   Select Box Plot Type
                 </Typography>
                 <RadioGroup
-                  value={boxPlotMode}
-                  onChange={(e) => setBoxPlotMode(e.target.value)}
+                  value={plotType}
+                  onChange={(e) => setPlotType(e.target.value)}
                   row
                 >
                   <FormControlLabel
                     value="auto"
                     control={<Radio />}
-                    label="Auto-detect ranges"
+                    label="Interval width based ranges"
                   />
                   <FormControlLabel
                     value="quantile"
                     control={<Radio />}
-                    label="Quantile-based"
+                    label="Quantile based ranges"
                   />
                 </RadioGroup>
 
-                {/* Show quantile input only when quantile mode is selected */}
-                {boxPlotMode === "quantile" && (
+                {/* Show input field for number of bins pr quantiles */}
                   <Box sx={{ mt: 2 }}>
                     <TextField
-                      label="Number of Quantiles"
+                      label="Number of Quantiles / Bins"
                       type="number"
                       size="small"
-                      value={numQuantiles}
-                      onChange={(e) => setNumQuantiles(Number(e.target.value))}
-                      inputProps={{ min: 2, max: 20 }}
+                      value={numBins}
+                      onChange={(e) => setNumBins(Number(e.target.value))}
+                      InputProps={{ inputProps: { min: 1 } }}
                     />
                   </Box>
-                )}
+                
 
-                <Button variant="contained" size="small">
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
+                onClick={generateDualAxesBoxPlots}>
                   Generate Dual Axes Plot
                 </Button>
               </AccordionDetails>
             </Accordion>
+
 
             {/* Correlation Analysis */}
             <Accordion
