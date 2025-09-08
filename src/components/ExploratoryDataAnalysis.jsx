@@ -134,7 +134,7 @@ const generateDualAxesBoxPlots = async () => {
       return;
     }
 
-    const response = await axios.post(
+    const res = await axios.post(
       `${process.env.REACT_APP_BACKEND_URL}/eda/dualaxes_boxplot`,
       {
         column_x: selectedX,
