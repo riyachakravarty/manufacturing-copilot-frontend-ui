@@ -145,7 +145,7 @@ const generateDualAxesBoxPlots = async () => {
       }
     );
 
-    const result = await res.json();
+    const result = await res();
     console.log("Dual axes box plot response:", result);
 
     if (!res.ok) {
