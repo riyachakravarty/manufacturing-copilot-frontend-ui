@@ -483,8 +483,8 @@ const generateCorrelationAnalysis = async () => {
                   />
                 </RadioGroup>
 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                onClick={generateCorrelationAnalysis}
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
+                onClick={generateCorrelationAnalysis}>
                     Generate Correlation Heat Map
                 </Button>
               </AccordionDetails>
@@ -540,9 +540,8 @@ const generateCorrelationAnalysis = async () => {
                   onChange={(e) => setMinSpikeDuration(e.target.value)}
                 />
 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}
-                  onClick={generateCorrelationAnalysis}>
-                    Generate Correlation Heat Map
+                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                    Generate Range Analysis
                 </Button>
               </AccordionDetails>
             </Accordion>
