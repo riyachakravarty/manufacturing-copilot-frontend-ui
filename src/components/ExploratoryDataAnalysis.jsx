@@ -145,14 +145,17 @@ const generateDualAxesBoxPlots = async () => {
       }
     );
 
+    const result = await res.json();
+    console.log("Dual axes box plot response:", result);
+
     if (!res.ok) {
       const errorText = await res.text();
       console.error("Backend error:", errorText);
       return;
     }
 
-    const result = await res.json();
-    console.log("Dual axes box plot response:", result);
+    //const result = await res.json();
+    //console.log("Dual axes box plot response:", result);
 
     // 🔑 Example: if backend returns {"type": "plot", "data": ...}
     if (result.type === "plot") {
