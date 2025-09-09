@@ -105,7 +105,6 @@ const generateQcutBoxPlots = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(selectedQcutColumns),
     });
-    console.log(res.data);
 
     if (!res.ok) {
       const errorText = await res.text();
@@ -136,16 +135,30 @@ const generateDualAxesBoxPlots = async () => {
       return;
     }
 
-    const res = await axios.post(
-      `${process.env.REACT_APP_BACKEND_URL}/eda/dualaxes_boxplot`,
-      {
-        column_x: selectedX,
-        column_y: selectedY,
-        plot_type: plotType,            // "quantile" or "auto"
-        num_bins_quantiles: numBins,    // user input number (used for both)
-      }
-    );
-    console.log(res.data);
+    //const res = await axios.post(
+      //`${process.env.REACT_APP_BACKEND_URL}/eda/dualaxes_boxplot`,
+      //{
+        //column_x: selectedX,
+        //column_y: selectedY,
+        //plot_type: plotType,            // "quantile" or "auto"
+        //num_bins_quantiles: numBins,    // user input number (used for both)
+      //}
+    //);
+    const res = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/eda/dualaxes_boxplot`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              column_x: selectedX,
+              column_y: selectedY,
+              plot_type: plotType,            // "quantile" or "auto"
+              num_bins_quantiles: numBins,    // user input number
+            }),
+          }
+        );
 
     const result = await res.json();
     console.log("Dual axes box plot response:", result);
@@ -576,9 +589,9 @@ const generateDualAxesBoxPlots = async () => {
 
         {edaOutput ? (
           <Plot
-            data={edaOutput.data}
+            data={edaOutput.data.data}
             layout={{
-              ...edaOutput.layout,
+              ...edaOutput.data.layout,
               autosize: true,
               paper_bgcolor: theme.palette.background.paper,
               plot_bgcolor: theme.palette.background.default,
