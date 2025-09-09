@@ -144,6 +144,7 @@ const generateDualAxesBoxPlots = async () => {
         num_bins_quantiles: numBins,    // user input number (used for both)
       }
     );
+    console.log(res.data);
 
     const result = await res.json();
     console.log("Dual axes box plot response:", result);
