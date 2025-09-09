@@ -135,15 +135,6 @@ const generateDualAxesBoxPlots = async () => {
       return;
     }
 
-    //const res = await axios.post(
-      //`${process.env.REACT_APP_BACKEND_URL}/eda/dualaxes_boxplot`,
-      //{
-        //column_x: selectedX,
-        //column_y: selectedY,
-        //plot_type: plotType,            // "quantile" or "auto"
-        //num_bins_quantiles: numBins,    // user input number (used for both)
-      //}
-    //);
     const res = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/eda/dualaxes_boxplot`,
           {
@@ -160,17 +151,14 @@ const generateDualAxesBoxPlots = async () => {
           }
         );
 
-    const result = await res.json();
-    console.log("Dual axes box plot response:", result);
-
     if (!res.ok) {
       const errorText = await res.text();
       console.error("Backend error:", errorText);
       return;
     }
 
-    //const result = await res.json();
-    //console.log("Dual axes box plot response:", result);
+    const result = await res.json();
+    console.log("Dual axes box plot response:", result);
 
     // 🔑 Example: if backend returns {"type": "plot", "data": ...}
     if (result.type === "plot") {
@@ -181,6 +169,44 @@ const generateDualAxesBoxPlots = async () => {
     }
   } catch (err) {
     console.error("Error generating Dual axes box plots:", err);
+  }
+};
+
+const generateCorrelationAnalysis = async () => {
+  try {
+    if (selectedCorrColumns.length < 2) {
+      console.error("Select at least two columns for correlation analysis");
+      return;
+    }
+
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/eda/correlation_analysis`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          columns: selectedCorrColumns,
+          method: corrMethod,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Backend error:", errorText);
+      return;
+    }
+
+    const result = await res.json();
+    console.log("Correlation analysis response:", result);
+
+    if (result.type === "plot") {
+      setEdaOutput({
+        data: result.data,
+      });
+    }
+  } catch (err) {
+    console.error("Error generating correlation analysis:", err);
   }
 };
 
@@ -245,24 +271,38 @@ const generateDualAxesBoxPlots = async () => {
               <AccordionDetails>
                 {/* Multi-select column list */}
                 <FormGroup>
-                  {edaColumns.map((col) => (
-                    <FormControlLabel
-                      key={col}
-                      control={
-                        <Checkbox
-                          size="small"
-                          checked={selectedQcutColumns.includes(col)}
-                          onChange={(e) => {
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={selectedQcutColumns.includes(col)}
+                        onChange={(e) => {
                             if (e.target.checked) {
                               setSelectedQcutColumns([...selectedQcutColumns, col]);
                             } else {
                               setSelectedQcutColumns(selectedQcutColumns.filter((c) => c !== col));
                             }
                           }}
+                      />
+                    }
+                    label="Select All"
+                  />
+                  {edaColumns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      control={
+                        <Checkbox
+                          checked={selectedCorrColumns.includes(col)}
+                          onChange={(e) =>
+                            setSelectedCorrColumns(
+                              e.target.checked
+                                ? [...selectedCorrColumns, col]
+                                : selectedCorrColumns.filter((c) => c !== col)
+                            )
+                          }
                         />
                       }
                       label={col}
-                      sx={{ fontSize: "0.85rem" }}
                     />
                   ))}
                 </FormGroup>
@@ -387,6 +427,7 @@ const generateDualAxesBoxPlots = async () => {
                   <FormControlLabel
                     control={
                       <Checkbox
+                        size="small"
                         checked={selectedCorrColumns.length === edaColumns.length}
                         onChange={(e) =>
                           setSelectedCorrColumns(
@@ -417,20 +458,34 @@ const generateDualAxesBoxPlots = async () => {
                   ))}
                 </FormGroup>
 
-                <FormControl fullWidth size="small" sx={{ mt: 2 }}>
-                  <InputLabel>Correlation Method</InputLabel>
-                  <Select
-                    value={corrMethod}
-                    onChange={(e) => setCorrMethod(e.target.value)}
-                  >
-                    <MenuItem value="pearson">Pearson</MenuItem>
-                    <MenuItem value="spearman">Spearman</MenuItem>
-                    <MenuItem value="kendall">Kendall</MenuItem>
-                  </Select>
-                </FormControl>
+                {/* Correlation method Toggle */}
+                <Typography variant="subtitle1" sx={{ mt: 3, fontWeight: "bold" }}>
+                  Select Correlation Methd
+                </Typography>
+                <RadioGroup
+                  value={corrMethod}
+                  onChange={(e) => setCorrMethod(e.target.value)}
+                  row
+                >
+                  <FormControlLabel
+                    value="pearson"
+                    control={<Radio />}
+                    label="Pearson"
+                  />
+                  <FormControlLabel
+                    value="spearman"
+                    control={<Radio />}
+                    label="Spearman"
+                  />
+                  <FormControlLabel
+                    value="kendall"
+                    control={<Radio />}
+                    label="Kendall"
+                  />
+                </RadioGroup>
 
                 <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                  Generate Correlation Analysis
+                  Generate Correlation Heat Map
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -485,8 +540,9 @@ const generateDualAxesBoxPlots = async () => {
                   onChange={(e) => setMinSpikeDuration(e.target.value)}
                 />
 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                  Generate Range Analysis
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
+                onClick={generateCorrelationAnalysis}>
+                  Generate Correlation Heat Map
                 </Button>
               </AccordionDetails>
             </Accordion>
