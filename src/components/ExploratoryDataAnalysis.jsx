@@ -105,6 +105,7 @@ const generateQcutBoxPlots = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(selectedQcutColumns),
     });
+    console.log(res.data);
 
     if (!res.ok) {
       const errorText = await res.text();
