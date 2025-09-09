@@ -275,14 +275,12 @@ const generateCorrelationAnalysis = async () => {
                     control={
                       <Checkbox
                         size="small"
-                        checked={selectedQcutColumns.includes(col)}
-                        onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedQcutColumns([...selectedQcutColumns, col]);
-                            } else {
-                              setSelectedQcutColumns(selectedQcutColumns.filter((c) => c !== col));
-                            }
-                          }}
+                        checked={selectedQcutColumns.length === edaColumns.length}
+                        onChange={(e) => 
+                          setSelectedQcutColumns(
+                            e.target.checked ? edaColumns : []
+                          )
+                        }
                       />
                     }
                     label="Select All"
@@ -292,13 +290,14 @@ const generateCorrelationAnalysis = async () => {
                       key={col}
                       control={
                         <Checkbox
-                          checked={selectedCorrColumns.includes(col)}
-                          onChange={(e) =>
-                            setSelectedCorrColumns(
-                              e.target.checked
-                                ? [...selectedCorrColumns, col]
-                                : selectedCorrColumns.filter((c) => c !== col)
-                            )
+                          checked={selectedQcutColumns.includes(col)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedQcutColumns([...selectedQcutColumns, col]);
+                            } else {
+                              setSelectedQcutColumns(selectedQcutColumns.filter((c) => c !== col));
+                            }
+                          }
                           }
                         />
                       }
