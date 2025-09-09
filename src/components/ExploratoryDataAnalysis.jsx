@@ -484,7 +484,8 @@ const generateCorrelationAnalysis = async () => {
                 </RadioGroup>
 
                 <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                  Generate Correlation Heat Map
+                onClick={generateCorrelationAnalysis}
+                    Generate Correlation Heat Map
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -540,8 +541,8 @@ const generateCorrelationAnalysis = async () => {
                 />
 
                 <Button variant="contained" size="small" sx={{ mt: 2 }}
-                onClick={generateCorrelationAnalysis}>
-                  Generate Correlation Heat Map
+                  onClick={generateCorrelationAnalysis}>
+                    Generate Correlation Heat Map
                 </Button>
               </AccordionDetails>
             </Accordion>
