@@ -30,7 +30,7 @@ import {
   ToggleButton,
   ToggleButtonGroup, 
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGridPro } from '@mui/x-data-grid-pro';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 
@@ -724,7 +724,7 @@ const generateContRangeAnalysis = async () => {
                   boxShadow: 2,
                 }}
                 >
-              <DataGrid
+              <DataGridPro
                 autoHeight
                 rows={edaOutput.ranges.map((r, idx) => ({
                   id: idx + 1,
