@@ -746,6 +746,21 @@ const generateContRangeAnalysis = async () => {
                 pageSize={5}
                 rowsPerPageOptions={[5, 10]}
                 disableSelectionOnClick
+                sx={{
+                  backgroundColor: theme.palette.background.default,
+                  color: theme.palette.text.primary,
+                  borderColor: theme.palette.divider,
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: theme.palette.primary.dark,
+                    color: theme.palette.primary.contrastText,
+                  },
+                  "& .MuiDataGrid-row:hover": {
+                    backgroundColor: theme.palette.action.hover,
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    backgroundColor: theme.palette.background.paper,
+                  },
+                }}
               />
               </Paper>
               </Box>
