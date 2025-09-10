@@ -28,9 +28,9 @@ import {
   FormGroup,
   Checkbox,
   ToggleButton,
-  ToggleButtonGroup,
-  DataGrid 
+  ToggleButtonGroup, 
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 
