@@ -29,6 +29,7 @@ import {
   Checkbox,
   ToggleButton,
   ToggleButtonGroup,
+  DataGrid 
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
@@ -62,10 +63,12 @@ const ExploratoryDataAnalysis = () => {
   const [corrMethod, setCorrMethod] = useState("pearson");
 
   // Continuous Range Analysis
-  const [minRangeDuration, setMinRangeDuration] = useState("");
-  const [spikeMin, setSpikeMin] = useState("");
-  const [spikeMax, setSpikeMax] = useState("");
-  const [minSpikeDuration, setMinSpikeDuration] = useState("");
+  const [minDuration, setMinDuration] = useState("");
+  const [lowerPct, setLowerPct] = useState("");
+  const [upperPct, setUpperPct] = useState("");
+  const [maxBreak, setMaxBreak] = useState("");
+  const [continuousOutput, setContinuousOutput] = useState(null);
+  const [continuousRanges, setContinuousRanges] = useState([]);
 
   // Multivariate Analysis
   const [selectedMultiColumns, setSelectedMultiColumns] = useState([]);
@@ -209,6 +212,44 @@ const generateCorrelationAnalysis = async () => {
     console.error("Error generating correlation analysis:", err);
   }
 };
+
+const generateContRangeAnalysis = async () => {
+  try{  
+  const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/eda/continuous_range`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target: targetColumn,   // from dropdown / radio
+          min_duration: minDuration,
+          lower_pct: lowerPct,
+          upper_pct: upperPct,
+          max_break: maxBreak,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Backend error:", errorText);
+      return;
+    }
+
+    const result = await res.json();
+    console.log("Continuous range analysis result:", result);
+
+    if (result.type === "plot") {
+      setEdaOutput({
+        data: result.data,
+        ranges: result.ranges,
+      });
+    }
+  } catch (err) {
+    console.error("Error generating continuous range analysis:", err);
+  }
+};
+
 
   return (
     <Grid container spacing={2}>
@@ -504,30 +545,36 @@ const generateCorrelationAnalysis = async () => {
                 <TextField
                   fullWidth
                   size="small"
-                  label="Minimum duration of continuous range"
-                  value={minRangeDuration}
-                  onChange={(e) => setMinRangeDuration(e.target.value)}
+                  label="Minimum duration (minutes)"
+                  type="number"
+                  margin="dense"
+                  value={minDuration}
+                  onChange={(e) => setMinDuration(e.target.value)}
                   sx={{ mb: 2 }}
                 />
 
-                <Typography variant="body2">Threshold of spike for range break</Typography>
+                <Typography variant="body2">Thresholds for range break</Typography>
                 <Grid container spacing={1} sx={{ mb: 2 }}>
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
                       size="small"
-                      label="Min"
-                      value={spikeMin}
-                      onChange={(e) => setSpikeMin(e.target.value)}
+                      label="Lower Threshold for range break (%)"
+                      type="number"
+                      margin="dense"
+                      value={lowerPct}
+                      onChange={(e) => setLowerPct(e.target.value)}
                     />
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
                       size="small"
-                      label="Max"
-                      value={spikeMax}
-                      onChange={(e) => setSpikeMax(e.target.value)}
+                      label="Upper Threshold for range break (%)"
+                      type="number"
+                      margin="dense"
+                      value={upperPct}
+                      onChange={(e) => setUpperPct(e.target.value)}
                     />
                   </Grid>
                 </Grid>
@@ -535,13 +582,16 @@ const generateCorrelationAnalysis = async () => {
                 <TextField
                   fullWidth
                   size="small"
-                  label="Minimum duration of spike for range break"
-                  value={minSpikeDuration}
-                  onChange={(e) => setMinSpikeDuration(e.target.value)}
+                  label="Max duration of threshold breach for range break (minutes)"
+                  type="number"
+                  margin="dense"
+                  value={maxBreak}
+                  onChange={(e) => setMaxBreak(e.target.value)}
                 />
 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                    Generate Range Analysis
+                <Button variant="contained" size="small" fullWidth sx={{ mt: 2 }}
+                onClick={generateContRangeAnalysis}>
+                    Generate Continuous Range Analysis
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -625,7 +675,7 @@ const generateCorrelationAnalysis = async () => {
       <Typography variant="h6" gutterBottom color="primary">
         Analysis Output
       </Typography>
-      {/* Latest Augmented Data Download */}
+      {/* Latest plots download */}
         
         <Button
           variant="contained"
@@ -643,6 +693,7 @@ const generateCorrelationAnalysis = async () => {
         {error && <Alert severity="error">{error}</Alert>}
 
         {edaOutput ? (
+          <>
           <Plot
             data={edaOutput.data.data}
             layout={{
@@ -658,6 +709,48 @@ const generateCorrelationAnalysis = async () => {
             useResizeHandler
             //config={{ responsive: true }}
           />
+            
+          {/* Continuous Ranges Table */}
+          {edaOutput.ranges && edaOutput.ranges.length > 0 && (
+            <Box mt={4} width="100%">
+              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "bold", color: "primary.main" }}>
+                Continuous Ranges Detected
+              </Typography>
+              <Paper
+                sx={{
+                  width: "100%",
+                  p: 2,
+                  bgcolor: theme.palette.background.default,
+                  boxShadow: 2,
+                }}
+                >
+              <DataGrid
+                autoHeight
+                rows={edaOutput.ranges.map((r, idx) => ({
+                  id: idx + 1,
+                  start: new Date(r.start).toLocaleString(),
+                  end: new Date(r.end).toLocaleString(),
+                  duration: r.duration_min.toFixed(2),
+                  start_value: r.start_value.toFixed(2),
+                  lower: r.lower.toFixed(2),
+                  upper: r.upper.toFixed(2),
+                }))}
+                columns={[
+                  { field: "start", headerName: "Start", flex: 1 },
+                  { field: "end", headerName: "End", flex: 1 },
+                  { field: "duration", headerName: "Duration (min)", flex: 1 },
+                  { field: "start_value", headerName: "Start Value", flex: 1 },
+                  { field: "lower", headerName: "Lower", flex: 1 },
+                  { field: "upper", headerName: "Upper", flex: 1 },
+                ]}
+                pageSize={5}
+                rowsPerPageOptions={[5, 10]}
+                disableSelectionOnClick
+              />
+              </Paper>
+              </Box>
+          )}
+          </>
         ) : (
           !loading &&
           !error && (
