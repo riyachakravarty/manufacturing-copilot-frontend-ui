@@ -73,6 +73,7 @@ const ExploratoryDataAnalysis = () => {
   // Multivariate Analysis
   const [selectedMultiColumns, setSelectedMultiColumns] = useState([]);
   const [multiMode, setMultiMode] = useState("Boxplot");
+  const [numMultiRanges, setnumMultiRanges] = useState(5); // default top and bottom ranges
 
   // Fetch column names from backend
   useEffect(() => {
@@ -664,6 +665,18 @@ const generateContRangeAnalysis = async () => {
                     label="Timeseries for feature importance"
                   />
                 </RadioGroup>
+
+                {/* Show input field for number of top and bottom ranges */}
+                  <Box sx={{ mt: 2 }}>
+                    <TextField
+                      label="Number of top vs bottom ranges"
+                      type="number"
+                      size="small"
+                      value={numMultiRanges}
+                      onChange={(e) => setnumMultiRanges(Number(e.target.value))}
+                      InputProps={{ inputProps: { min: 1 } }}
+                    />
+                  </Box>
 
                 <Button variant="contained" size="small" sx={{ mt: 2 }}>
                   Generate Multivariate Analysis
