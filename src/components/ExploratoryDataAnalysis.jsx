@@ -72,7 +72,7 @@ const ExploratoryDataAnalysis = () => {
 
   // Multivariate Analysis
   const [selectedMultiColumns, setSelectedMultiColumns] = useState([]);
-  const [multiMode, setMultiMode] = useState("continuous");
+  const [multiMode, setMultiMode] = useState("Boxplot");
 
   // Fetch column names from backend
   useEffect(() => {
@@ -596,30 +596,46 @@ const generateContRangeAnalysis = async () => {
               </AccordionDetails>
             </Accordion>
 
-            {/* Multivariate Timeseries Analysis */}
+            {/* Multivariate plot Analysis */}
             <Accordion
               expanded={expandedCard === "multivariate"}
               onChange={handleAccordionChange("multivariate")}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                  Multivariate Timeseries Analysis
+                  Multivariate Plot Analysis
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
+                {/* Multi-select column list */}
                 <FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={selectedMultiColumns.length === edaColumns.length}
+                        onChange={(e) => 
+                          setSelectedMultiColumns(
+                            e.target.checked ? edaColumns : []
+                          )
+                        }
+                      />
+                    }
+                    label="Select All"
+                  />
                   {edaColumns.map((col) => (
                     <FormControlLabel
                       key={col}
                       control={
                         <Checkbox
                           checked={selectedMultiColumns.includes(col)}
-                          onChange={(e) =>
-                            setSelectedMultiColumns(
-                              e.target.checked
-                                ? [...selectedMultiColumns, col]
-                                : selectedMultiColumns.filter((c) => c !== col)
-                            )
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedMultiColumns([...selectedMultiColumns, col]);
+                            } else {
+                              setSelectedMultiColumns(selectedMultiColumns.filter((c) => c !== col));
+                            }
+                          }
                           }
                         />
                       }
@@ -628,16 +644,26 @@ const generateContRangeAnalysis = async () => {
                   ))}
                 </FormGroup>
 
-                <ToggleButtonGroup
+                {/* Plot Mode Toggle */}
+                <Typography variant="subtitle1" sx={{ mt: 3, fontWeight: "bold" }}>
+                  Select Plot Type
+                </Typography>
+                <RadioGroup
                   value={multiMode}
-                  exclusive
-                  onChange={(e, val) => val && setMultiMode(val)}
-                  size="small"
-                  sx={{ mt: 2 }}
+                  onChange={(e) => setMultiMode (e.target.value)}
+                  row
                 >
-                  <ToggleButton value="continuous">Continuous ranges</ToggleButton>
-                  <ToggleButton value="all">All timestamps</ToggleButton>
-                </ToggleButtonGroup>
+                  <FormControlLabel
+                    value="Boxplot"
+                    control={<Radio />}
+                    label="Boxplot for feature importance"
+                  />
+                  <FormControlLabel
+                    value="Timeseries"
+                    control={<Radio />}
+                    label="Timeseries for feature importance"
+                  />
+                </RadioGroup>
 
                 <Button variant="contained" size="small" sx={{ mt: 2 }}>
                   Generate Multivariate Analysis
