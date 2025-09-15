@@ -251,6 +251,43 @@ const generateContRangeAnalysis = async () => {
   }
 };
 
+const generatemultivariateanalysis = async () => {
+  try{  
+  const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/eda/multivariate`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: multiMode,
+          target: targetColumn,   // from dropdown / radio
+          columns: selectedMultiColumns,
+          numMultiRanges: numMultiRanges,
+          performanceDirection: performanceDirection
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Backend error:", errorText);
+      return;
+    }
+
+    const result = await res.json();
+    console.log("Multivariate analysis result:", result);
+
+    if (result.type === "plot") {
+      setEdaOutput({
+        data: result.data,
+        groups: result.groups,
+      });
+    }
+  } catch (err) {
+    console.error("Error generating multivariate analysis:", err);
+  }
+};
+
 
   return (
     <Grid container spacing={2}>
@@ -647,7 +684,7 @@ const generateContRangeAnalysis = async () => {
 
                 {/* Plot Mode Toggle */}
                 <Typography variant="subtitle1" sx={{ mt: 3, fontWeight: "bold" }}>
-                  Select Plot Type
+                  Select Plot Type for feature importance
                 </Typography>
                 <RadioGroup
                   value={multiMode}
@@ -657,12 +694,12 @@ const generateContRangeAnalysis = async () => {
                   <FormControlLabel
                     value="Boxplot"
                     control={<Radio />}
-                    label="Boxplot for feature importance"
+                    label="Boxplot"
                   />
                   <FormControlLabel
                     value="Timeseries"
                     control={<Radio />}
-                    label="Timeseries for feature importance"
+                    label="Timeseries"
                   />
                 </RadioGroup>
 
@@ -678,7 +715,8 @@ const generateContRangeAnalysis = async () => {
                     />
                   </Box>
 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
+                  onClick={generatemultivariateanalysis}>
                   Generate Multivariate Analysis
                 </Button>
               </AccordionDetails>
@@ -687,7 +725,7 @@ const generateContRangeAnalysis = async () => {
         </Card>
       </Grid>
 
-      {/* Right Panel */}
+{/* Right Panel */}
 <Grid
   item
   xs={12}
