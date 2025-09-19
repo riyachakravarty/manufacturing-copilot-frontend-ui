@@ -56,7 +56,7 @@ const FeatureEngineering = () => {
     op23: "",
     between2and3: ""
 });
-
+  const [finalFormula, setFinalFormula] = useState("");
 
   // Fetch column names from backend
   useEffect(() => {
@@ -79,6 +79,40 @@ const FeatureEngineering = () => {
     setExpandedCard(isExpanded ? panel : false);
   };
 
+  const formula = `
+  ${featureInputs.beforeCol1}(${selected1})
+  ${featureInputs.op12 ? " " + featureInputs.op12 + " " : ""}
+  ${featureInputs.between1and2 ? featureInputs.between1and2 : ""}${selected2 || ""}
+  ${featureInputs.op23 ? " " + featureInputs.op23 + " " : ""}
+  ${featureInputs.between2and3 ? featureInputs.between2and3 : ""}${selected3 || ""}
+`;
+
+// Auto-build formula for custom feature whenever inputs change
+useEffect(() => {
+  let formula = "";
+
+  if (selected1) {
+    formula += featureInputs.beforeCol1
+      ? `${featureInputs.beforeCol1}(${selected1})`
+      : selected1;
+  }
+
+  if (selected2) {
+    formula += featureInputs.op12 ? ` ${featureInputs.op12} ` : "";
+    formula += featureInputs.between1and2
+      ? `${featureInputs.between1and2}${selected2}`
+      : selected2;
+  }
+
+  if (selected3) {
+    formula += featureInputs.op23 ? ` ${featureInputs.op23} ` : "";
+    formula += featureInputs.between2and3
+      ? `${featureInputs.between2and3}${selected3}`
+      : selected3;
+  }
+
+  setFinalFormula(formula.trim());
+}, [selected1, selected2, selected3, featureInputs]);
 
 
   return (
@@ -253,6 +287,17 @@ const FeatureEngineering = () => {
                     </Box>
                   )}
                 </Box>
+
+                {finalFormula && (
+                <Box sx={{ mt: 2, p: 2, border: "1px solid #ddd", borderRadius: 2 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                    Preview Formula:
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontFamily: "monospace", mt: 1 }}>
+                    {finalFormula}
+                  </Typography>
+                </Box>
+              )}
                 
                 <Button variant="contained" size="small" sx={{ mt: 2 }}>
                   Generate Custom Feature
