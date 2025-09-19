@@ -60,6 +60,8 @@ const FeatureEngineering = () => {
 
   //Right panel
   const [featureOutput, setFeatureOutput] = useState(null);
+  // To store latest augmented dataframe for download
+  const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
 
   // Fetch column names from backend
   useEffect(() => {
@@ -391,12 +393,31 @@ const generatefeature = async () => {
         Analysis Output
       </Typography>
 
-      {/* Latest plots download */}
-      <Button variant="contained" color="secondary" size="small">
-        Download Latest Plots
-      </Button>
-    </Box>
+      {/* Latest Augmented Data Download */}    
+        <Button
+          variant="contained"
+          color="secondary"
+          size="small"
+          onClick={async () => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/download`);
+    if (!response.ok) throw new Error("Download failed");
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "feature_data.csv"; // same name as backend header
+    link.click();
+  } catch (err) {
+    console.error(err);
+    setError("Failed to download file from server.");
+  }
+}}
 
+        >
+          Download Latest Data
+        </Button>
+</Box>
     <Divider sx={{ mb: 2 }} />
 
     <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
