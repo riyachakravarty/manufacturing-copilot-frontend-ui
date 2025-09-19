@@ -84,24 +84,36 @@ const FeatureEngineering = () => {
 useEffect(() => {
   let formula = "";
 
-  if (selected1) {
-    formula += featureInputs.beforeCol1
-      ? `${featureInputs.beforeCol1}(${selected1})`
-      : selected1;
+
+  if (selected1 && selected1 !== "None") {
+  if (featureInputs.beforeCol1) {
+    formula += `${featureInputs.beforeCol1}(${selected1})`;
+  } else {
+    formula += selected1;
+  }
+}
+
+  if (selected2 && selected2 !== "None") {
+    if (featureInputs.op12) {
+      formula += ` ${featureInputs.op12} `;
+    }
+    if (featureInputs.between1and2) {
+      // if user entered a function like log, wrap properly
+      formula += `${featureInputs.between1and2}(${selected2})`;
+    } else {
+      formula += selected2;
+    }
   }
 
-  if (selected2) {
-    formula += featureInputs.op12 ? ` ${featureInputs.op12} ` : "";
-    formula += featureInputs.between1and2
-      ? `${featureInputs.between1and2}${selected2}`
-      : selected2;
-  }
-
-  if (selected3) {
-    formula += featureInputs.op23 ? ` ${featureInputs.op23} ` : "";
-    formula += featureInputs.between2and3
-      ? `${featureInputs.between2and3}${selected3}`
-      : selected3;
+  if (selected3 && selected3 !== "None") {
+    if (featureInputs.op23) {
+      formula += ` ${featureInputs.op23} `;
+    }
+    if (featureInputs.between2and3) {
+      formula += `${featureInputs.between2and3}(${selected3})`;
+    } else {
+      formula += selected3;
+    }
   }
 
   setFinalFormula(formula.trim());
@@ -231,14 +243,6 @@ useEffect(() => {
                       {/* Operator if col2 exists */}
                       {selected2 && (
                         <>
-                        <TextField
-                        placeholder="Enter operator between Column 1 & 2"
-                        size="small"
-                        value={featureInputs.op12}
-                        onChange={(e) =>
-                          setFeatureInputs((prev) => ({ ...prev, op12: e.target.value }))
-                        }
-                      />
                       <TextField
                           placeholder="Enter number or function (e.g., log, sqrt)"
                           size="small"
@@ -247,6 +251,14 @@ useEffect(() => {
                             setFeatureInputs((prev) => ({ ...prev, between1and2: e.target.value }))
                           }
                         />
+                        <TextField
+                        placeholder="Enter operator between Column 1 & 2"
+                        size="small"
+                        value={featureInputs.op12}
+                        onChange={(e) =>
+                          setFeatureInputs((prev) => ({ ...prev, op12: e.target.value }))
+                        }
+                      />
                           <Typography variant="body1" sx={{ fontWeight: "bold", alignSelf: "center" }}>
                             {selected2}
                           </Typography>
@@ -259,19 +271,19 @@ useEffect(() => {
                           <TextField
                           placeholder="Enter number or function (e.g., log, sqrt)"
                           size="small"
+                          value={featureInputs.between2and3}
+                          onChange={(e) =>
+                            setFeatureInputs((prev) => ({ ...prev, between2and3: e.target.value }))
+                          }
+                          />
+                          <TextField
+                          placeholder="Enter operator between Column 2 & 3"
+                          size="small"
                           value={featureInputs.op23}
                           onChange={(e) =>
                             setFeatureInputs((prev) => ({ ...prev, op23: e.target.value }))
                           }
                         />
-                          <TextField
-                          placeholder="Enter operator between Column 2 & 3"
-                          size="small"
-                          value={featureInputs.between2and3}
-                          onChange={(e) =>
-                            setFeatureInputs((prev) => ({ ...prev, between2and3: e.target.value }))
-                          }
-    />
                           <Typography variant="body1" sx={{ fontWeight: "bold", alignSelf: "center" }}>
                             {selected3}
                           </Typography>
