@@ -79,13 +79,6 @@ const FeatureEngineering = () => {
     setExpandedCard(isExpanded ? panel : false);
   };
 
-  const formula = `
-  ${featureInputs.beforeCol1}(${selected1})
-  ${featureInputs.op12 ? " " + featureInputs.op12 + " " : ""}
-  ${featureInputs.between1and2 ? featureInputs.between1and2 : ""}${selected2 || ""}
-  ${featureInputs.op23 ? " " + featureInputs.op23 + " " : ""}
-  ${featureInputs.between2and3 ? featureInputs.between2and3 : ""}${selected3 || ""}
-`;
 
 // Auto-build formula for custom feature whenever inputs change
 useEffect(() => {
@@ -288,16 +281,15 @@ useEffect(() => {
                   )}
                 </Box>
 
-                {finalFormula && (
                 <Box sx={{ mt: 2, p: 2, border: "1px solid #ddd", borderRadius: 2 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                     Preview Formula:
                   </Typography>
                   <Typography variant="body1" sx={{ fontFamily: "monospace", mt: 1 }}>
-                    {finalFormula}
+                     {finalFormula || "No formula yet"}
                   </Typography>
                 </Box>
-              )}
+              
                 
                 <Button variant="contained" size="small" sx={{ mt: 2 }}>
                   Generate Custom Feature
