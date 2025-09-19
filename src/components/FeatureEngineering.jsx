@@ -36,7 +36,7 @@ import { useTheme } from "@mui/material/styles";
 
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
-const ExploratoryDataAnalysis = () => {
+const FeatureEngineering = () => {
   const [edaColumns, setEdaColumns] = useState([]);
   const [edaOutput, setEdaOutput] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -254,8 +254,7 @@ const ExploratoryDataAnalysis = () => {
                   )}
                 </Box>
                 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}
-                onClick={generateCustomFeature}>
+                <Button variant="contained" size="small" sx={{ mt: 2 }}>
                   Generate Custom Feature
                 </Button>
               </AccordionDetails>
