@@ -390,70 +390,70 @@ const generatefeature = async () => {
       <Typography variant="h6" gutterBottom color="primary">
         Analysis Output
       </Typography>
+
       {/* Latest plots download */}
-        
-        <Button
-          variant="contained"
-          color="secondary"
-          size="small"
+      <Button variant="contained" color="secondary" size="small">
+        Download Latest Plots
+      </Button>
+    </Box>
 
-        >
-          Download Latest Plots
-        </Button>
-      </Box>
-      <Divider sx={{ mb: 2 }} />
+    <Divider sx={{ mb: 2 }} />
 
-      <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
-        {loading && <CircularProgress />}
-        {error && <Alert severity="error">{error}</Alert>}
+    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
 
-        {edaOutput ? (
-          <>
-          <Plot
-            data={edaOutput.data.data}
-            layout={{
-              ...edaOutput.data.layout,
-              autosize: true,
-              paper_bgcolor: theme.palette.background.paper,
-              plot_bgcolor: theme.palette.background.default,
-              margin: { t: 40, b: 40, l: 40, r: 40 },
-            }}
-            style={{ width: "100%", height: "100%", 
-              minHeight: 400, minWidth: 400 
-              }}
-            useResizeHandler
-            //config={{ responsive: true }}
-          />
-        
+      {/* EDA Plot (if present) */}
+      {edaOutput ? (
+        <Plot
+          data={edaOutput?.data?.data ?? []}
+          layout={{
+            ...(edaOutput?.data?.layout ?? {}),
+            autosize: true,
+            paper_bgcolor: theme.palette.background.paper,
+            plot_bgcolor: theme.palette.background.default,
+            margin: { t: 40, b: 40, l: 40, r: 40 },
+          }}
+          style={{
+            width: "100%",
+            height: "100%",
+            minHeight: 400,
+            minWidth: 400,
+          }}
+          useResizeHandler
+        />
+      ) : (
+        !loading &&
+        !error && (
+          <Typography variant="body2" color="text.secondary">
+            No analysis results yet.
+          </Typography>
+        )
+      )}
+
+      {/* Custom Feature Output (renders independently) */}
       {featureOutput && (
-      <Box sx={{ mt: 2, p: 2, border: "1px solid #ddd", borderRadius: 2 }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-          Custom Feature Generation
-        </Typography>
-        <Typography variant="body1" sx={{ mt: 1, fontFamily: "monospace" }}>
-          {featureOutput.message}
-        </Typography>
-        {featureOutput.errors && featureOutput.errors.length > 0 && (
-          <Box sx={{ mt: 1 }}>
-            <Typography variant="body2" color="error">
-              Rows with errors: {featureOutput.errors.join(", ")}
-            </Typography>
-          </Box>
-        )}
-      </Box>
-    )}
-    </>
-):(
-          !loading &&
-          !error && (
-            <Typography variant="body2" color="text.secondary">
-              No analysis results yet.
-            </Typography>
-          )
-        )}
-        </Box>   
+        <Box sx={{ mt: 2, p: 2, border: "1px solid #ddd", borderRadius: 2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+            Custom Feature Generation
+          </Typography>
+          <Typography variant="body1" sx={{ mt: 1, fontFamily: "monospace" }}>
+            {featureOutput.message}
+          </Typography>
+
+          {Array.isArray(featureOutput.errors) && featureOutput.errors.length > 0 && (
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="body2" color="error">
+                Rows with errors: {featureOutput.errors.join(", ")}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      )}
+    </Box>
   </Paper>
 </Grid>
+
     </Grid>
   );
 };
