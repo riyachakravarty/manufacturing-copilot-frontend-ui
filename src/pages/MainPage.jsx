@@ -6,6 +6,7 @@ import { Box, Typography, Tabs, Tab, Card, CardContent, Chip } from '@mui/materi
 import { DataObject, Insights, Build, PrecisionManufacturing } from '@mui/icons-material';
 import DataVisualizationAndEngineering from '../components/DataVisualizationAndEngineering';
 import ExploratoryDataAnalysis from "../components/ExploratoryDataAnalysis";
+import FeatureEngineering from "../components/FeatureEngineering";
 
 
 const tabLabels = [
@@ -29,6 +30,8 @@ const MainPage = () => {
         return <DataVisualizationAndEngineering />;
       case 1:
         return <ExploratoryDataAnalysis />;
+      case 2:
+        return <FeatureEngineering />;
       default:
         return (
           <Typography variant="body1">
