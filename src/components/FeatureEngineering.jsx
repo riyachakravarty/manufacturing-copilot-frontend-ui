@@ -232,7 +232,7 @@ useEffect(() => {
                       {selected2 && (
                         <>
                         <TextField
-                        placeholder="Enter number or function (e.g., log, sqrt)"
+                        placeholder="Enter operator between Column 1 & 2"
                         size="small"
                         value={featureInputs.op12}
                         onChange={(e) =>
@@ -240,7 +240,7 @@ useEffect(() => {
                         }
                       />
                       <TextField
-                          placeholder="Enter operator between Column 1 & 2"
+                          placeholder="Enter number or function (e.g., log, sqrt)"
                           size="small"
                           value={featureInputs.between1and2}
                           onChange={(e) =>
