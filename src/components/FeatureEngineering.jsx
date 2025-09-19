@@ -58,6 +58,9 @@ const FeatureEngineering = () => {
 });
   const [finalFormula, setFinalFormula] = useState("");
 
+  //Right panel
+  const [featureOutput, setFeatureOutput] = useState(null);
+
   // Fetch column names from backend
   useEffect(() => {
     const fetchColumns = async () => {
@@ -84,40 +87,87 @@ const FeatureEngineering = () => {
 useEffect(() => {
   let formula = "";
 
-
-  if (selected1 && selected1 !== "None") {
-  if (featureInputs.beforeCol1) {
-    formula += `${featureInputs.beforeCol1}(${selected1})`;
-  } else {
-    formula += selected1;
-  }
-}
-
-  if (selected2 && selected2 !== "None") {
-    if (featureInputs.op12) {
-      formula += ` ${featureInputs.op12} `;
-    }
-    if (featureInputs.between1and2) {
-      // if user entered a function like log, wrap properly
-      formula += `${featureInputs.between1and2}(${selected2})`;
-    } else {
-      formula += selected2;
-    }
+  if (selected1) {
+    formula += featureInputs.beforeCol1
+      ? `${featureInputs.beforeCol1}(${selected1})`
+      : selected1;
   }
 
-  if (selected3 && selected3 !== "None") {
-    if (featureInputs.op23) {
-      formula += ` ${featureInputs.op23} `;
-    }
-    if (featureInputs.between2and3) {
-      formula += `${featureInputs.between2and3}(${selected3})`;
-    } else {
-      formula += selected3;
-    }
+  if (selected2) {
+    formula += featureInputs.op12 ? ` ${featureInputs.op12} ` : "";
+    formula += selected2
+      ? featureInputs.between1and2
+        ? `${featureInputs.between1and2}(${selected2})`
+        : selected2
+      : "";
+  }
+
+  if (selected3) {
+    formula += featureInputs.op23 ? ` ${featureInputs.op23} ` : "";
+    formula += selected3
+      ? featureInputs.between2and3
+        ? `${featureInputs.between2and3}(${selected3})`
+        : selected3
+      : "";
   }
 
   setFinalFormula(formula.trim());
 }, [selected1, selected2, selected3, featureInputs]);
+
+const generatefeature = async () => {
+  try {
+    // Check if user has selected anything
+    const nothingSelected =
+      (!selected1 && !selected2 && !selected3) &&
+      Object.values(featureInputs).every((val) => !val || val.trim() === "");
+
+    if (nothingSelected) {
+      console.error("Please select at least one column or input to create a feature");
+      setFeatureOutput({ message: "⚠️ Please select at least one column or input to create a feature" });
+      return;
+    }
+
+    const payload = {
+      column1: selected1 || null,
+      column2: selected2 || null,
+      column3: selected3 || null,
+      featureInputs,
+    };
+
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/custom_feature`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Backend error:", errorText);
+      setFeatureOutput({ message: `❌ Backend error: ${errorText}` });
+      return;
+    }
+
+    const result = await res.json();
+
+    // Set feature output
+    if (result.success && (!result.errors || result.errors.length === 0)) {
+      setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
+    } else if (result.errors && result.errors.length > 0) {
+      setFeatureOutput({
+        message: `⚠️ Feature partially created. Errors in rows: ${result.errors.join(", ")}`,
+        errors: result.errors,
+        new_column: result.new_column,
+      });
+    } else {
+      setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
+    }
+
+  } catch (err) {
+    console.error("Error generating custom feature:", err);
+    setFeatureOutput({ message: `❌ Error: ${err.message}` });
+  }
+};
+
 
 
   return (
@@ -303,8 +353,9 @@ useEffect(() => {
                 </Box>
               
                 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
                   Generate Custom Feature
+                onClick={generatefeature}>
                 </Button>
               </AccordionDetails>
             </Accordion>
@@ -373,9 +424,26 @@ useEffect(() => {
             useResizeHandler
             //config={{ responsive: true }}
           />
-            
-          </>
-        ) : (
+        
+      {featureOutput && (
+      <Box sx={{ mt: 2, p: 2, border: "1px solid #ddd", borderRadius: 2 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+          Custom Feature Generation
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1, fontFamily: "monospace" }}>
+          {featureOutput.message}
+        </Typography>
+        {featureOutput.errors && featureOutput.errors.length > 0 && (
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="body2" color="error">
+              Rows with errors: {featureOutput.errors.join(", ")}
+            </Typography>
+          </Box>
+        )}
+      </Box>
+    )}
+    </>
+):(
           !loading &&
           !error && (
             <Typography variant="body2" color="text.secondary">
@@ -383,8 +451,7 @@ useEffect(() => {
             </Typography>
           )
         )}
-
-    </Box>
+        </Box>   
   </Paper>
 </Grid>
     </Grid>
