@@ -363,7 +363,48 @@ const generatefeature = async () => {
             </Accordion>
           </CardContent>
         </Card>
+
+      <Card sx={{ borderRadius: 3, boxShadow: 2, flexGrow: 1 }}>
+          <CardContent>
+            {/* Feature Variability */}
+            <Accordion
+              expanded={expandedCard === "featurevar"}
+              onChange={handleAccordionChange("featurevar")}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Feature Variability
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {/* Column Selection */}
+                <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: "bold" }}>
+                  Select Column
+                </Typography>
+                <RadioGroup
+                  value={edaColumns}
+                  onChange={(e) => setEdaColumns(e.target.value)}
+                >
+                  {edaColumns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      value={col}
+                      control={<Radio />}
+                      label={col}
+                    />
+                  ))}
+                </RadioGroup>
+
+                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                  Generate Feature Variability
+                </Button>
+
+                </AccordionDetails>
+                </Accordion>
+          </CardContent>
+        </Card>
       </Grid>
+
 
 {/* Right Panel */}
 <Grid
