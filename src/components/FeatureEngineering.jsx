@@ -58,6 +58,10 @@ const FeatureEngineering = () => {
 });
   const [finalFormula, setFinalFormula] = useState("");
 
+  //Feature variability
+  const [selectedForVariability, setSelectedForVariability] = useState("");
+  const [plotData, setPlotData] = useState(null);
+
   //Right panel
   const [featureOutput, setFeatureOutput] = useState(null);
   // To store latest augmented dataframe for download
@@ -170,7 +174,37 @@ const generatefeature = async () => {
   }
 };
 
+const generateFeatureVariability = async () => {
+    if (selectedForVariability.length === 0) {
+      setError("Please select at least one column for analysis.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    setPlotData(null);
+    try {
+      const payload = {
+        selectedFeature: selectedForVariability || null
+      };
 
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_variability`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const result = await res.json();
+        console.log("Feature variability response:", result);
+      if (result.type === "plot") {
+      setEdaOutput({
+        data: result.data,
+      });
+    }
+  } catch (err) {
+    console.error("Error generating variability analysis:", err);
+  }
+};
 
   return (
     <Grid container spacing={2}>
@@ -382,8 +416,8 @@ const generatefeature = async () => {
                   Select Column
                 </Typography>
                 <RadioGroup
-                  value={edaColumns}
-                  onChange={(e) => setEdaColumns(e.target.value)}
+                  value={selectedForVariability}
+                  onChange={(e) => setSelectedForVariability(e.target.value)}
                 >
                   {edaColumns.map((col) => (
                     <FormControlLabel
@@ -395,8 +429,9 @@ const generatefeature = async () => {
                   ))}
                 </RadioGroup>
 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
                   Generate Feature Variability
+                  onClick={generateFeatureVariability}>
                 </Button>
 
                 </AccordionDetails>
