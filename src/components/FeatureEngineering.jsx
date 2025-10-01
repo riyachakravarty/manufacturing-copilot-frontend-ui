@@ -224,8 +224,6 @@ const generateFeatureVariability = async () => {
           transition: "width 0.3s ease",
           width: 320, // fixed like DVE
   }}>
-        <Card sx={{ borderRadius: 3, boxShadow: 2, flexGrow: 1 }}>
-          <CardContent>
             {/* Feature Generation */}
             <Accordion
               expanded={expandedCard === "featuregen"}
@@ -395,11 +393,7 @@ const generateFeatureVariability = async () => {
                 </Button>
               </AccordionDetails>
             </Accordion>
-          </CardContent>
-        </Card>
-
-      <Card sx={{ borderRadius: 3, boxShadow: 2, flexGrow: 1 }}>
-          <CardContent>
+   
             {/* Feature Variability */}
             <Accordion
               expanded={expandedCard === "featurevar"}
@@ -436,8 +430,6 @@ const generateFeatureVariability = async () => {
 
                 </AccordionDetails>
                 </Accordion>
-          </CardContent>
-        </Card>
       </Grid>
 
 
