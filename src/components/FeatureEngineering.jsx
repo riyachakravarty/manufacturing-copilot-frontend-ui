@@ -97,8 +97,10 @@ const FeatureEngineering = () => {
       }
     };
 
+    if (expandedCard === "featurevar") {
     fetchColumns1();
-  }, [BACKEND_URL]);
+  }
+}, [expandedCard, BACKEND_URL]);
 
   // Card toggle
   const handleAccordionChange = (panel) => (event, isExpanded) => {
