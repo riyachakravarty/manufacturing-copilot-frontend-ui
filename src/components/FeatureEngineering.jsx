@@ -61,6 +61,7 @@ const FeatureEngineering = () => {
   //Feature variability
   const [selectedForVariability, setSelectedForVariability] = useState("");
   const [plotData, setPlotData] = useState(null);
+  const [augmented_df_columns, setAugmented_df_columns] = useState([]);
 
   //Right panel
   const [featureOutput, setFeatureOutput] = useState(null);
@@ -81,6 +82,22 @@ const FeatureEngineering = () => {
     };
 
     fetchColumns();
+  }, [BACKEND_URL]);
+
+   // Fetch augmented df column names from backend for feature variability
+  useEffect(() => {
+    const fetchColumns1 = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/get_augmented_df_columns`);
+        if (!res.ok) throw new Error("Failed to fetch columns");
+        const data = await res.json();
+        setAugmented_df_columns(data.columns || []);
+      } catch (err) {
+        console.error("Error fetching columns:", err);
+      }
+    };
+
+    fetchColumns1();
   }, [BACKEND_URL]);
 
   // Card toggle
@@ -413,7 +430,7 @@ const generateFeatureVariability = async () => {
                   value={selectedForVariability}
                   onChange={(e) => setSelectedForVariability(e.target.value)}
                 >
-                  {edaColumns.map((col) => (
+                  {augmented_df_columns.map((col) => (
                     <FormControlLabel
                       key={col}
                       value={col}
