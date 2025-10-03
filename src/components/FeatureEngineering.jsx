@@ -241,7 +241,7 @@ const generateFeatureVariability = async () => {
           flexShrink: 0,
           minWidth: 320,
           transition: "width 0.3s ease",
-          width: 320, // fixed like DVE
+          width: expanded ? 320 : 320, //fixed width, no shrink on collapse to avoid UI issues
   }}>
             {/* Feature Generation */}
             <Accordion
@@ -507,7 +507,7 @@ const generateFeatureVariability = async () => {
 </Box>
     <Divider sx={{ mb: 2 }} />
 
-    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
+    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
       {loading && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
 
