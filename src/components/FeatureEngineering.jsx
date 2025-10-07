@@ -41,6 +41,7 @@ const FeatureEngineering = () => {
   const [edaOutput, setEdaOutput] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expandedCard, setExpandedCard] = useState(false);
+  const [expanded, setExpanded] = useState("");
   const theme = useTheme();
   const [error, setError] = useState("");
 
