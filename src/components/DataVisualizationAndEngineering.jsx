@@ -1385,7 +1385,8 @@ export default function DataVisualizationAndEngineering() {
       </Dialog>
 
       {/* Post-Treatment Column Selection & Plot */}
-      {postTreatmentColumns?.length > 0 && postTreatmentSelectedColumn !== null && (
+      {postTreatmentColumns?.length > 0 && (
+      //{postTreatmentColumns?.length > 0 && postTreatmentSelectedColumn !== null && (
         <Box sx={{ mt: 2 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
             {postTreatmentMode === "missing"
