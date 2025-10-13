@@ -4,6 +4,9 @@ import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
 import axios from "axios";
 import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
   Box,
   Paper, 
   CircularProgress,
@@ -58,6 +61,7 @@ const FeatureEngineering = () => {
     between2and3: ""
 });
   const [finalFormula, setFinalFormula] = useState("");
+  const [showFeatureGenPrompt, setShowFeatureGenPrompt] = useState(false);
 
   //Feature variability
   const [selectedForVariability, setSelectedForVariability] = useState("");
