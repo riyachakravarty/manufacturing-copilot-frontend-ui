@@ -140,6 +140,16 @@ useEffect(() => {
   setFinalFormula(formula.trim());
 }, [selected1, selected2, selected3, featureInputs]);
 
+ //Function to trigger feature generation dialog box
+  const handleFeatureGenFlow = (backendResponse) => {
+  if (!backendResponse) {
+    setError("No result received from backend.");
+    return;
+  }
+  // Show pop-up prompt
+  setShowFeatureGenPrompt(true);
+};
+
 const generatefeature = async () => {
   try {
     // Check if user has selected anything
@@ -187,6 +197,9 @@ const generatefeature = async () => {
     } else {
       setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
     }
+
+    // Trigger dialog box with message
+    handleFeatureGenFlow(result);
 
   } catch (err) {
     console.error("Error generating custom feature:", err);
@@ -559,6 +572,16 @@ const generateFeatureVariability = async () => {
           )}
         </Box>
       )}
+      {/* Custom feature generation dialog box*/}
+      <Dialog open={showFeatureGenPrompt} onClose={() => setShowFeatureGenPrompt(false)}>
+        <DialogTitle>Status of custom feature generation</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {featureOutput.message}
+          </Typography>
+        </DialogContent>
+      </Dialog>
+
     </Box>
   </Paper>
 </Grid>
