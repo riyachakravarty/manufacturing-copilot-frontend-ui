@@ -204,10 +204,12 @@ const generatefeature = async () => {
 
     // Trigger dialog box with message
     handleFeatureGenFlow(result);
+    setShowFeatureGenPrompt(true);
 
   } catch (err) {
     console.error("Error generating custom feature:", err);
     setFeatureOutput({ message: `❌ Error: ${err.message}` });
+    setShowFeatureGenPrompt(true);
   }
 };
 
@@ -581,7 +583,7 @@ const generateFeatureVariability = async () => {
         <DialogTitle>Status of custom feature generation</DialogTitle>
         <DialogContent>
           <Typography>
-            {featureOutput.message}
+            {featureOutput?.message || "Processing feature generation..."}
           </Typography>
         </DialogContent>
       </Dialog>
