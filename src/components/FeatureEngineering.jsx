@@ -73,6 +73,7 @@ const FeatureEngineering = () => {
   // To store latest augmented dataframe for download
   const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
 
+
   // Fetch column names from backend
   useEffect(() => {
     const fetchColumns = async () => {
@@ -110,6 +111,8 @@ const FeatureEngineering = () => {
   // Card toggle
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedCard(isExpanded ? panel : false);
+    setError("");
+    setEdaOutput(null);
   };
 
 
@@ -220,7 +223,7 @@ const generateFeatureVariability = async () => {
     }
     setError("");
     setLoading(true);
-    setPlotData(null);
+    setEdaOutput(null);
     try {
       const payload = {
         selectedFeature: selectedForVariability || null
@@ -238,7 +241,8 @@ const generateFeatureVariability = async () => {
       if (result.type === "plot") {
       setEdaOutput({
         data: result.data,
-      });
+      })
+      setExpandedCard(false); // Collapse left accordion to free space;
     }
   } catch (err) {
     console.error("Error generating variability analysis:", err);
