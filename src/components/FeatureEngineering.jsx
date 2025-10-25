@@ -71,6 +71,10 @@ const FeatureEngineering = () => {
   //Feature Missing Value Analysis
   const [selectedForMissing, setSelectedForMissing] = useState("");
 
+  //Feature Outlier Analysis
+  const [selectedForOutlier, setSelectedForOutlier] = useState("");
+  const [outlierMethod, setOutlierMethod] = useState("");
+
   //Right panel
   const [featureOutput, setFeatureOutput] = useState(null);
   // To store latest augmented dataframe for download
@@ -93,7 +97,7 @@ const FeatureEngineering = () => {
     fetchColumns();
   }, [BACKEND_URL]);
 
-   // Fetch augmented df column names from backend for feature variability
+   // Fetch augmented df column names from backend for feature variability, missing and outlier analysis
   useEffect(() => {
     const fetchColumns1 = async () => {
       try {
@@ -106,7 +110,7 @@ const FeatureEngineering = () => {
       }
     };
 
-    if (expandedCard === "featurevar" || expandedCard === "featuremissing") {
+    if (expandedCard === "featurevar" || expandedCard === "featuremissing" || expandedCard === "featureoutlier") {
     fetchColumns1();
   }
 }, [expandedCard, BACKEND_URL]);
@@ -282,6 +286,40 @@ const generateFeatureMissingAnalysis = async () => {
     }
   } catch (err) {
     console.error("Error generating missing value analysis:", err);
+  }
+};
+
+const generateFeatureOutlierAnalysis = async () => {
+    if (selectedForOutlier.length === 0) {
+      setError("Please select at least one column for analysis.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    setEdaOutput(null);
+    try {
+      const payload = {
+        selectedFeature: selectedForOutlier || null,
+        method: outlierMethod || null
+      };
+
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_outlier`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const result = await res.json();
+        console.log("Feature Outlier Analysis response:", result);
+      if (result.type === "plot") {
+      setEdaOutput({
+        data: result.data,
+      })
+      setExpandedCard(false); // Collapse left accordion to free space;
+    }
+  } catch (err) {
+    console.error("Error generating outlier analysis:", err);
   }
 };
 
@@ -542,6 +580,63 @@ const generateFeatureMissingAnalysis = async () => {
                 <Button variant="contained" size="small" sx={{ mt: 2 }}
                   Generate Feature Missing Value Analysis
                   onClick={generateFeatureMissingAnalysis}>
+                </Button>
+
+                </AccordionDetails>
+                </Accordion>
+
+                {/* Feature Outlier Analysis */}
+            <Accordion
+              expanded={expandedCard === "featureoutlier"}
+              onChange={handleAccordionChange("featureoutlier")}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Feature Outlier Analysis
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {/* Column Selection */}
+                <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: "bold" }}>
+                  Select Column
+                </Typography>
+                <RadioGroup
+                  value={selectedForOutlier}
+                  onChange={(e) => setSelectedForOutlier(e.target.value)}
+                >
+                  {augmented_df_columns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      value={col}
+                      control={<Radio />}
+                      label={col}
+                    />
+                  ))}
+                </RadioGroup>
+
+                {/* Method Selection */}
+              <RadioGroup
+                value={outlierMethod}
+                onChange={(e) => setOutlierMethod(e.target.value)}
+                row
+              >
+                <FormControlLabel
+                  value="zscore"
+                  control={<Radio size="small" />}
+                  label="Z-Score"
+                  sx={{ fontSize: "0.85rem" }}
+                />
+                <FormControlLabel
+                  value="iqr"
+                  control={<Radio size="small" />}
+                  label="IQR"
+                  sx={{ fontSize: "0.85rem" }}
+                />
+              </RadioGroup>
+
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
+                  Generate Feature Missing Value Analysis
+                  onClick={generateFeatureOutlierAnalysis}>
                 </Button>
 
                 </AccordionDetails>
