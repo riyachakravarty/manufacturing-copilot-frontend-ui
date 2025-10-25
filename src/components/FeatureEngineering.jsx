@@ -68,6 +68,9 @@ const FeatureEngineering = () => {
   const [plotData, setPlotData] = useState(null);
   const [augmented_df_columns, setAugmented_df_columns] = useState([]);
 
+  //Feature Missing Value Analysis
+  const [selectedForMissing, setSelectedForMissing] = useState("");
+
   //Right panel
   const [featureOutput, setFeatureOutput] = useState(null);
   // To store latest augmented dataframe for download
@@ -103,7 +106,7 @@ const FeatureEngineering = () => {
       }
     };
 
-    if (expandedCard === "featurevar") {
+    if (expandedCard === "featurevar" || expandedCard === "featuremissing") {
     fetchColumns1();
   }
 }, [expandedCard, BACKEND_URL]);
@@ -246,6 +249,39 @@ const generateFeatureVariability = async () => {
     }
   } catch (err) {
     console.error("Error generating variability analysis:", err);
+  }
+};
+
+const generateFeatureMissingAnalysis = async () => {
+    if (selectedForMissing.length === 0) {
+      setError("Please select at least one column for analysis.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    setEdaOutput(null);
+    try {
+      const payload = {
+        selectedFeature: selectedForMissing || null
+      };
+
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_missing`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const result = await res.json();
+        console.log("Feature Missing Value Analysis response:", result);
+      if (result.type === "plot") {
+      setEdaOutput({
+        data: result.data,
+      })
+      setExpandedCard(false); // Collapse left accordion to free space;
+    }
+  } catch (err) {
+    console.error("Error generating missing value analysis:", err);
   }
 };
 
@@ -469,6 +505,43 @@ const generateFeatureVariability = async () => {
                 <Button variant="contained" size="small" sx={{ mt: 2 }}
                   Generate Feature Variability
                   onClick={generateFeatureVariability}>
+                </Button>
+
+                </AccordionDetails>
+                </Accordion>
+
+                {/* Feature Misisng Value Analysis */}
+            <Accordion
+              expanded={expandedCard === "featuremissing"}
+              onChange={handleAccordionChange("featuremissing")}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Feature Missing Value Analysis
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {/* Column Selection */}
+                <Typography variant="subtitle1" sx={{ mt: 2, fontWeight: "bold" }}>
+                  Select Column
+                </Typography>
+                <RadioGroup
+                  value={selectedForMissing}
+                  onChange={(e) => setSelectedForMissing(e.target.value)}
+                >
+                  {augmented_df_columns.map((col) => (
+                    <FormControlLabel
+                      key={col}
+                      value={col}
+                      control={<Radio />}
+                      label={col}
+                    />
+                  ))}
+                </RadioGroup>
+
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
+                  Generate Feature Missing Value Analysis
+                  onClick={generateFeatureMissingAnalysis}>
                 </Button>
 
                 </AccordionDetails>
