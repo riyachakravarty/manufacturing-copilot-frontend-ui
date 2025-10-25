@@ -706,9 +706,9 @@ const generateFeatureOutlierAnalysis = async () => {
       {/* EDA Plot (if present) */}
       {edaOutput ? (
         <Plot
-          data={edaOutput?.data?.data ?? []}
+          data={edaOutput?.data}
           layout={{
-            ...(edaOutput?.data?.layout ?? {}),
+            ...(edaOutput?.layout),
             autosize: true,
             paper_bgcolor: theme.palette.background.paper,
             plot_bgcolor: theme.palette.background.default,
