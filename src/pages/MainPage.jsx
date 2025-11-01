@@ -7,6 +7,7 @@ import { DataObject, Insights, Build, PrecisionManufacturing } from '@mui/icons-
 import DataVisualizationAndEngineering from '../components/DataVisualizationAndEngineering';
 import ExploratoryDataAnalysis from "../components/ExploratoryDataAnalysis";
 import FeatureEngineering from "../components/FeatureEngineering";
+import MLModelDevelopment from "../components/MLModelDevelopment";
 
 
 const tabLabels = [
@@ -32,6 +33,8 @@ const MainPage = () => {
         return <ExploratoryDataAnalysis />;
       case 2:
         return <FeatureEngineering />;
+      case 3:
+        return <MLModelDevelopment/>;
       default:
         return (
           <Typography variant="body1">
