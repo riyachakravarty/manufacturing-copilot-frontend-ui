@@ -49,6 +49,7 @@ const MLModelDevelopment = () => {
   const [error, setError] = useState("");
   const [targetColumn, setTargetColumn] = useState("");
   const [performanceDirection, setPerformanceDirection] = useState("higher");
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
 
 
   // Feature generation
@@ -379,7 +380,7 @@ const generateFeatureOutlierAnalysis = async () => {
                     control={
                       <Checkbox
                         size="small"
-                        checked={selectedQcutColumns.length === edaColumns.length}
+                        checked={selectedFeatures.length === edaColumns.length}
                         onChange={(e) => 
                           setSelectedQcutColumns(
                             e.target.checked ? edaColumns : []
@@ -394,12 +395,12 @@ const generateFeatureOutlierAnalysis = async () => {
                       key={col}
                       control={
                         <Checkbox
-                          checked={selectedQcutColumns.includes(col)}
+                          checked={selectedFeatures.includes(col)}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setSelectedQcutColumns([...selectedQcutColumns, col]);
+                              setSelectedFeatures([...selectedFeatures, col]);
                             } else {
-                              setSelectedQcutColumns(selectedQcutColumns.filter((c) => c !== col));
+                              setSelectedFeatures(selectedFeatures.filter((c) => c !== col));
                             }
                           }
                           }
