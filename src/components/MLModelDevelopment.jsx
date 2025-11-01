@@ -50,7 +50,7 @@ const MLModelDevelopment = () => {
   const [targetColumn, setTargetColumn] = useState("");
   const [performanceDirection, setPerformanceDirection] = useState("higher");
   const [selectedFeatures, setSelectedFeatures] = useState([]);
-
+  const [TrainTestOption, setTrainTestOption] = useState("");
 
   // Feature generation
   const [selected1, setSelected1] = useState("");
@@ -410,6 +410,20 @@ const generateFeatureOutlierAnalysis = async () => {
                     />
                   ))}
                 </FormGroup>
+
+                {/* Train Test dropdown */}
+            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+              <InputLabel>Train & Test data</InputLabel>
+              <Select
+                value={TrainTestOption}
+                label="Train & Test Split"
+                onChange={(e) => setTrainTestOption(e.target.value)}
+              >
+                <MenuItem value="random">Random</MenuItem>
+                <MenuItem value="time_percent">Time Based - Choose split %</MenuItem>
+                <MenuItem value="time_custom">Time Based - Choose custom dates</MenuItem>
+            </Select>
+        </FormControl>
 
             
           </CardContent>
