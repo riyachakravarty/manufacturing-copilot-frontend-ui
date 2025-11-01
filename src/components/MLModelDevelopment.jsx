@@ -382,7 +382,7 @@ const generateFeatureOutlierAnalysis = async () => {
                         size="small"
                         checked={selectedFeatures.length === edaColumns.length}
                         onChange={(e) => 
-                          setSelectedQcutColumns(
+                          setSelectedFeatures(
                             e.target.checked ? edaColumns : []
                           )
                         }
