@@ -25,7 +25,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  Slider
+  Slider,
   TextField,
   Divider,
   Button,
