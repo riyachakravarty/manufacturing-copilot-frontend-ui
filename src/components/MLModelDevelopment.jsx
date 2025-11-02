@@ -25,6 +25,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Slider
   TextField,
   Divider,
   Button,
@@ -33,7 +34,10 @@ import {
   ToggleButton,
   ToggleButtonGroup, 
 } from "@mui/material";
-import { DataGridPro } from '@mui/x-data-grid-pro';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 
@@ -51,6 +55,9 @@ const MLModelDevelopment = () => {
   const [performanceDirection, setPerformanceDirection] = useState("higher");
   const [selectedFeatures, setSelectedFeatures] = useState([]);
   const [TrainTestOption, setTrainTestOption] = useState("");
+  const [splitPercent, setSplitPercent] = useState(70);
+  const [startDate, setStartDate] = useState(dayjs().subtract(30, "day"));
+  const [endDate, setEndDate] = useState(dayjs());
 
   // Feature generation
   const [selected1, setSelected1] = useState("");
@@ -424,6 +431,44 @@ const generateFeatureOutlierAnalysis = async () => {
                 <MenuItem value="time_custom">Time Based - Choose custom dates</MenuItem>
             </Select>
         </FormControl>
+
+        {/* Slider for Random or Time-Based % */}
+      {(TrainTestOption === "random" || TrainTestOption === "time_percent") && (
+        <Box sx={{ px: 2, mt: 2 }}>
+          <Typography gutterBottom>
+            Select % of data for training: {splitPercent}%
+          </Typography>
+          <Slider
+            value={splitPercent}
+            onChange={(e, newValue) => setSplitPercent(newValue)}
+            aria-labelledby="train-test-slider"
+            step={1}
+            min={0}
+            max={100}
+            valueLabelDisplay="auto"
+          />
+        </Box>
+      )}
+
+      {/* Date Pickers for Custom Date Split */}
+      {TrainTestOption === "time_custom" && (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={(newValue) => setStartDate(newValue)}
+              renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+            />
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={(newValue) => setEndDate(newValue)}
+              renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+            />
+          </Box>
+        </LocalizationProvider>
+      )}
 
             
           </CardContent>
