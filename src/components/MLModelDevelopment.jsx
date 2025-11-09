@@ -58,6 +58,7 @@ const MLModelDevelopment = () => {
   const [splitPercent, setSplitPercent] = useState(70);
   const [startDate, setStartDate] = useState(dayjs().subtract(30, "day"));
   const [endDate, setEndDate] = useState(dayjs());
+  const [MLChoice, setMLChoice] = useState("");
 
   // Feature generation
   const [selected1, setSelected1] = useState("");
@@ -469,6 +470,58 @@ const generateFeatureOutlierAnalysis = async () => {
           </Box>
         </LocalizationProvider>
       )}
+
+  {/* ML model choice */}
+              <Accordion
+                expanded={expandedCard === "MLChoice"}
+                onChange={handleAccordionChange("MLChoice")}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                    Choose ML model
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {/* ML model list */}
+                  <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+              <InputLabel>Choose ML Model</InputLabel>
+              <Select
+                value={MLChoice}
+                label="Choose ML Model"
+                onChange={(e) => setMLChoice(e.target.value)}
+              >
+                <MenuItem value="Decision Tree">Decision Tree</MenuItem>
+                <MenuItem value="Random Forest">Random Forest</MenuItem>
+                <MenuItem value="XGBoost">XGBoost</MenuItem>
+                <MenuItem value="Light GBM">Light GBM</MenuItem>
+            </Select>
+        </FormControl>
+  
+                  <Button variant="contained" size="small" sx={{ mt: 2 }}
+                  onClick={runMLModel}>
+        Train ML Model
+                  </Button>
+                </AccordionDetails>
+              </Accordion>
+
+              {/* ML model choice */}
+              <Accordion
+                expanded={expandedCard === "SHAP"}
+                onChange={handleAccordionChange("SHAP")}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                    Build SHAP plots
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+  
+                  <Button variant="contained" size="small" sx={{ mt: 2 }}
+                  onClick={generateSHAP}>
+        Generate SHAP plots
+                  </Button>
+                </AccordionDetails>
+              </Accordion>
 
             
           </CardContent>
