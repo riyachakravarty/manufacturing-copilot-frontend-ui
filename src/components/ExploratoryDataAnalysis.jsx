@@ -40,11 +40,11 @@ const ExploratoryDataAnalysis = () => {
   const [edaColumns, setEdaColumns] = useState([]);
   const [targetColumn, setTargetColumn] = useState("");
   const [edaOutput, setEdaOutput] = useState(null);
-  //const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [performanceDirection, setPerformanceDirection] = useState("higher");
   const [expandedCard, setExpandedCard] = useState(false);
   const theme = useTheme();
-  //const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
   // Q-cut state
   const [selectedQcutColumns, setSelectedQcutColumns] = useState([]);
@@ -100,6 +100,8 @@ const ExploratoryDataAnalysis = () => {
 
   // Function to call backend and fetch Q-cut box plots
 const generateQcutBoxPlots = async () => {
+  setLoading(true);
+  setError("");
   try {
     if (!targetColumn || selectedQcutColumns.length === 0) {
       console.error("Target or columns not selected for Q-cut analysis");
@@ -768,8 +770,8 @@ const generatemultivariateanalysis = async () => {
       <Divider sx={{ mb: 2 }} />
 
       <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
-        {/*loading && <CircularProgress />*/}
-        {/*error && <Alert severity="error">{error}</Alert>*/}
+        {loading && <CircularProgress />}
+        {error && <Alert severity="error">{error}</Alert>}
 
         {edaOutput ? (
           <>

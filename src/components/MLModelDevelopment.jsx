@@ -46,7 +46,7 @@ const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 const MLModelDevelopment = () => {
   const [edaColumns, setEdaColumns] = useState([]);
   const [edaOutput, setEdaOutput] = useState(null);
-  //const [loading, setLoading] = useState(false);
+//  const [loading, setLoading] = useState(false);
   const [expandedCard, setExpandedCard] = useState(false);
 //  const [expanded, setExpanded] = useState("");
   const theme = useTheme();
@@ -589,7 +589,7 @@ const MLModelDevelopment = () => {
     <Divider sx={{ mb: 2 }} />
 
     <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
-      {loading && <CircularProgress />}
+      { /* loading && <CircularProgress /> */}
       {error && <Alert severity="error">{error}</Alert>}
 
       {/* EDA Plot (if present) */}
