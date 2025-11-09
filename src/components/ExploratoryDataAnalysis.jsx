@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
-import axios from "axios";
+//import axios from "axios";
 import {
   Box,
   Paper, 
@@ -40,11 +40,11 @@ const ExploratoryDataAnalysis = () => {
   const [edaColumns, setEdaColumns] = useState([]);
   const [targetColumn, setTargetColumn] = useState("");
   const [edaOutput, setEdaOutput] = useState(null);
-  const [loading, setLoading] = useState(false);
+  //const [loading, setLoading] = useState(false);
   const [performanceDirection, setPerformanceDirection] = useState("higher");
   const [expandedCard, setExpandedCard] = useState(false);
   const theme = useTheme();
-  const [error, setError] = useState("");
+  //const [error, setError] = useState("");
 
   // Q-cut state
   const [selectedQcutColumns, setSelectedQcutColumns] = useState([]);
@@ -67,8 +67,8 @@ const ExploratoryDataAnalysis = () => {
   const [lowerPct, setLowerPct] = useState("");
   const [upperPct, setUpperPct] = useState("");
   const [maxBreak, setMaxBreak] = useState("");
-  const [continuousOutput, setContinuousOutput] = useState(null);
-  const [continuousRanges, setContinuousRanges] = useState([]);
+  //const [continuousOutput, setContinuousOutput] = useState(null);
+  //const [continuousRanges, setContinuousRanges] = useState([]);
 
   // Multivariate Analysis
   const [selectedMultiColumns, setSelectedMultiColumns] = useState([]);

@@ -25,8 +25,8 @@ import {
   Radio,
   MenuItem,
   Select,
-  FormControl,
-  InputLabel
+  //FormControl,
+  //InputLabel
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
@@ -34,7 +34,7 @@ import { useTheme } from "@mui/material/styles";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 export default function DataVisualizationAndEngineering() {
-  const { uploadedFile } = useContext(AppContext);
+  //const { uploadedFile } = useContext(AppContext);
   const theme = useTheme();
 
   const [expanded, setExpanded] = useState("variability");
@@ -50,7 +50,7 @@ export default function DataVisualizationAndEngineering() {
   const [treatmentMode, setTreatmentMode] = useState("datetime");
   const [outlierColumn, setOutlierColumn] = useState("");
   const [outlierMethod, setOutlierMethod] = useState("zscore");
-  const [outlierPlot, setOutlierPlot] = useState(null);
+  //const [outlierPlot, setOutlierPlot] = useState(null);
 
   // For treatment cards
   const [treatmentMethod, setTreatmentMethod] = useState("Mean");
@@ -78,16 +78,7 @@ export default function DataVisualizationAndEngineering() {
   const [selectedMissingValueIntervals, setSelectedMissingValueIntervals] = useState([]);
   const [missingValueTreatmentMethod, setMissingValueTreatmentMethod] = useState("Mean");
 
-  // Mock intervals fallback (not used now but kept for legacy or testing)
-  const mockIntervals = [
-    "2025-08-01 10:00 to 2025-08-01 12:00",
-    "2025-08-02 14:00 to 2025-08-02 16:30",
-    "2025-08-03 09:15 to 2025-08-03 10:45",
-    "2025-08-04 11:00 to 2025-08-04 13:00",
-    "2025-08-05 15:30 to 2025-08-05 17:00",
-    "2025-08-06 08:00 to 2025-08-06 09:30",
-  ];
-
+  
     // Select All states
   const [selectAllColumns, setSelectAllColumns] = useState(false);
   const [selectAllDateTimeIntervals, setSelectAllDateTimeIntervals] = useState(false);
@@ -163,7 +154,7 @@ export default function DataVisualizationAndEngineering() {
   const [postTreatmentSelectedColumn, setPostTreatmentSelectedColumn] = useState("");
 
   // Data for updated missing value plot
-  const [postTreatmentPlotData, setPostTreatmentPlotData] = useState(null);
+  //const [postTreatmentPlotData, setPostTreatmentPlotData] = useState(null);
 
   // To store latest augmented dataframe for download
   const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
@@ -449,45 +440,45 @@ export default function DataVisualizationAndEngineering() {
   };
 
     // Load columns for Missing Values mode
-  const loadMissingValueColumns = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/get_columns`);
-      const data = await res.json();
-      setMissingValueColumns(data.columns || []);
-    } catch (err) {
-      console.error("Error loading missing value columns:", err);
-    }
-  };
+  //const loadMissingValueColumns = async () => {
+    //try {
+      //const res = await fetch(`${BACKEND_URL}/get_columns`);
+      //const data = await res.json();
+      //setMissingValueColumns(data.columns || []);
+    //} catch (err) {
+      //console.error("Error loading missing value columns:", err);
+    //}
+  //};
 
-  // Load missing value intervals for selected column
-  const loadMissingValueIntervals = async () => {
-    if (!selectedMissingValueColumn) {
-      alert("Please select a column first");
-      return;
-    }
-    try {
-      const res = await fetch(`${BACKEND_URL}/missing_value_intervals?column=${encodeURIComponent(selectedMissingValueColumn)}`);
-      const data = await res.json();
-      setMissingValueIntervals(data.intervals || []);
-    } catch (err) {
-      console.error("Error loading missing value intervals:", err);
-    }
-  };
+  // Load missing value intervals for selected column [NOT NEEDED AS USE EFFECT EXISTS]
+  //const loadMissingValueIntervals = async () => {
+    //if (!selectedMissingValueColumn) {
+      //alert("Please select a column first");
+      //return;
+    //}
+    //try {
+      //const res = await fetch(`${BACKEND_URL}/missing_value_intervals?column=${encodeURIComponent(selectedMissingValueColumn)}`);
+      //const data = await res.json();
+      //setMissingValueIntervals(data.intervals || []);
+    //} catch (err) {
+      //console.error("Error loading missing value intervals:", err);
+    //}
+  //};
 
     // Load outlier intervals for selected column
-  const loadOutlierIntervals = async () => {
-    if (!outlierSelectedColumns) {
-      alert("Please select a column first");
-      return;
-    }
-    try {
-      const res = await fetch(`${BACKEND_URL}/outlier_intervals?column=${encodeURIComponent(outlierSelectedColumns)}`);
-      const data = await res.json();
-      setOutlierIntervals(data.intervals || []);
-    } catch (err) {
-      console.error("Error loading outlier intervals:", err);
-    }
-  };
+  //const loadOutlierIntervals = async () => {
+    //if (!outlierSelectedColumns) {
+      //alert("Please select a column first");
+      //return;
+    //}
+    //try {
+      //const res = await fetch(`${BACKEND_URL}/outlier_intervals?column=${encodeURIComponent(outlierSelectedColumns)}`);
+      //const data = await res.json();
+      //setOutlierIntervals(data.intervals || []);
+    //} catch (err) {
+      //console.error("Error loading outlier intervals:", err);
+    //}
+  //};
 
   //Function to trigger post-treatment prompt
   const handlePostTreatmentFlow = (backendResponse) => {
