@@ -6,8 +6,8 @@ import Plot from "react-plotly.js";
 import {
   Box,
   Paper, 
-  CircularProgress,
-  Alert,
+  //CircularProgress,
+  //Alert,
   Typography,
   Grid,
   Card,
@@ -89,7 +89,9 @@ const ExploratoryDataAnalysis = () => {
     };
 
     fetchColumns();
-  }, [BACKEND_URL]);
+  }, 
+//  [BACKEND_URL]
+);
 
   // Card toggle
   const handleAccordionChange = (panel) => (event, isExpanded) => {

@@ -1,7 +1,8 @@
 // src/components/DataVisualizationAndEngineering.jsx
-import React, { useState, useContext, useEffect } from "react";
+//import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
-import { AppContext } from "../context/AppContext";
+//import { AppContext } from "../context/AppContext";
 import {
   Dialog,
   DialogTitle,
@@ -281,7 +282,7 @@ export default function DataVisualizationAndEngineering() {
       setOutlierIntervals([]);
       setOutlierSelectedIntervals([]);
     }
-  }, [outlierSelectedColumns,outlierTreatmentMethod]);
+  }, [outlierSelectedColumns,outlierMethod]);
 
   // Toggle for interval checkboxes in "Missing Values in Column" mode
   //const handleMissingValueIntervalToggle = (interval) => {

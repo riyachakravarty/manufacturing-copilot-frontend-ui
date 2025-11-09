@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
-import axios from "axios";
+//import axios from "axios";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
+//  Dialog,
+//  DialogTitle,
+//  DialogContent,
   Box,
   Paper, 
   CircularProgress,
@@ -22,9 +22,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  RadioGroup,
+//  RadioGroup,
   FormControlLabel,
-  Radio,
+//  Radio,
   Slider,
   TextField,
   Divider,
@@ -48,7 +48,7 @@ const MLModelDevelopment = () => {
   const [edaOutput, setEdaOutput] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expandedCard, setExpandedCard] = useState(false);
-  const [expanded, setExpanded] = useState("");
+//  const [expanded, setExpanded] = useState("");
   const theme = useTheme();
   const [error, setError] = useState("");
   const [targetColumn, setTargetColumn] = useState("");
@@ -61,35 +61,35 @@ const MLModelDevelopment = () => {
   const [MLChoice, setMLChoice] = useState("");
 
   // Feature generation
-  const [selected1, setSelected1] = useState("");
-  const [selected2, setSelected2] = useState("");
-  const [selected3, setSelected3] = useState("");
-  const [featureInputs, setFeatureInputs] = useState({
-    beforeCol1: "",
-    op12: "",
-    between1and2: "",
-    op23: "",
-    between2and3: ""
-});
-  const [finalFormula, setFinalFormula] = useState("");
-  const [showFeatureGenPrompt, setShowFeatureGenPrompt] = useState(false);
+//  const [selected1, setSelected1] = useState("");
+//  const [selected2, setSelected2] = useState("");
+//  const [selected3, setSelected3] = useState("");
+//  const [featureInputs, setFeatureInputs] = useState({
+  //  beforeCol1: "",
+  //  op12: "",
+  //  between1and2: "",
+  //  op23: "",
+  //  between2and3: ""
+//});
+//  const [finalFormula, setFinalFormula] = useState("");
+//  const [showFeatureGenPrompt, setShowFeatureGenPrompt] = useState(false);
 
   //Feature variability
-  const [selectedForVariability, setSelectedForVariability] = useState("");
-  const [plotData, setPlotData] = useState(null);
-  const [augmented_df_columns, setAugmented_df_columns] = useState([]);
+ // const [selectedForVariability, setSelectedForVariability] = useState("");
+//  const [plotData, setPlotData] = useState(null);
+//  const [augmented_df_columns, setAugmented_df_columns] = useState([]);
 
   //Feature Missing Value Analysis
-  const [selectedForMissing, setSelectedForMissing] = useState("");
+//  const [selectedForMissing, setSelectedForMissing] = useState("");
 
   //Feature Outlier Analysis
-  const [selectedForOutlier, setSelectedForOutlier] = useState("");
-  const [outlierMethod, setOutlierMethod] = useState("");
+//  const [selectedForOutlier, setSelectedForOutlier] = useState("");
+//  const [outlierMethod, setOutlierMethod] = useState("");
 
   //Right panel
-  const [featureOutput, setFeatureOutput] = useState(null);
+//  const [featureOutput, setFeatureOutput] = useState(null);
   // To store latest augmented dataframe for download
-  const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
+//  const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
 
 
   // Fetch column names from backend
@@ -106,7 +106,9 @@ const MLModelDevelopment = () => {
     };
 
     fetchColumns();
-  }, [BACKEND_URL]);
+  }
+//  , [BACKEND_URL]
+);
 
    // Fetch augmented df column names from backend for feature variability, missing and outlier analysis
   useEffect(() => {
@@ -124,7 +126,9 @@ const MLModelDevelopment = () => {
     if (expandedCard === "featurevar" || expandedCard === "featuremissing" || expandedCard === "featureoutlier") {
     fetchColumns1();
   }
-}, [expandedCard, BACKEND_URL]);
+}, [expandedCard]
+//  , BACKEND_URL]
+);
 
   // Card toggle
   const handleAccordionChange = (panel) => (event, isExpanded) => {
@@ -175,164 +179,164 @@ useEffect(() => {
   setShowFeatureGenPrompt(true);
 };
 
-const generatefeature = async () => {
-  try {
+//const generatefeature = async () => {
+  //try {
     // Check if user has selected anything
-    const nothingSelected =
-      (!selected1 && !selected2 && !selected3) &&
-      Object.values(featureInputs).every((val) => !val || val.trim() === "");
+    //const nothingSelected =
+      //(!selected1 && !selected2 && !selected3) &&
+      //Object.values(featureInputs).every((val) => !val || val.trim() === "");
 
-    if (nothingSelected) {
-      console.error("Please select at least one column or input to create a feature");
-      setFeatureOutput({ message: "⚠️ Please select at least one column or input to create a feature" });
-      return;
-    }
+    //if (nothingSelected) {
+      //console.error("Please select at least one column or input to create a feature");
+      //setFeatureOutput({ message: "⚠️ Please select at least one column or input to create a feature" });
+      //return;
+    //}
 
-    const payload = {
-      column1: selected1 || null,
-      column2: selected2 || null,
-      column3: selected3 || null,
-      featureInputs,
-    };
+    //const payload = {
+      //column1: selected1 || null,
+      //column2: selected2 || null,
+      //column3: selected3 || null,
+      //featureInputs,
+    //};
 
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/custom_feature`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    //const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/custom_feature`, {
+      //method: "POST",
+      //headers: { "Content-Type": "application/json" },
+      //body: JSON.stringify(payload),
+    //});
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Backend error:", errorText);
-      setFeatureOutput({ message: `❌ Backend error: ${errorText}` });
-      return;
-    }
+    //if (!res.ok) {
+      //const errorText = await res.text();
+      //console.error("Backend error:", errorText);
+      //setFeatureOutput({ message: `❌ Backend error: ${errorText}` });
+      //return;
+    //}
 
-    const result = await res.json();
+    //const result = await res.json();
 
     // Set feature output
-    if (result.success && (!result.errors || result.errors.length === 0)) {
-      setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
-    } else if (result.errors && result.errors.length > 0) {
-      setFeatureOutput({
-        message: `⚠️ Feature partially created. Errors in rows: ${result.errors.join(", ")}`,
-        errors: result.errors,
-        new_column: result.new_column,
-      });
-    } else {
-      setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
-    }
+    //if (result.success && (!result.errors || result.errors.length === 0)) {
+      //setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
+    //} else if (result.errors && result.errors.length > 0) {
+      //setFeatureOutput({
+        //message: `⚠️ Feature partially created. Errors in rows: ${result.errors.join(", ")}`,
+        //errors: result.errors,
+        //new_column: result.new_column,
+      //});
+    //} else {
+      //setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
+    //}
 
     // Trigger dialog box with message
-    handleFeatureGenFlow(result);
-    setShowFeatureGenPrompt(true);
+    //handleFeatureGenFlow(result);
+    //setShowFeatureGenPrompt(true);
 
-  } catch (err) {
-    console.error("Error generating custom feature:", err);
-    setFeatureOutput({ message: `❌ Error: ${err.message}` });
-    setShowFeatureGenPrompt(true);
-  }
-};
+  //} catch (err) {
+    //console.error("Error generating custom feature:", err);
+    //setFeatureOutput({ message: `❌ Error: ${err.message}` });
+    //setShowFeatureGenPrompt(true);
+  //}
+//};
 
-const generateFeatureVariability = async () => {
-    if (selectedForVariability.length === 0) {
-      setError("Please select at least one column for analysis.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    setEdaOutput(null);
-    try {
-      const payload = {
-        selectedFeature: selectedForVariability || null
-      };
+//const generateFeatureVariability = async () => {
+  //  if (selectedForVariability.length === 0) {
+    //  setError("Please select at least one column for analysis.");
+    //  return;
+    //}
+    //setError("");
+    //setLoading(true);
+    //setEdaOutput(null);
+    //try {
+      //const payload = {
+        //selectedFeature: selectedForVariability || null
+      //};
 
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_variability`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      //const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_variability`, {
+        //method: "POST",
+        //headers: { "Content-Type": "application/json" },
+        //body: JSON.stringify(payload),
+      //});
 
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      const result = await res.json();
-        console.log("Feature variability response:", result);
-      if (result.type === "plot") {
-      setEdaOutput({
-        data: result.data,
-      })
-      setExpandedCard(false); // Collapse left accordion to free space;
-    }
-  } catch (err) {
-    console.error("Error generating variability analysis:", err);
-  }
-};
+      //if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      //const result = await res.json();
+        //console.log("Feature variability response:", result);
+      //if (result.type === "plot") {
+      //setEdaOutput({
+        //data: result.data,
+      //})
+      //setExpandedCard(false); // Collapse left accordion to free space;
+    //}
+  //} catch (err) {
+    //console.error("Error generating variability analysis:", err);
+  //}
+//};
 
-const generateFeatureMissingAnalysis = async () => {
-    if (selectedForMissing.length === 0) {
-      setError("Please select at least one column for analysis.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    setEdaOutput(null);
-    try {
-      const payload = {
-        selectedFeature: selectedForMissing || null
-      };
+//const generateFeatureMissingAnalysis = async () => {
+  //  if (selectedForMissing.length === 0) {
+    //  setError("Please select at least one column for analysis.");
+    //  return;
+    //}
+    //setError("");
+    //setLoading(true);
+    //setEdaOutput(null);
+    //try {
+      //const payload = {
+        //selectedFeature: selectedForMissing || null
+      //};
 
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_missing`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      //const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_missing`, {
+        //method: "POST",
+        //headers: { "Content-Type": "application/json" },
+        //body: JSON.stringify(payload),
+      //});
 
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      const result = await res.json();
-        console.log("Feature Missing Value Analysis response:", result);
-      if (result.type === "plot") {
-      setEdaOutput({
-        data: result.data,
-      })
-      setExpandedCard(false); // Collapse left accordion to free space;
-    }
-  } catch (err) {
-    console.error("Error generating missing value analysis:", err);
-  }
-};
+      //if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      //const result = await res.json();
+        //console.log("Feature Missing Value Analysis response:", result);
+      //if (result.type === "plot") {
+      //setEdaOutput({
+        //data: result.data,
+      //})
+      //setExpandedCard(false); // Collapse left accordion to free space;
+    //}
+  //} catch (err) {
+    //console.error("Error generating missing value analysis:", err);
+  //}
+//};
 
-const generateFeatureOutlierAnalysis = async () => {
-    if (selectedForOutlier.length === 0) {
-      setError("Please select at least one column for analysis.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    setEdaOutput(null);
-    try {
-      const payload = {
-        selectedFeature: selectedForOutlier || null,
-        method: outlierMethod || null
-      };
+//const generateFeatureOutlierAnalysis = async () => {
+  //  if (selectedForOutlier.length === 0) {
+    //  setError("Please select at least one column for analysis.");
+    //  return;
+    //}
+    //setError("");
+    //setLoading(true);
+    //setEdaOutput(null);
+    //try {
+      //const payload = {
+        //selectedFeature: selectedForOutlier || null,
+        //method: outlierMethod || null
+      //};
 
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_outlier`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      //const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_outlier`, {
+        //method: "POST",
+        //headers: { "Content-Type": "application/json" },
+        //body: JSON.stringify(payload),
+      //});
 
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      const result = await res.json();
-        console.log("Feature Outlier Analysis response:", result);
-      if (result.type === "plot") {
-      setEdaOutput({
-        data: result.data,
-      })
-      setExpandedCard(false); // Collapse left accordion to free space;
-    }
-  } catch (err) {
-    console.error("Error generating outlier analysis:", err);
-  }
-};
+      //if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      //const result = await res.json();
+        //console.log("Feature Outlier Analysis response:", result);
+      //if (result.type === "plot") {
+      //setEdaOutput({
+        //data: result.data,
+      //})
+      //setExpandedCard(false); // Collapse left accordion to free space;
+    //}
+  //} catch (err) {
+    //console.error("Error generating outlier analysis:", err);
+  //}
+//};
 
     return (
     <Grid container spacing={2}>
