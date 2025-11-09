@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Plot from "react-plotly.js";
-import axios from "axios";
+//import axios from "axios";
 import {
   Dialog,
   DialogTitle,
@@ -13,27 +13,27 @@ import {
   Alert,
   Typography,
   Grid,
-  Card,
-  CardContent,
+//  Card,
+//  CardContent,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+//  FormControl,
+//  InputLabel,
+//  Select,
+// MenuItem,
   RadioGroup,
   FormControlLabel,
   Radio,
   TextField,
   Divider,
   Button,
-  FormGroup,
-  Checkbox,
-  ToggleButton,
-  ToggleButtonGroup, 
+//  FormGroup,
+//  Checkbox,
+//  ToggleButton,
+//  ToggleButtonGroup, 
 } from "@mui/material";
-import { DataGridPro } from '@mui/x-data-grid-pro';
+//import { DataGridPro } from '@mui/x-data-grid-pro';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 
@@ -44,7 +44,7 @@ const FeatureEngineering = () => {
   const [edaOutput, setEdaOutput] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expandedCard, setExpandedCard] = useState(false);
-  const [expanded, setExpanded] = useState("");
+//  const [expanded, setExpanded] = useState("");
   const theme = useTheme();
   const [error, setError] = useState("");
 
@@ -65,7 +65,7 @@ const FeatureEngineering = () => {
 
   //Feature variability
   const [selectedForVariability, setSelectedForVariability] = useState("");
-  const [plotData, setPlotData] = useState(null);
+//  const [plotData, setPlotData] = useState(null);
   const [augmented_df_columns, setAugmented_df_columns] = useState([]);
 
   //Feature Missing Value Analysis
@@ -78,7 +78,7 @@ const FeatureEngineering = () => {
   //Right panel
   const [featureOutput, setFeatureOutput] = useState(null);
   // To store latest augmented dataframe for download
-  const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
+//  const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
 
 
   // Fetch column names from backend
@@ -95,7 +95,9 @@ const FeatureEngineering = () => {
     };
 
     fetchColumns();
-  }, [BACKEND_URL]);
+  }, 
+  //[BACKEND_URL]
+   );
 
    // Fetch augmented df column names from backend for feature variability, missing and outlier analysis
   useEffect(() => {
@@ -113,7 +115,9 @@ const FeatureEngineering = () => {
     if (expandedCard === "featurevar" || expandedCard === "featuremissing" || expandedCard === "featureoutlier") {
     fetchColumns1();
   }
-}, [expandedCard, BACKEND_URL]);
+}, [expandedCard,] 
+//  BACKEND_URL]
+);
 
   // Card toggle
   const handleAccordionChange = (panel) => (event, isExpanded) => {
