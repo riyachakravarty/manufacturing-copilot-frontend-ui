@@ -111,24 +111,24 @@ const MLModelDevelopment = () => {
 );
 
    // Fetch augmented df column names from backend for feature variability, missing and outlier analysis
-  useEffect(() => {
-    const fetchColumns1 = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/get_augmented_df_columns`);
-        if (!res.ok) throw new Error("Failed to fetch columns");
-        const data = await res.json();
-        setAugmented_df_columns(data.columns || []);
-      } catch (err) {
-        console.error("Error fetching columns:", err);
-      }
-    };
+  //useEffect(() => {
+    //const fetchColumns1 = async () => {
+      //try {
+        //const res = await fetch(`${BACKEND_URL}/get_augmented_df_columns`);
+        //if (!res.ok) throw new Error("Failed to fetch columns");
+        //const data = await res.json();
+        //setAugmented_df_columns(data.columns || []);
+      //} catch (err) {
+        //console.error("Error fetching columns:", err);
+      //}
+    //};
 
-    if (expandedCard === "featurevar" || expandedCard === "featuremissing" || expandedCard === "featureoutlier") {
-    fetchColumns1();
-  }
-}, [expandedCard]
+    //if (expandedCard === "featurevar" || expandedCard === "featuremissing" || expandedCard === "featureoutlier") {
+    //fetchColumns1();
+  //}
+//}, [expandedCard]
 //  , BACKEND_URL]
-);
+//);
 
   // Card toggle
   const handleAccordionChange = (panel) => (event, isExpanded) => {
@@ -139,45 +139,45 @@ const MLModelDevelopment = () => {
 
 
 // Auto-build formula for custom feature whenever inputs change
-useEffect(() => {
-  let formula = "";
+//useEffect(() => {
+  //let formula = "";
 
-  if (selected1) {
-    formula += featureInputs.beforeCol1
-      ? `${featureInputs.beforeCol1}(${selected1})`
-      : selected1;
-  }
+  //if (selected1) {
+    //formula += featureInputs.beforeCol1
+      //? `${featureInputs.beforeCol1}(${selected1})`
+      //: selected1;
+  //}
 
-  if (selected2) {
-    formula += featureInputs.op12 ? ` ${featureInputs.op12} ` : "";
-    formula += selected2
-      ? featureInputs.between1and2
-        ? `${featureInputs.between1and2}(${selected2})`
-        : selected2
-      : "";
-  }
+  //if (selected2) {
+    //formula += featureInputs.op12 ? ` ${featureInputs.op12} ` : "";
+    //formula += selected2
+      //? featureInputs.between1and2
+        //? `${featureInputs.between1and2}(${selected2})`
+        //: selected2
+      //: "";
+  //}
 
-  if (selected3) {
-    formula += featureInputs.op23 ? ` ${featureInputs.op23} ` : "";
-    formula += selected3
-      ? featureInputs.between2and3
-        ? `${featureInputs.between2and3}(${selected3})`
-        : selected3
-      : "";
-  }
+  //if (selected3) {
+    //formula += featureInputs.op23 ? ` ${featureInputs.op23} ` : "";
+    //formula += selected3
+      //? featureInputs.between2and3
+        //? `${featureInputs.between2and3}(${selected3})`
+        //: selected3
+      //: "";
+  //}
 
-  setFinalFormula(formula.trim());
-}, [selected1, selected2, selected3, featureInputs]);
+  //setFinalFormula(formula.trim());
+//}, [selected1, selected2, selected3, featureInputs]);
 
  //Function to trigger feature generation dialog box
-  const handleFeatureGenFlow = (backendResponse) => {
-  if (!backendResponse) {
-    setError("No result received from backend.");
-    return;
-  }
+  //const handleFeatureGenFlow = (backendResponse) => {
+  //if (!backendResponse) {
+    //setError("No result received from backend.");
+    //return;
+  //}
   // Show pop-up prompt
-  setShowFeatureGenPrompt(true);
-};
+  //setShowFeatureGenPrompt(true);
+//};
 
 //const generatefeature = async () => {
   //try {
