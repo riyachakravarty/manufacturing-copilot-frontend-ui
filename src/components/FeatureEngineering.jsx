@@ -44,7 +44,7 @@ const FeatureEngineering = () => {
   const [edaOutput, setEdaOutput] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expandedCard, setExpandedCard] = useState(false);
-  const [expanded, setExpanded] = useState("");
+//  const [expanded, setExpanded] = useState("");
   const theme = useTheme();
   const [error, setError] = useState("");
 
@@ -343,7 +343,7 @@ const generateFeatureOutlierAnalysis = async () => {
           flexShrink: 0,
           minWidth: 320,
           transition: "width 0.3s ease",
-          width: expanded ? 320 : 320, //fixed width, no shrink on collapse to avoid UI issues
+          //width: expanded ? 320 : 320, //fixed width, no shrink on collapse to avoid UI issues
   }}>
             {/* Feature Generation */}
             <Accordion
