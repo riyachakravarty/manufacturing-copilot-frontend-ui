@@ -497,8 +497,8 @@ const generateFeatureOutlierAnalysis = async () => {
             </Select>
         </FormControl>
   
-                  <Button variant="contained" size="small" sx={{ mt: 2 }}
-                  onClick={runMLModel}>
+                  <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                  
         Train ML Model
                   </Button>
                 </AccordionDetails>
@@ -516,8 +516,8 @@ const generateFeatureOutlierAnalysis = async () => {
                 </AccordionSummary>
                 <AccordionDetails>
   
-                  <Button variant="contained" size="small" sx={{ mt: 2 }}
-                  onClick={generateSHAP}>
+                  <Button variant="contained" size="small" sx={{ mt: 2 }}>
+                  
         Generate SHAP plots
                   </Button>
                 </AccordionDetails>
