@@ -501,7 +501,7 @@ export default function DataVisualizationAndEngineering() {
     if (answer === "yes") {
       // Optionally, clear previous selection & plot
       setPostTreatmentSelectedColumn("");
-      setPostTreatmentPlotData(null);
+      //setPostTreatmentPlotData(null);
     }
   };
 
