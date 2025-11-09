@@ -482,7 +482,7 @@ const MLModelDevelopment = () => {
               >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                    Choose ML model
+                    ML model Development
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -509,23 +509,13 @@ const MLModelDevelopment = () => {
               </Accordion>
 
               {/* ML model choice */}
-              <Accordion
-                expanded={expandedCard === "SHAP"}
-                onChange={handleAccordionChange("SHAP")}
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                    Build SHAP plots
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-  
-                  <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                  
-        Generate SHAP plots
+                  <Button variant="contained" size="small" sx={{ mt: 2 }}> 
+        Generate Feature Importance
                   </Button>
-                </AccordionDetails>
-              </Accordion>
+                
+                <Button variant="contained" size="small" sx={{ mt: 2 }}> 
+        Generate Optimal Operating Ranges
+                  </Button>
 
             
           </CardContent>
