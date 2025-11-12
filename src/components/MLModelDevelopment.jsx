@@ -45,7 +45,6 @@ const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const MLModelDevelopment = () => {
   const [edaColumns, setEdaColumns] = useState([]);
-  const [edaOutput, setEdaOutput] = useState(null);
 //  const [loading, setLoading] = useState(false);
   const [expandedCard, setExpandedCard] = useState(false);
 //  const [expanded, setExpanded] = useState("");
