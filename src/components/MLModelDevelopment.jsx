@@ -9,7 +9,7 @@ import {
 //  DialogContent,
   Box,
   Paper, 
-  //CircularProgress,
+  CircularProgress,
   Alert,
   Typography,
   Grid,
@@ -59,37 +59,11 @@ const MLModelDevelopment = () => {
   const [startDate, setStartDate] = useState(dayjs().subtract(30, "day"));
   const [endDate, setEndDate] = useState(dayjs());
   const [MLChoice, setMLChoice] = useState("");
-
-  // Feature generation
-//  const [selected1, setSelected1] = useState("");
-//  const [selected2, setSelected2] = useState("");
-//  const [selected3, setSelected3] = useState("");
-//  const [featureInputs, setFeatureInputs] = useState({
-  //  beforeCol1: "",
-  //  op12: "",
-  //  between1and2: "",
-  //  op23: "",
-  //  between2and3: ""
-//});
-//  const [finalFormula, setFinalFormula] = useState("");
-//  const [showFeatureGenPrompt, setShowFeatureGenPrompt] = useState(false);
-
-  //Feature variability
- // const [selectedForVariability, setSelectedForVariability] = useState("");
-//  const [plotData, setPlotData] = useState(null);
-//  const [augmented_df_columns, setAugmented_df_columns] = useState([]);
-
-  //Feature Missing Value Analysis
-//  const [selectedForMissing, setSelectedForMissing] = useState("");
-
-  //Feature Outlier Analysis
-//  const [selectedForOutlier, setSelectedForOutlier] = useState("");
-//  const [outlierMethod, setOutlierMethod] = useState("");
-
-  //Right panel
-//  const [featureOutput, setFeatureOutput] = useState(null);
-  // To store latest augmented dataframe for download
-//  const [latestAugmentedDf, setLatestAugmentedDf] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [trainMetrics, setTrainMetrics] = useState(null);
+  const [testMetrics, setTestMetrics] = useState(null);
+  const [trainPlot, setTrainPlot] = useState(null);
+  const [testPlot, setTestPlot] = useState(null);
 
 
   // Fetch column names from backend
@@ -110,26 +84,6 @@ const MLModelDevelopment = () => {
 //  , [BACKEND_URL]
 );
 
-   // Fetch augmented df column names from backend for feature variability, missing and outlier analysis
-  //useEffect(() => {
-    //const fetchColumns1 = async () => {
-      //try {
-        //const res = await fetch(`${BACKEND_URL}/get_augmented_df_columns`);
-        //if (!res.ok) throw new Error("Failed to fetch columns");
-        //const data = await res.json();
-        //setAugmented_df_columns(data.columns || []);
-      //} catch (err) {
-        //console.error("Error fetching columns:", err);
-      //}
-    //};
-
-    //if (expandedCard === "featurevar" || expandedCard === "featuremissing" || expandedCard === "featureoutlier") {
-    //fetchColumns1();
-  //}
-//}, [expandedCard]
-//  , BACKEND_URL]
-//);
-
   // Card toggle
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedCard(isExpanded ? panel : false);
@@ -137,206 +91,90 @@ const MLModelDevelopment = () => {
     setEdaOutput(null);
   };
 
+// Function to train the ML model
 
-// Auto-build formula for custom feature whenever inputs change
-//useEffect(() => {
-  //let formula = "";
+  const handleTrainModel = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      setTrainMetrics(null);
+      setTestMetrics(null);
+      setTrainPlot(null);
+      setTestPlot(null);
 
-  //if (selected1) {
-    //formula += featureInputs.beforeCol1
-      //? `${featureInputs.beforeCol1}(${selected1})`
-      //: selected1;
-  //}
+      // --- Validation ---
+      if (!targetColumn) {
+        setError("Please select a target or objective variable.");
+        setLoading(false);
+        return;
+      }
+      if (!performanceDirection || !["maximize", "minimize"].includes(performanceDirection.toLowerCase())) {
+        setError("Please select whether to maximize or minimize the target.");
+        setLoading(false);
+        return;
+      }
+      if (!selectedFeatures || selectedFeatures.length === 0) {
+        setError("Please select at least one feature to build the ML model.");
+        setLoading(false);
+        return;
+      }
 
-  //if (selected2) {
-    //formula += featureInputs.op12 ? ` ${featureInputs.op12} ` : "";
-    //formula += selected2
-      //? featureInputs.between1and2
-        //? `${featureInputs.between1and2}(${selected2})`
-        //: selected2
-      //: "";
-  //}
+    if (
+      (TrainTestOption === "random" || TrainTestOption === "time_percent") &&
+      (splitPercent === null || splitPercent <= 0 || splitPercent >= 100)
+    ) {
+      setError("Please specify a valid split percentage between 1 and 99.");
+      return;
+    }
 
-  //if (selected3) {
-    //formula += featureInputs.op23 ? ` ${featureInputs.op23} ` : "";
-    //formula += selected3
-      //? featureInputs.between2and3
-        //? `${featureInputs.between2and3}(${selected3})`
-        //: selected3
-      //: "";
-  //}
+    if (TrainTestOption === "time_custom" && (!startDate || !endDate)) {
+      setError("Please select valid start and end dates for custom time-based split.");
+      return;
+    }
 
-  //setFinalFormula(formula.trim());
-//}, [selected1, selected2, selected3, featureInputs]);
+    // Prepare payload for backend
+    const payload = {
+      target: targetColumn,
+      performanceDirection, // "maximize" or "minimize"
+      features: selectedFeatures,
+      trainTestOption: TrainTestOption, // "random", "time_percent", or "time_custom"
+      splitPercent:
+        TrainTestOption === "time_custom" ? null : splitPercent, // used only for random/time_percent
+      startDate:
+        TrainTestOption === "time_custom" ? startDate : null,    // only relevant for time_custom
+      endDate:
+        TrainTestOption === "time_custom" ? endDate : null,      // only relevant for time_custom
+      modelType: MLChoice,
+};
+    const res = await fetch(`${BACKEND_URL}/train_model`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
- //Function to trigger feature generation dialog box
-  //const handleFeatureGenFlow = (backendResponse) => {
-  //if (!backendResponse) {
-    //setError("No result received from backend.");
-    //return;
-  //}
-  // Show pop-up prompt
-  //setShowFeatureGenPrompt(true);
-//};
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText);
+    }
 
-//const generatefeature = async () => {
-  //try {
-    // Check if user has selected anything
-    //const nothingSelected =
-      //(!selected1 && !selected2 && !selected3) &&
-      //Object.values(featureInputs).every((val) => !val || val.trim() === "");
+    const result = await res.json();
+    if (!result.success) {
+      throw new Error(result.error || "Unknown error while training model");
+    }
 
-    //if (nothingSelected) {
-      //console.error("Please select at least one column or input to create a feature");
-      //setFeatureOutput({ message: "⚠️ Please select at least one column or input to create a feature" });
-      //return;
-    //}
+    // --- Store results ---
+    setTrainMetrics(result.metrics_train);
+    setTestMetrics(result.metrics_test);
+    setTrainPlot(result.plot_train);
+    setTestPlot(result.plot_test);
+  } catch (err) {
+    console.error("Error training model:", err);
+    setError(err.message || "Error during training");
+  } finally {
+    setLoading(false);
+  }
+};
 
-    //const payload = {
-      //column1: selected1 || null,
-      //column2: selected2 || null,
-      //column3: selected3 || null,
-      //featureInputs,
-    //};
-
-    //const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/custom_feature`, {
-      //method: "POST",
-      //headers: { "Content-Type": "application/json" },
-      //body: JSON.stringify(payload),
-    //});
-
-    //if (!res.ok) {
-      //const errorText = await res.text();
-      //console.error("Backend error:", errorText);
-      //setFeatureOutput({ message: `❌ Backend error: ${errorText}` });
-      //return;
-    //}
-
-    //const result = await res.json();
-
-    // Set feature output
-    //if (result.success && (!result.errors || result.errors.length === 0)) {
-      //setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
-    //} else if (result.errors && result.errors.length > 0) {
-      //setFeatureOutput({
-        //message: `⚠️ Feature partially created. Errors in rows: ${result.errors.join(", ")}`,
-        //errors: result.errors,
-        //new_column: result.new_column,
-      //});
-    //} else {
-      //setFeatureOutput({ message: `✅ Feature created successfully: ${result.new_column}` });
-    //}
-
-    // Trigger dialog box with message
-    //handleFeatureGenFlow(result);
-    //setShowFeatureGenPrompt(true);
-
-  //} catch (err) {
-    //console.error("Error generating custom feature:", err);
-    //setFeatureOutput({ message: `❌ Error: ${err.message}` });
-    //setShowFeatureGenPrompt(true);
-  //}
-//};
-
-//const generateFeatureVariability = async () => {
-  //  if (selectedForVariability.length === 0) {
-    //  setError("Please select at least one column for analysis.");
-    //  return;
-    //}
-    //setError("");
-    //setLoading(true);
-    //setEdaOutput(null);
-    //try {
-      //const payload = {
-        //selectedFeature: selectedForVariability || null
-      //};
-
-      //const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_variability`, {
-        //method: "POST",
-        //headers: { "Content-Type": "application/json" },
-        //body: JSON.stringify(payload),
-      //});
-
-      //if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      //const result = await res.json();
-        //console.log("Feature variability response:", result);
-      //if (result.type === "plot") {
-      //setEdaOutput({
-        //data: result.data,
-      //})
-      //setExpandedCard(false); // Collapse left accordion to free space;
-    //}
-  //} catch (err) {
-    //console.error("Error generating variability analysis:", err);
-  //}
-//};
-
-//const generateFeatureMissingAnalysis = async () => {
-  //  if (selectedForMissing.length === 0) {
-    //  setError("Please select at least one column for analysis.");
-    //  return;
-    //}
-    //setError("");
-    //setLoading(true);
-    //setEdaOutput(null);
-    //try {
-      //const payload = {
-        //selectedFeature: selectedForMissing || null
-      //};
-
-      //const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_missing`, {
-        //method: "POST",
-        //headers: { "Content-Type": "application/json" },
-        //body: JSON.stringify(payload),
-      //});
-
-      //if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      //const result = await res.json();
-        //console.log("Feature Missing Value Analysis response:", result);
-      //if (result.type === "plot") {
-      //setEdaOutput({
-        //data: result.data,
-      //})
-      //setExpandedCard(false); // Collapse left accordion to free space;
-    //}
-  //} catch (err) {
-    //console.error("Error generating missing value analysis:", err);
-  //}
-//};
-
-//const generateFeatureOutlierAnalysis = async () => {
-  //  if (selectedForOutlier.length === 0) {
-    //  setError("Please select at least one column for analysis.");
-    //  return;
-    //}
-    //setError("");
-    //setLoading(true);
-    //setEdaOutput(null);
-    //try {
-      //const payload = {
-        //selectedFeature: selectedForOutlier || null,
-        //method: outlierMethod || null
-      //};
-
-      //const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/eda/feature_outlier`, {
-        //method: "POST",
-        //headers: { "Content-Type": "application/json" },
-        //body: JSON.stringify(payload),
-      //});
-
-      //if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      //const result = await res.json();
-        //console.log("Feature Outlier Analysis response:", result);
-      //if (result.type === "plot") {
-      //setEdaOutput({
-        //data: result.data,
-      //})
-      //setExpandedCard(false); // Collapse left accordion to free space;
-    //}
-  //} catch (err) {
-    //console.error("Error generating outlier analysis:", err);
-  //}
-//};
 
     return (
     <Grid container spacing={2}>
@@ -501,8 +339,8 @@ const MLModelDevelopment = () => {
             </Select>
         </FormControl>
   
-                  <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                  
+                  <Button variant="contained" size="small" sx={{ mt: 2 }}
+                  onClick={handleTrainModel}>
         Train ML Model
                   </Button>
                 </AccordionDetails>
@@ -578,40 +416,82 @@ const MLModelDevelopment = () => {
 </Box>
     <Divider sx={{ mb: 2 }} />
 
+    {/* Content Scroll Area */}
     <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
-      { /* loading && <CircularProgress /> */}
-      {error && <Alert severity="error">{error}</Alert>}
-
-      {/* EDA Plot (if present) */}
-      {edaOutput ? (
-        <Plot
-          data={edaOutput?.data?.data ?? []}
-          layout={{
-            ...edaOutput?.data?.layout ?? {},
-            autosize: true,
-            paper_bgcolor: theme.palette.background.paper,
-            plot_bgcolor: theme.palette.background.default,
-            margin: { t: 40, b: 40, l: 40, r: 40 },
-          }}
-          style={{
-            width: "100%",
-            height: "100%",
-            minHeight: 400,
-            minWidth: 400,
-          }}
-          useResizeHandler
-        />
-      ) : (
-        //!loading &&
-        !error && (
-          <Typography variant="body2" color="text.secondary">
-            No analysis results yet.
-          </Typography>
-        )
+      {loading && (
+        <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: 300 }}>
+          <CircularProgress />
+        </Box>
       )}
 
-      
+      {/* Error Message */}
+      {error && <Alert severity="error">{error}</Alert>}
 
+      {/* Metrics and Plots */}
+      {!loading && !error && (
+        <>
+          {/* --- Metrics --- */}
+          {(trainMetrics || testMetrics) && (
+            <Box>
+              {trainMetrics && renderMetrics(trainMetrics, "Training Metrics")}
+              {testMetrics && renderMetrics(testMetrics, "Test Metrics")}
+            </Box>
+          )}
+
+          {/* --- Train Actual vs Predicted Plot --- */}
+          {trainPlot && (
+            <Card sx={{ mt: 2 }}>
+              <CardContent>
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                  Predicted vs Actual (Train Data)
+                </Typography>
+                <Plot
+                  data={trainPlot.data}
+                  layout={{
+                    ...trainPlot.layout,
+                    autosize: true,
+                    paper_bgcolor: theme.palette.background.paper,
+                    plot_bgcolor: theme.palette.background.default,
+                    margin: { t: 40, b: 40, l: 40, r: 40 },
+                  }}
+                  useResizeHandler
+                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* --- Test Actual vs Predicted Plot --- */}
+          {testPlot && (
+            <Card sx={{ mt: 2 }}>
+              <CardContent>
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                  Predicted vs Actual (Test Data)
+                </Typography>
+                <Plot
+                  data={testPlot.data}
+                  layout={{
+                    ...testPlot.layout,
+                    autosize: true,
+                    paper_bgcolor: theme.palette.background.paper,
+                    plot_bgcolor: theme.palette.background.default,
+                    margin: { t: 40, b: 40, l: 40, r: 40 },
+                  }}
+                  useResizeHandler
+                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* --- Default Message if No Outputs Yet --- */}
+          {!trainMetrics && !testMetrics && !trainPlot && !testPlot && (
+            <Typography variant="body2" color="text.secondary">
+              No analysis results yet.
+            </Typography>
+          )}
+        </>
+      )}
     </Box>
   </Paper>
 </Grid>
