@@ -65,6 +65,23 @@ const MLModelDevelopment = () => {
   const [trainPlot, setTrainPlot] = useState(null);
   const [testPlot, setTestPlot] = useState(null);
 
+  // Helper function to render metric cards
+  const renderMetrics = (metrics, title) => (
+    <Card sx={{ mb: 2 }}>
+      <CardContent>
+        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+          {title}
+        </Typography>
+        {Object.entries(metrics || {}).map(([key, val]) => (
+          <Typography key={key} variant="body2">
+            {key}: {val}
+          </Typography>
+        ))}
+      </CardContent>
+    </Card>
+  );
+
+
 
   // Fetch column names from backend
   useEffect(() => {
