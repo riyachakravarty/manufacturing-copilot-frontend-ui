@@ -104,7 +104,6 @@ const MLModelDevelopment = () => {
   const handleAccordionChange = (panel) => (event, isExpanded) => {
     setExpandedCard(isExpanded ? panel : false);
     setError("");
-    setEdaOutput(null);
   };
 
 // Function to train the ML model
