@@ -63,6 +63,10 @@ const MLModelDevelopment = () => {
   const [testMetrics, setTestMetrics] = useState(null);
   const [trainPlot, setTrainPlot] = useState(null);
   const [testPlot, setTestPlot] = useState(null);
+  // SHAP plots and states
+  const [featureImportancePlot, setFeatureImportancePlot] = useState(null);
+  const [optimalRangesPlot, setOptimalRangesPlot] = useState(null);
+  const [shapLoading, setShapLoading] = useState(false);
 
   // Helper function to render metric cards
   const renderMetrics = (metrics, title) => (
@@ -190,6 +194,49 @@ const MLModelDevelopment = () => {
   }
 };
 
+// --- Generate Feature Importance ---
+  const handleGenerateFeatureImportance = async () => {
+    try {
+      setShapLoading(true);
+      setError(null);
+
+      const response = await fetch(`${BACKEND_URL}/feature_importance`, {
+        method: "GET",
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch feature importance plot");
+
+      const result = await response.json();
+      setFeatureImportancePlot(result.plot);
+    } catch (err) {
+      console.error("Error loading feature importance:", err);
+      setError("Failed to generate feature importance plot");
+    } finally {
+      setShapLoading(false);
+    }
+  };
+
+  // --- Generate Optimal Operating Ranges ---
+  const handleGenerateOptimalRanges = async () => {
+    try {
+      setShapLoading(true);
+      setError(null);
+
+      const response = await fetch(`${BACKEND_URL}/optimal_ranges`, {
+        method: "GET",
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch optimal ranges plot");
+
+      const result = await response.json();
+      setOptimalRangesPlot(result.plot);
+    } catch (err) {
+      console.error("Error loading optimal ranges:", err);
+      setError("Failed to generate optimal operating ranges plot");
+    } finally {
+      setShapLoading(false);
+    }
+  };
 
     return (
     <Grid container spacing={2}>
@@ -362,11 +409,17 @@ const MLModelDevelopment = () => {
               </Accordion>
 
               {/* ML model choice */}
-                  <Button variant="contained" size="small" sx={{ mt: 2 }}> 
+                  <Button variant="contained" size="small" sx={{ mt: 2 }} 
+                  onClick={handleGenerateFeatureImportance}
+                  disabled={shapLoading}
+                  >
         Generate Feature Importance
                   </Button>
                 
-                <Button variant="contained" size="small" sx={{ mt: 2 }}> 
+                <Button variant="contained" size="small" sx={{ mt: 2 }}
+                onClick={handleGenerateOptimalRanges}
+                disabled={shapLoading}
+                >
         Generate Optimal Operating Ranges
                   </Button>
 
@@ -507,6 +560,53 @@ const MLModelDevelopment = () => {
           )}
         </>
       )}
+
+{/* --- Feature Importance Plot --- */}
+{featureImportancePlot && (
+  <Card sx={{ mt: 2 }}>
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        SHAP Feature Importance
+      </Typography>
+      <Plot
+        data={featureImportancePlot.data}
+        layout={{
+          ...featureImportancePlot.layout,
+          autosize: true,
+          paper_bgcolor: theme.palette.background.paper,
+          plot_bgcolor: theme.palette.background.default,
+          margin: { t: 40, b: 40, l: 60, r: 40 },
+        }}
+        useResizeHandler
+        style={{ width: "100%", height: "100%", minHeight: 400 }}
+      />
+    </CardContent>
+  </Card>
+)}
+
+{/* --- Optimal Operating Ranges Plot --- */}
+{optimalRangesPlot && (
+  <Card sx={{ mt: 2 }}>
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        SHAP Dependence / Optimal Operating Ranges
+      </Typography>
+      <Plot
+        data={optimalRangesPlot.data}
+        layout={{
+          ...optimalRangesPlot.layout,
+          autosize: true,
+          paper_bgcolor: theme.palette.background.paper,
+          plot_bgcolor: theme.palette.background.default,
+          margin: { t: 40, b: 40, l: 60, r: 40 },
+        }}
+        useResizeHandler
+        style={{ width: "100%", height: "100%", minHeight: 400 }}
+      />
+    </CardContent>
+  </Card>
+)}
+
     </Box>
   </Paper>
 </Grid>
