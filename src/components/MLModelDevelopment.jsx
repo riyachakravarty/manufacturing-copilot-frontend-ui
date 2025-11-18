@@ -32,7 +32,9 @@ import {
   FormGroup,
   Checkbox,
   ToggleButton,
-  ToggleButtonGroup, 
+  ToggleButtonGroup,
+  List, 
+  ListItem 
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -65,6 +67,9 @@ const MLModelDevelopment = () => {
   const [testPlot, setTestPlot] = useState(null);
   // SHAP plots and states
   const [featureImportancePlot, setFeatureImportancePlot] = useState(null);
+  const [featureImportance, setFeatureImportance] = useState(null);
+  const [topFeatures,setTopFeatures] = useState(null);
+  const [summaryInterpretation, setSummaryInterpretation] = useState(null);
   const [optimalRangesPlot, setOptimalRangesPlot] = useState(null);
   const [shapLoading, setShapLoading] = useState(false);
 
@@ -109,6 +114,28 @@ const MLModelDevelopment = () => {
     setExpandedCard(isExpanded ? panel : false);
     setError("");
   };
+
+// Auto-load SHAP interpretations
+  useEffect(() => {
+  if (!featureImportance || !topFeatures) return;
+
+  const fetchInterpretation = async () => {
+    const res = await fetch(`${BACKEND_URL}/interpret_shap_summary`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        feature_importance: featureImportance,
+        top_features: topFeatures
+      })
+    });
+
+    const out = await res.json();
+    setSummaryInterpretation(out);
+  };
+
+  fetchInterpretation();
+}, [featureImportance, topFeatures]);
+
 
 // Function to train the ML model
 
@@ -208,6 +235,8 @@ const MLModelDevelopment = () => {
 
       const result = await response.json();
       setFeatureImportancePlot(result.plot);
+      setFeatureImportance(result.feature_importance);
+      setTopFeatures(result.top_features);
     } catch (err) {
       console.error("Error loading feature importance:", err);
       setError("Failed to generate feature importance plot");
@@ -583,6 +612,38 @@ const MLModelDevelopment = () => {
     </CardContent>
   </Card>
 )}
+
+{summaryInterpretation && (
+  <Card 
+  >
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        AI Interpretation
+      </Typography>
+
+      <Typography>
+        {summaryInterpretation.insight}
+      </Typography>
+
+      <Typography>
+        <strong>Confidence:</strong> {Math.round(summaryInterpretation.confidence * 100)}%
+      </Typography>
+
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        Suggested Next Steps:
+      </Typography>
+
+      <List dense>
+        {summaryInterpretation.suggested_next_steps.map((step, idx) => (
+          <ListItem key={idx} sx={{ paddingLeft: 2 }}>
+            • {step}
+          </ListItem>
+        ))}
+      </List>
+    </CardContent>
+  </Card>
+)}
+
 
 {/* --- Optimal Operating Ranges Plot --- */}
 {optimalRangesPlot && (
