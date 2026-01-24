@@ -55,6 +55,7 @@ const HomePage = ({ setUploadedFile, setSelectedMode }) => {
         setUploadedFile(file);
         setSelectedMode(mode);
         setShowSnackbar(true);
+        alert('File upload successful!')
       } else {
         alert('File upload failed');
       }
@@ -114,7 +115,7 @@ const HomePage = ({ setUploadedFile, setSelectedMode }) => {
               {fileName && (
                 <Grid item xs={12}>
                   <Typography variant="body2" color="success.main">
-                    File "{fileName}" has been uploaded successfully.
+                    File "{fileName}" being processed.
                   </Typography>
                 </Grid>
               )}
