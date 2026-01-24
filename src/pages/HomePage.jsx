@@ -19,8 +19,11 @@ import { useNavigate } from 'react-router-dom';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
-const HomePage = ({ setUploadedFile, setSelectedMode }) => {
+const HomePage = () => {
+  const { setUploadedFile, setSelectedMode } = useContext(AppContext);
   const [file, setFile] = useState(null);
   const [mode, setMode] = useState('');
   const [loading, setLoading] = useState(false);

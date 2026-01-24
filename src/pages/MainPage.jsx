@@ -48,7 +48,7 @@ const MainPage = () => {
     <Box sx={{ padding: 4 }}>
       {/* Header */}
       <Typography variant="h4" sx={{ mb: 2, color: 'primary.main' }}>
-        Welcome to Manufacturing Co-Pilot
+        Welcome to Nexus AI
       </Typography>
 
       {/* File + Mode */}
