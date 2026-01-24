@@ -83,7 +83,7 @@ const HomePage = () => {
       <Card elevation={6}>
         <CardContent>
           <Typography variant="h4" gutterBottom>
-            Welcome to the Manufacturing Co-Pilot
+            Welcome to Nexus AI
           </Typography>
           <Typography variant="subtitle1" color="text.secondary" gutterBottom>
             Upload your dataset and choose how you'd like to interact with the platform.
