@@ -23,13 +23,15 @@ import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
 const HomePage = () => {
-  const { setUploadedFile, setSelectedMode } = useContext(AppContext);
+  const { setUploadedFile, setSelectedMode, setContextFiles } = useContext(AppContext);
   const [file, setFile] = useState(null);
   const [mode, setMode] = useState('');
   const [loading, setLoading] = useState(false);
   const [fileName, setFileName] = useState('');
   const [showSnackbar, setShowSnackbar] = useState(false);
   const navigate = useNavigate();
+  const [localContextFiles, setLocalContextFiles] = useState([]);
+  const [contextUploading, setContextUploading] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -78,6 +80,56 @@ const HomePage = () => {
     }
   };
 
+  const handleContextFilesChange = (e) => {
+    const newFiles = Array.from(e.target.files);
+    setLocalContextFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  const handleContextUpload = async () => {
+    if (localContextFiles.length === 0) return;
+  
+    const formData = new FormData();
+    localContextFiles.forEach((file) => {
+      formData.append("files", file);
+    });
+  
+    setContextUploading(true);
+  
+    try {
+      const response = await fetch(
+        "https://manufacturing-copilot-backend.onrender.com/upload-context",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error("Context upload failed");
+      }
+
+      setContextFiles((prev) =>
+        prev.concat(
+          localContextFiles.map((f) => ({
+            name: f.name,
+            status: "uploaded",
+          }))
+        )
+      );
+
+      setLocalContextFiles([]);
+  
+      alert("Context files uploaded successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading context files");
+    } finally {
+      setContextUploading(false);
+    }
+  };
+  
+  
+
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
       <Card elevation={6}>
@@ -122,6 +174,51 @@ const HomePage = () => {
                   </Typography>
                 </Grid>
               )}
+
+          <Grid item xs={12}>
+            <Typography variant="h6">Add Process Context (Optional)</Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={8}>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<UploadFileIcon />}
+              fullWidth
+            >
+              + Add Context Files
+              <input
+                type="file"
+                hidden
+                multiple
+                onChange={handleContextFilesChange}
+              />
+            </Button>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleContextUpload}
+              disabled={contextFiles.length === 0 || contextUploading}
+              fullWidth
+            >
+              {contextUploading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                "Upload Context"
+              )}
+            </Button>
+          </Grid>
+
+          {contextFiles.length > 0 && (
+            <Grid item xs={12}>
+              <Typography variant="body2">
+                {contextFiles.length} context file(s) added
+              </Typography>
+            </Grid>
+          )}
 
               <Grid item xs={12}>
                 <Typography variant="h6">Select Mode</Typography>
