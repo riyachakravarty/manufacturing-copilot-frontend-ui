@@ -201,7 +201,7 @@ const HomePage = () => {
               variant="contained"
               color="primary"
               onClick={handleContextUpload}
-              disabled={contextFiles.length === 0 || contextUploading}
+              disabled={localContextFiles.length === 0 || contextUploading}
               fullWidth
             >
               {contextUploading ? (
@@ -212,10 +212,10 @@ const HomePage = () => {
             </Button>
           </Grid>
 
-          {contextFiles.length > 0 && (
+          {localContextFiles.length > 0 && (
             <Grid item xs={12}>
               <Typography variant="body2">
-                {contextFiles.length} context file(s) added
+                {localContextFiles.length} context file(s) added
               </Typography>
             </Grid>
           )}
