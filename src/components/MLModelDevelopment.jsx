@@ -42,6 +42,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
+import InterpretationPanel from "./InterpretationPanel";
 
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
@@ -70,7 +71,7 @@ const MLModelDevelopment = () => {
   const [featureImportance, setFeatureImportance] = useState(null);
   const [topFeatures,setTopFeatures] = useState(null);
   const [summaryInterpretation, setSummaryInterpretation] = useState(null);
-  const [optimalRangesPlot, setOptimalRangesPlot] = useState(null);
+  const [optimalRanges, setOptimalRanges] = useState(null);
   const [shapLoading, setShapLoading] = useState(false);
 
   // Helper function to render metric cards
@@ -213,9 +214,7 @@ const MLModelDevelopment = () => {
       if (!response.ok) throw new Error("Failed to fetch feature importance plot");
 
       const result = await response.json();
-      setFeatureImportancePlot(result.plot);
-      setFeatureImportance(result.feature_importance);
-      setTopFeatures(result.top_features);
+      setFeatureImportance(result);
     } catch (err) {
       console.error("Error loading feature importance:", err);
       setError("Failed to generate feature importance plot");
@@ -237,7 +236,7 @@ const MLModelDevelopment = () => {
       if (!response.ok) throw new Error("Failed to fetch optimal ranges plot");
 
       const result = await response.json();
-      setOptimalRangesPlot(result.plot);
+      setOptimalRanges(result);
     } catch (err) {
       console.error("Error loading optimal ranges:", err);
       setError("Failed to generate optimal operating ranges plot");
@@ -570,16 +569,16 @@ const MLModelDevelopment = () => {
       )}
 
 {/* --- Feature Importance Plot --- */}
-{featureImportancePlot && (
+{featureImportance && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Feature Importance
       </Typography>
       <Plot
-        data={featureImportancePlot.data}
+        data={featureImportance.plot.data}
         layout={{
-          ...featureImportancePlot.layout,
+          ...featureImportance.plot.layout,
           autosize: true,
           paper_bgcolor: theme.palette.background.paper,
           plot_bgcolor: theme.palette.background.default,
@@ -588,6 +587,11 @@ const MLModelDevelopment = () => {
         useResizeHandler
         style={{ width: "100%", height: "100%", minHeight: 400 }}
       />
+      <InterpretationPanel
+      observations={featureImportance.shap_observations}
+      explanation={featureImportance.shap_explanation}
+      sources={featureImportance.context_sources}
+    />
     </CardContent>
   </Card>
 )}
@@ -595,16 +599,16 @@ const MLModelDevelopment = () => {
 
 
 {/* --- Optimal Operating Ranges Plot --- */}
-{optimalRangesPlot && (
+{optimalRanges && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Dependence / Optimal Operating Ranges
       </Typography>
       <Plot
-        data={optimalRangesPlot.data}
+        data={optimalRanges.plot.data}
         layout={{
-          ...optimalRangesPlot.layout,
+          ...optimalRanges.plot.layout,
           autosize: true,
           paper_bgcolor: theme.palette.background.paper,
           plot_bgcolor: theme.palette.background.default,
@@ -613,6 +617,11 @@ const MLModelDevelopment = () => {
         useResizeHandler
         style={{ width: "100%", height: "100%", minHeight: 400 }}
       />
+      <InterpretationPanel
+      observations={optimalRanges.shap_observations}
+      explanation={optimalRanges.shap_explanation}
+      sources={optimalRanges.context_sources}
+    />
     </CardContent>
   </Card>
 )}
