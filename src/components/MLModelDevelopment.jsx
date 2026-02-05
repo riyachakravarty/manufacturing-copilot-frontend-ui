@@ -33,8 +33,6 @@ import {
   Checkbox,
   ToggleButton,
   ToggleButtonGroup,
-  List, 
-  ListItem 
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -67,10 +65,7 @@ const MLModelDevelopment = () => {
   const [trainPlot, setTrainPlot] = useState(null);
   const [testPlot, setTestPlot] = useState(null);
   // SHAP plots and states
-  const [featureImportancePlot, setFeatureImportancePlot] = useState(null);
   const [featureImportance, setFeatureImportance] = useState(null);
-  const [topFeatures,setTopFeatures] = useState(null);
-  const [summaryInterpretation, setSummaryInterpretation] = useState(null);
   const [optimalRanges, setOptimalRanges] = useState(null);
   const [shapLoading, setShapLoading] = useState(false);
 
