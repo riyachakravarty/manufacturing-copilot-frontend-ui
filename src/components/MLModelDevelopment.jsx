@@ -40,7 +40,6 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
-import InterpretationPanel from "./InterpretationPanel";
 
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
