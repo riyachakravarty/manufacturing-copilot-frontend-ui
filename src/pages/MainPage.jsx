@@ -45,7 +45,7 @@ const MainPage = () => {
   };
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Box sx={{ padding: 4,height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Header */}
       <Typography variant="h4" sx={{ mb: 2, color: 'primary.main' }}>
         Welcome to Nexus AI
@@ -78,7 +78,7 @@ const MainPage = () => {
         textColor="inherit"
         variant="scrollable"
         scrollButtons="auto"
-        sx={{ mb: 3 }}
+        sx={{ mb: 2, flexShrink: 0 }}
       >
         {tabLabels.map((tab, index) => (
           <Tab
@@ -94,12 +94,28 @@ const MainPage = () => {
       </Tabs>
 
       {/* Tab Content Area */}
-      <Card sx={{ borderRadius: 4, p: 3, boxShadow: 3 }}>
-        <CardContent>
-          <Box mt={2}>
-            {renderTabContent()}
-          </Box>
-        </CardContent>
+      <Card
+    sx={{
+      borderRadius: 4,
+      boxShadow: 3,
+      flexGrow: 1,
+      display: "flex",
+      flexDirection: "column",
+      minHeight: 0,
+    }}
+  >
+        <CardContent sx={{ flexGrow: 1, minHeight: 0, p: 0 }}>
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          minHeight: 0,
+        }}
+      >
+        {renderTabContent()}
+      </Box>
+    </CardContent>
       </Card>
     </Box>
   );
