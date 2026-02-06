@@ -40,7 +40,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
-
+import AIInterpretationContent from "./AIInterpretationContent";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const MLModelDevelopment = () => {
@@ -261,11 +261,11 @@ const MLModelDevelopment = () => {
   };
 
     return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} sx={{ height: "100%" }}>
       {/* Left Panel */}
       <Grid item 
         xs={12}
-        md={4}
+        md="auto"
         sx={{
           height: "100%",
           display: "flex",
@@ -277,6 +277,7 @@ const MLModelDevelopment = () => {
           minWidth: 320,
           transition: "width 0.3s ease",
           width: 320, // fixed like DVE
+          minHeight: 0,
   }}>
         <Card sx={{ borderRadius: 3, boxShadow: 2, flexGrow: 1 }}>
           <CardContent>
@@ -455,7 +456,7 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md={5}
+  md
   sx={{
     height: "100%",
     display: "flex",
@@ -640,16 +641,18 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md={3}
+  md="auto"
   sx={{
     height: "100%",
+    flexShrink: 0,
     display: "flex",
     flexDirection: "column",
     fontSize: "0.85rem",
-    minWidth: 200,
+    width: 360,
     minHeight: 0
   }}
 >
+<Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
       <Typography variant="h6" gutterBottom color="primary">
         AI led Interpretation panel
@@ -662,9 +665,11 @@ const MLModelDevelopment = () => {
         SHAP Feature Importance
       </Typography>
 
-      observations={featureImportance.shap_observations}
-      explanation={featureImportance.shap_explanation}
-      sources={featureImportance.context_sources}
+      <AIInterpretationContent
+  observations={featureImportance.shap_observations}
+  explanation={featureImportance.shap_explanation}
+  sources={featureImportance.context_sources}
+/>
 
     </CardContent>
   </Card>
@@ -678,13 +683,16 @@ const MLModelDevelopment = () => {
       </Typography>
     </CardContent>
 
-      observations={optimalRanges.shap_observations}
-      explanation={optimalRanges.shap_explanation}
-      sources={optimalRanges.context_sources}
+    <AIInterpretationContent
+  observations={featureImportance.shap_observations}
+  explanation={featureImportance.shap_explanation}
+  sources={featureImportance.context_sources}
+/>
       </Card>
 )}
 
   </Box>
+  </Paper>
     </Grid>   
     </Grid>
   );
