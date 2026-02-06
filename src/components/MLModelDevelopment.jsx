@@ -270,7 +270,6 @@ const MLModelDevelopment = () => {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          overflowY: "auto",
           px: 1,
           fontSize: "0.85rem",
           flexShrink: 0,
@@ -279,8 +278,22 @@ const MLModelDevelopment = () => {
           width: 320, // fixed like DVE
           minHeight: 0,
   }}>
-        <Card sx={{ borderRadius: 3, boxShadow: 2, flexGrow: 1 }}>
-          <CardContent>
+          <Card
+          sx={{
+            borderRadius: 3,
+            boxShadow: 2,
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+        <CardContent
+          sx={{
+            flexGrow: 1,
+            overflowY: "auto",
+            minHeight: 0,
+          }}
+        >
             {/* Target Dropdown */}
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
               <InputLabel>Target / Objective</InputLabel>
@@ -475,7 +488,7 @@ const MLModelDevelopment = () => {
     }}
     elevation={3}
   >
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
       <Typography variant="h6" gutterBottom color="primary">
         Analysis Output
       </Typography>
@@ -653,7 +666,7 @@ const MLModelDevelopment = () => {
   }}
 >
 <Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
       <Typography variant="h6" gutterBottom color="primary">
         AI led Interpretation panel
       </Typography>
@@ -684,9 +697,9 @@ const MLModelDevelopment = () => {
     </CardContent>
 
     <AIInterpretationContent
-  observations={featureImportance.shap_observations}
-  explanation={featureImportance.shap_explanation}
-  sources={featureImportance.context_sources}
+  observations={optimalRanges.shap_observations}
+  explanation={optimalRanges.shap_explanation}
+  sources={optimalRanges.context_sources}
 />
       </Card>
 )}
