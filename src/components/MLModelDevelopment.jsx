@@ -68,6 +68,7 @@ const MLModelDevelopment = () => {
   const [featureImportance, setFeatureImportance] = useState(null);
   const [optimalRanges, setOptimalRanges] = useState(null);
   const [shapLoading, setShapLoading] = useState(false);
+  const [activeAnalysis, setActiveAnalysis] = useState(null);// "train" | "feature_importance" | "optimal_ranges"
 
   // Helper function to render metric cards
   const renderMetrics = (metrics, title) => (
@@ -122,6 +123,7 @@ const MLModelDevelopment = () => {
       setTestMetrics(null);
       setTrainPlot(null);
       setTestPlot(null);
+      
 
       // --- Validation ---
       if (!targetColumn) {
@@ -188,6 +190,9 @@ const MLModelDevelopment = () => {
     setTestMetrics(result.metrics_test);
     setTrainPlot(result.plot_train);
     setTestPlot(result.plot_test);
+    setActiveAnalysis("train");
+    setFeatureImportance(null);
+    setOptimalRanges(null);
   } catch (err) {
     console.error("Error training model:", err);
     setError(err.message || "Error during training");
@@ -210,6 +215,16 @@ const MLModelDevelopment = () => {
 
       const result = await response.json();
       setFeatureImportance(result);
+      setActiveAnalysis("feature_importance");
+
+      // 🔴 clear train/test plots
+      setTrainPlot(null);
+      setTestPlot(null);
+      setTrainMetrics(null);
+      setTestMetrics(null);
+
+      // 🔴 clear other analysis
+      setOptimalRanges(null);
     } catch (err) {
       console.error("Error loading feature importance:", err);
       setError("Failed to generate feature importance plot");
@@ -232,6 +247,12 @@ const MLModelDevelopment = () => {
 
       const result = await response.json();
       setOptimalRanges(result);
+      setActiveAnalysis("optimal_ranges");
+      setTrainPlot(null);
+      setTestPlot(null);
+      setTrainMetrics(null);
+      setTestMetrics(null);
+      setFeatureImportance(null);
     } catch (err) {
       console.error("Error loading optimal ranges:", err);
       setError("Failed to generate optimal operating ranges plot");
@@ -435,7 +456,7 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md={8}
+  md={6}
   sx={{
     height: "100%",
     display: "flex",
@@ -501,7 +522,7 @@ const MLModelDevelopment = () => {
       {!loading && !error && (
         <>
           {/* --- Metrics --- */}
-          {(trainMetrics || testMetrics) && (
+          {activeAnalysis === "train" &&(trainMetrics || testMetrics) && (
             <Box>
               {trainMetrics && renderMetrics(trainMetrics, "Training Metrics")}
               {testMetrics && renderMetrics(testMetrics, "Test Metrics")}
@@ -509,7 +530,7 @@ const MLModelDevelopment = () => {
           )}
 
           {/* --- Train Actual vs Predicted Plot --- */}
-          {trainPlot && (
+          {activeAnalysis === "train" && trainPlot && (
             <Card sx={{ mt: 2 }}>
               <CardContent>
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -532,7 +553,7 @@ const MLModelDevelopment = () => {
           )}
 
           {/* --- Test Actual vs Predicted Plot --- */}
-          {testPlot && (
+          {activeAnalysis === "train" && testPlot && (
             <Card sx={{ mt: 2 }}>
               <CardContent>
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -564,7 +585,7 @@ const MLModelDevelopment = () => {
       )}
 
 {/* --- Feature Importance Plot --- */}
-{featureImportance && (
+{activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -594,7 +615,7 @@ const MLModelDevelopment = () => {
 
 
 {/* --- Optimal Operating Ranges Plot --- */}
-{optimalRanges && (
+{activeAnalysis === "optimal_ranges" && optimalRanges && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -612,11 +633,6 @@ const MLModelDevelopment = () => {
         useResizeHandler
         style={{ width: "100%", height: "100%", minHeight: 400 }}
       />
-      <InterpretationPanel
-      observations={optimalRanges.shap_observations}
-      explanation={optimalRanges.shap_explanation}
-      sources={optimalRanges.context_sources}
-    />
     </CardContent>
   </Card>
 )}
@@ -625,6 +641,66 @@ const MLModelDevelopment = () => {
   </Paper>
 </Grid>
 
+{/* AI led Interpretation panel */}
+<Grid
+  item
+  xs={12}
+  md={2}
+  sx={{
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    minHeight: 0,
+  }}
+>
+  <Paper
+    sx={{
+      p: 2,
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      bgcolor: theme.palette.background.paper,
+    }}
+    elevation={3}
+  >
+    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+      <Typography variant="h6" gutterBottom color="primary">
+        AI led Interpretation panel
+      </Typography>
+
+      {activeAnalysis === "feature_importance" && featureImportance && (
+  <Card sx={{ mt: 2 }}>
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        SHAP Feature Importance
+      </Typography>
+
+      observations={featureImportance.shap_observations}
+      explanation={featureImportance.shap_explanation}
+      sources={featureImportance.context_sources}
+
+    </CardContent>
+  </Card>
+)}
+
+{activeAnalysis === "optimal_ranges" && optimalRanges && (
+  <Card sx={{ mt: 2 }}>
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        SHAP Dependence / Optimal Operating Ranges
+      </Typography>
+    </CardContent>
+
+      observations={optimalRanges.shap_observations}
+      explanation={optimalRanges.shap_explanation}
+      sources={optimalRanges.context_sources}
+      </Card>
+)}
+
+  </Box>
+  </Paper>
+    </Grid>   
     </Grid>
   );
 };
