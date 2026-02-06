@@ -456,7 +456,7 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md={6}
+  md={5}
   sx={{
     height: "100%",
     display: "flex",
@@ -603,11 +603,7 @@ const MLModelDevelopment = () => {
         useResizeHandler
         style={{ width: "100%", height: "100%", minHeight: 400 }}
       />
-      <InterpretationPanel
-      observations={featureImportance.shap_observations}
-      explanation={featureImportance.shap_explanation}
-      sources={featureImportance.context_sources}
-    />
+
     </CardContent>
   </Card>
 )}
@@ -645,25 +641,16 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md={2}
+  md={3}
   sx={{
     height: "100%",
     display: "flex",
     flexDirection: "column",
-    minWidth: 0,
-    minHeight: 0,
+    fontSize: "0.85rem",
+    minWidth: 200,
+    minHeight: 0
   }}
 >
-  <Paper
-    sx={{
-      p: 2,
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-      bgcolor: theme.palette.background.paper,
-    }}
-    elevation={3}
-  >
     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
       <Typography variant="h6" gutterBottom color="primary">
         AI led Interpretation panel
@@ -699,7 +686,6 @@ const MLModelDevelopment = () => {
 )}
 
   </Box>
-  </Paper>
     </Grid>   
     </Grid>
   );
