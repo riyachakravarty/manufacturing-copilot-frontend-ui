@@ -11,6 +11,9 @@ const InterpretationPanel = ({ observations, explanation, sources }) => {
         borderRadius: 2,
         backgroundColor: "#0f1c2e",
         border: "1px solid #1e3a5f",
+        maxWidth: "100%",
+        wordBreak: "break-word",
+        lineHeight: 1.6,
       }}
     >
       <Typography variant="h6" gutterBottom>

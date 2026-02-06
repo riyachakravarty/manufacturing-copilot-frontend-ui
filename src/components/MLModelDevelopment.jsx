@@ -476,6 +476,8 @@ const MLModelDevelopment = () => {
     flexDirection: "column",
     minWidth: 0,
     minHeight: 0,
+    flexShrink: 1,          // allow growth
+   flexGrow: 1,
   }}
 >
   <Paper
@@ -662,14 +664,26 @@ const MLModelDevelopment = () => {
     flexDirection: "column",
     fontSize: "0.85rem",
     width: 360,
-    minHeight: 0
+    minHeight: 0,
+    flexShrink: 0
   }}
 >
 <Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
-    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-      <Typography variant="h6" gutterBottom color="primary">
-        AI led Interpretation panel
-      </Typography>
+<Box
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    bgcolor: "background.paper",
+    pb: 1,
+    mb: 2,
+    borderBottom: "1px solid",
+    borderColor: "divider",
+  }}
+>
+  <Typography variant="h6" color="primary">
+    AI led Interpretation
+  </Typography>
 
       {activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mt: 2 }}>
