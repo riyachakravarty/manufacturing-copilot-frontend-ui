@@ -261,7 +261,7 @@ const MLModelDevelopment = () => {
   };
 
     return (
-    <Grid container spacing={2} sx={{ height: "100%" }}>
+    <Grid container spacing={2} sx={{ flexGrow: 1, minHeight: 0 }}>
       {/* Left Panel */}
       <Grid item 
         xs={12}
@@ -270,7 +270,7 @@ const MLModelDevelopment = () => {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          px: 1,
+          //px: 1,
           fontSize: "0.85rem",
           flexShrink: 0,
           minWidth: 320,
@@ -614,7 +614,7 @@ const MLModelDevelopment = () => {
           margin: { t: 40, b: 40, l: 60, r: 40 },
         }}
         useResizeHandler
-        style={{ width: "100%", height: "100%", minHeight: 400 }}
+        style={{ width: "100%",  minHeight: 450 }}
       />
 
     </CardContent>
