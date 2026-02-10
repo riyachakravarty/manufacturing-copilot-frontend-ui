@@ -709,7 +709,7 @@ const MLModelDevelopment = () => {
     </CardContent>
 
     <AIInterpretationContent
-  explanation={optimalRanges.interpretation_table}
+  rows={optimalRanges.interpretation_table}
   sources={optimalRanges.sources}
 />
       </Card>
