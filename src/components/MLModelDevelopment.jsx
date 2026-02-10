@@ -692,9 +692,8 @@ const MLModelDevelopment = () => {
       </Typography>
 
       <AIInterpretationContent
-  observations={featureImportance.shap_observations}
-  explanation={featureImportance.shap_explanation}
-  sources={featureImportance.context_sources}
+  interpretation={featureImportance.interpretation}
+  sources={featureImportance.sources}
 />
 
     </CardContent>
@@ -710,9 +709,8 @@ const MLModelDevelopment = () => {
     </CardContent>
 
     <AIInterpretationContent
-  observations={optimalRanges.shap_observations}
-  explanation={optimalRanges.shap_explanation}
-  sources={optimalRanges.context_sources}
+  explanation={optimalRanges.interpretation}
+  sources={optimalRanges.sources}
 />
       </Card>
 )}
