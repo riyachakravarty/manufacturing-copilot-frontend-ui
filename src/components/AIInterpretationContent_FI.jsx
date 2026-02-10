@@ -1,7 +1,7 @@
 // src/components/AIInterpretationContent.jsx
 import { Box, Typography, Divider } from "@mui/material";
 
-const AIInterpretationContent = ({ explanation, sources }) => {
+const AIInterpretationContent_FI = ({ explanation, sources }) => {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
 
