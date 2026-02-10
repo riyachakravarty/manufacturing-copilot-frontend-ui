@@ -14,41 +14,52 @@ const AIInterpretationContent = ({ rows, sources }) => {
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Typography
-        variant="subtitle2"
-        color="text.secondary"
-        sx={{ mb: 1 }}
-      >
-        Optimal Operating Ranges Interpretation
-      </Typography>
 
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ fontWeight: "bold" }}>Feature</TableCell>
-            <TableCell sx={{ fontWeight: "bold" }}>
-              Optimal Operating Range
-            </TableCell>
-            <TableCell sx={{ fontWeight: "bold" }}>
-              Process Rationale
-            </TableCell>
-          </TableRow>
-        </TableHead>
+<Table size="small" tableLayout="fixed">
+    <TableHead>
+      <TableRow>
+        <TableCell sx={{ width: "22%", fontWeight: "bold" }}>
+          Feature
+        </TableCell>
+        <TableCell sx={{ width: "23%", fontWeight: "bold" }}>
+          Optimal Operating Range
+        </TableCell>
+        <TableCell sx={{ width: "55%", fontWeight: "bold" }}>
+          Process Rationale
+        </TableCell>
+      </TableRow>
+    </TableHead>
 
-        <TableBody>
-          {rows.map((row, idx) => (
-            <TableRow key={idx}>
-              <TableCell>{row.feature}</TableCell>
-              <TableCell>
-                {row.range_min} – {row.range_max} {row.unit}
-              </TableCell>
-              <TableCell sx={{ whiteSpace: "pre-line" }}>
-                {row.process_rationale}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <TableBody>
+      {rows.map((row, idx) => (
+        <TableRow
+          key={idx}
+          sx={{
+            verticalAlign: "top",
+            "& td": { paddingY: 1 },
+          }}
+        >
+          <TableCell>{row.feature}</TableCell>
+
+          <TableCell>
+            {row.range_min} – {row.range_max} {row.unit}
+          </TableCell>
+
+          <TableCell
+            sx={{
+              whiteSpace: "normal",
+              lineHeight: 1.5,
+              wordBreak: "break-word",
+            }}
+          >
+            <Typography variant="body2">
+              {row.process_rationale || "No explicit process rationale found."}
+            </Typography>
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
 
       {sources && sources.length > 0 && (
         <>
