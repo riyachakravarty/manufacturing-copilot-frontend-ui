@@ -57,7 +57,7 @@ const AIInterpretationContent = ({ rows, sources }) => {
             <TableCell>{row.feature}</TableCell>
   
             <TableCell>
-              {row.range_min} – {row.range_max}
+              {Number(row.range_min).toFixed(2)} – {Number(row.range_max).toFixed(2)}
             </TableCell>
   
             <TableCell>

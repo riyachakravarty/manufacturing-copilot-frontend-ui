@@ -664,7 +664,7 @@ const MLModelDevelopment = () => {
     display: "flex",
     flexDirection: "column",
     fontSize: "0.85rem",
-    width: 360,
+    width: 480,
     minHeight: 0,
   }}
 >
