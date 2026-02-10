@@ -41,7 +41,7 @@ import dayjs from "dayjs";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 import AIInterpretationContent from "./AIInterpretationContent";
-import AIInterpretationContentFI from "./AIInterpretationContent_FI";
+import AIInterpretationContentFI from "./AIInterpretationContentFI";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const MLModelDevelopment = () => {
