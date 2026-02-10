@@ -13,53 +13,63 @@ const AIInterpretationContent = ({ rows, sources }) => {
   if (!rows || rows.length === 0) return null;
 
   return (
-    <Box sx={{ mt: 2 }}>
-
-<Table size="small" tableLayout="fixed">
-    <TableHead>
-      <TableRow>
-        <TableCell sx={{ width: "22%", fontWeight: "bold" }}>
-          Feature
-        </TableCell>
-        <TableCell sx={{ width: "23%", fontWeight: "bold" }}>
-          Optimal Operating Range
-        </TableCell>
-        <TableCell sx={{ width: "55%", fontWeight: "bold" }}>
-          Process Rationale
-        </TableCell>
-      </TableRow>
-    </TableHead>
-
-    <TableBody>
-      {rows.map((row, idx) => (
-        <TableRow
-          key={idx}
-          sx={{
-            verticalAlign: "top",
-            "& td": { paddingY: 1 },
-          }}
-        >
-          <TableCell>{row.feature}</TableCell>
-
-          <TableCell>
-            {row.range_min} – {row.range_max} {row.unit}
+    <Box
+    sx={{
+      mt: 2,
+      overflowX: "auto",
+      width: "100%",
+    }}
+  >
+    <Table
+      size="small"
+      stickyHeader
+      sx={{
+        minWidth: 900,       // forces horizontal scroll
+        tableLayout: "fixed",
+      }}
+    >
+      <TableHead>
+        <TableRow>
+          <TableCell sx={{ width: 220, fontWeight: "bold" }}>
+            Feature
           </TableCell>
-
-          <TableCell
-            sx={{
-              whiteSpace: "normal",
-              lineHeight: 1.5,
-              wordBreak: "break-word",
-            }}
-          >
-            <Typography variant="body2">
-              {row.process_rationale || "No explicit process rationale found."}
-            </Typography>
+          <TableCell sx={{ width: 260, fontWeight: "bold" }}>
+            Optimal Operating Range
+          </TableCell>
+          <TableCell sx={{ width: 420, fontWeight: "bold" }}>
+            Process Rationale
           </TableCell>
         </TableRow>
-      ))}
-    </TableBody>
-  </Table>
+      </TableHead>
+  
+      <TableBody>
+        {rows.map((row, idx) => (
+          <TableRow
+            key={idx}
+            sx={{
+              verticalAlign: "top",
+              "& td": {
+                paddingY: 0.75,
+                paddingX: 1,
+              },
+            }}
+          >
+            <TableCell>{row.feature}</TableCell>
+  
+            <TableCell>
+              {row.range_min} – {row.range_max}
+            </TableCell>
+  
+            <TableCell>
+              <Typography variant="body2" sx={{ lineHeight: 1.4 }}>
+                {row.process_rationale || "No explicit process rationale found."}
+              </Typography>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  
 
       {sources && sources.length > 0 && (
         <>
