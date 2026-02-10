@@ -41,6 +41,7 @@ import dayjs from "dayjs";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 import AIInterpretationContent from "./AIInterpretationContent";
+import AIInterpretationContent_FI from "./AIInterpretationContent_FI";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const MLModelDevelopment = () => {
@@ -691,7 +692,7 @@ const MLModelDevelopment = () => {
         SHAP Feature Importance
       </Typography>
 
-      <AIInterpretationContent
+      <AIInterpretationContent_FI
   explanation={featureImportance.interpretation}
   sources={featureImportance.sources}
 />
