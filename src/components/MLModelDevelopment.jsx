@@ -692,7 +692,7 @@ const MLModelDevelopment = () => {
       </Typography>
 
       <AIInterpretationContent
-  interpretation={featureImportance.interpretation}
+  explanation={featureImportance.interpretation}
   sources={featureImportance.sources}
 />
 
@@ -709,7 +709,7 @@ const MLModelDevelopment = () => {
     </CardContent>
 
     <AIInterpretationContent
-  explanation={optimalRanges.interpretation}
+  explanation={optimalRanges.interpretation_table}
   sources={optimalRanges.sources}
 />
       </Card>
