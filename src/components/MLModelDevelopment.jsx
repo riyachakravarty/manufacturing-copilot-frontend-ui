@@ -64,6 +64,8 @@ const MLModelDevelopment = () => {
   const [testMetrics, setTestMetrics] = useState(null);
   const [trainPlot, setTrainPlot] = useState(null);
   const [testPlot, setTestPlot] = useState(null);
+  const [trainTimeseriesPlot, setTrainTimeseriesPlot] = useState(null);
+  const [testTimeseriesPlot, setTestTimeseriesPlot] = useState(null);
   // SHAP plots and states
   const [featureImportance, setFeatureImportance] = useState(null);
   const [optimalRanges, setOptimalRanges] = useState(null);
@@ -123,7 +125,8 @@ const MLModelDevelopment = () => {
       setTestMetrics(null);
       setTrainPlot(null);
       setTestPlot(null);
-      
+      setTrainTimeseriesPlot(null);
+      setTestTimeseriesPlot(null);
 
       // --- Validation ---
       if (!targetColumn) {
@@ -190,6 +193,8 @@ const MLModelDevelopment = () => {
     setTestMetrics(result.metrics_test);
     setTrainPlot(result.plot_train);
     setTestPlot(result.plot_test);
+    setTrainTimeseriesPlot(result.plot_train_timeseries);
+    setTestTimeseriesPlot(result.plot_test_timeseries);
     setActiveAnalysis("train");
     setFeatureImportance(null);
     setOptimalRanges(null);
@@ -579,6 +584,52 @@ const MLModelDevelopment = () => {
                   data={testPlot.data}
                   layout={{
                     ...testPlot.layout,
+                    autosize: true,
+                    paper_bgcolor: theme.palette.background.paper,
+                    plot_bgcolor: theme.palette.background.default,
+                    margin: { t: 40, b: 40, l: 40, r: 40 },
+                  }}
+                  useResizeHandler
+                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* --- Train Actual vs Predicted Plot --- */}
+          {activeAnalysis === "train" && trainTimeseriesPlot && (
+            <Card sx={{ mt: 2 }}>
+              <CardContent>
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                  Predicted vs Actual Timeseies (Train Data)
+                </Typography>
+                <Plot
+                  data={trainTimeseriesPlot.data}
+                  layout={{
+                    ...trainTimeseriesPlot.layout,
+                    autosize: true,
+                    paper_bgcolor: theme.palette.background.paper,
+                    plot_bgcolor: theme.palette.background.default,
+                    margin: { t: 40, b: 40, l: 40, r: 40 },
+                  }}
+                  useResizeHandler
+                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* --- Test Actual vs Predicted Plot --- */}
+          {activeAnalysis === "train" && testTimeseriesPlot && (
+            <Card sx={{ mt: 2 }}>
+              <CardContent>
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                  Predicted vs Actual Timeseries (Test Data)
+                </Typography>
+                <Plot
+                  data={testTimeseriesPlot.data}
+                  layout={{
+                    ...testTimeseriesPlot.layout,
                     autosize: true,
                     paper_bgcolor: theme.palette.background.paper,
                     plot_bgcolor: theme.palette.background.default,
