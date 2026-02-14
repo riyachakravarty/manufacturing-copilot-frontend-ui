@@ -66,6 +66,8 @@ const MLModelDevelopment = () => {
   const [testPlot, setTestPlot] = useState(null);
   const [trainTimeseriesPlot, setTrainTimeseriesPlot] = useState(null);
   const [testTimeseriesPlot, setTestTimeseriesPlot] = useState(null);
+  const [modelInterpretation, setModelInterpretation] =useState(null);
+  const [deviationInterpretation, setDeviationInterpretation] =useState(null);
   // SHAP plots and states
   const [featureImportance, setFeatureImportance] = useState(null);
   const [optimalRanges, setOptimalRanges] = useState(null);
@@ -195,6 +197,8 @@ const MLModelDevelopment = () => {
     setTestPlot(result.plot_test);
     setTrainTimeseriesPlot(result.plot_train_timeseries);
     setTestTimeseriesPlot(result.plot_test_timeseries);
+    setModelInterpretation(result.model_interpretation)
+    setDeviationInterpretation(result.deviation_interpretation)
     setActiveAnalysis("train");
     setFeatureImportance(null);
     setOptimalRanges(null);
@@ -496,7 +500,7 @@ const MLModelDevelopment = () => {
     }}
     elevation={3}
   >
-    <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between",alignItems: "center", mb: 2, flexShrink: 0 }}>
       <Typography variant="h6" gutterBottom color="primary">
         Analysis Output
       </Typography>
@@ -763,6 +767,34 @@ const MLModelDevelopment = () => {
     <AIInterpretationContent
   rows={optimalRanges.interpretation_table}
   sources={optimalRanges.sources}
+/>
+      </Card>
+)}
+
+{activeAnalysis === "train" && modelInterpretation && (
+  <Card sx={{ mt: 2 }}>
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        ML model interpretation
+      </Typography>
+    </CardContent>
+
+    <AIInterpretationContentFI
+  explanation={modelInterpretation}
+/>
+      </Card>
+)}
+
+{activeAnalysis === "train" && deviationInterpretation && (
+  <Card sx={{ mt: 2 }}>
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        Train Test Timeseries Deviation interpretation
+      </Typography>
+    </CardContent>
+
+    <AIInterpretationContentFI
+  explanation={deviationInterpretation}
 />
       </Card>
 )}
