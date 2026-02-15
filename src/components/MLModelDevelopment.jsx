@@ -772,7 +772,7 @@ const MLModelDevelopment = () => {
       </Card>
 )}
 
-{activeAnalysis === "train" && modelInterpretation?.model_assessment && modelInterpretation?.risk_assessment && (
+{activeAnalysis === "train" && modelInterpretation && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -810,7 +810,7 @@ const MLModelDevelopment = () => {
       </Card>
 )}
 
-{activeAnalysis === "train" && deviationInterpretation?.deviation_analysis && (
+{activeAnalysis === "train" && deviationInterpretation && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
