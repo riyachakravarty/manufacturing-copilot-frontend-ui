@@ -772,7 +772,9 @@ const MLModelDevelopment = () => {
       </Card>
 )}
 
-{activeAnalysis === "train" && modelInterpretation && (
+{activeAnalysis === "train" && (
+  <pre>{JSON.stringify(modelInterpretation, null, 2)}</pre>
+)} 
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -808,7 +810,7 @@ const MLModelDevelopment = () => {
     </Typography>
   </CardContent>
       </Card>
-)}
+)
 
 {activeAnalysis === "train" && deviationInterpretation && (
   <Card sx={{ mt: 2 }}>
