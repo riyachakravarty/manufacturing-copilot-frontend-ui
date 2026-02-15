@@ -773,44 +773,58 @@ const MLModelDevelopment = () => {
 )}
 
 {activeAnalysis === "train" && (
-  <pre>{JSON.stringify(modelInterpretation, null, 2)}</pre>
-)} 
-  <Card sx={{ mt: 2 }}>
-    <CardContent>
-      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-        ML model interpretation
-      </Typography>
-    
-    <Typography variant="subtitle2">Fit Quality</Typography>
-    <Typography>{modelInterpretation.model_assessment.fit_quality}</Typography>
+  <>
+    <pre>{JSON.stringify(modelInterpretation, null, 2)}</pre>
 
-    <Typography variant="subtitle2">Generalization</Typography>
-    <Typography>{modelInterpretation.model_assessment.generalization}</Typography>
+    <Card sx={{ mt: 2 }}>
+      <CardContent>
+        <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+          ML model interpretation
+        </Typography>
 
-    <Typography variant="subtitle2">Bias</Typography>
-    <Typography>{modelInterpretation.model_assessment.bias_explanation}</Typography>
+        <Typography variant="subtitle2">Fit Quality</Typography>
+        <Typography>
+          {modelInterpretation?.model_assessment?.fit_quality}
+        </Typography>
 
-    <Typography variant="subtitle2">Temporal Behavior</Typography>
-    <Typography>{modelInterpretation.model_assessment.temporal_behavior}</Typography>
+        <Typography variant="subtitle2">Generalization</Typography>
+        <Typography>
+          {modelInterpretation?.model_assessment?.generalization}
+        </Typography>
 
-    <Typography variant="subtitle2">Operational Readiness</Typography>
-    <Typography>{modelInterpretation.model_assessment.operational_readiness}</Typography>
-  
-    <Typography variant="subtitle2">Deployment Recommendation</Typography>
-    <Typography>
-      {modelInterpretation.risk_assessment.deployment_recommendation}
-    </Typography>
+        <Typography variant="subtitle2">Bias</Typography>
+        <Typography>
+          {modelInterpretation?.model_assessment?.bias_explanation}
+        </Typography>
 
-    <Typography variant="subtitle2">Confidence Score</Typography>
-    <Typography>
-      {modelInterpretation.risk_assessment.confidence_score}
-    </Typography>
-    <Typography>
-      {modelInterpretation.risk_assessment.justification}
-    </Typography>
-  </CardContent>
-      </Card>
-)
+        <Typography variant="subtitle2">Temporal Behavior</Typography>
+        <Typography>
+          {modelInterpretation?.model_assessment?.temporal_behavior}
+        </Typography>
+
+        <Typography variant="subtitle2">Operational Readiness</Typography>
+        <Typography>
+          {modelInterpretation?.model_assessment?.operational_readiness}
+        </Typography>
+
+        <Typography variant="subtitle2">Deployment Recommendation</Typography>
+        <Typography>
+          {modelInterpretation?.risk_assessment?.deployment_recommendation}
+        </Typography>
+
+        <Typography variant="subtitle2">Confidence Score</Typography>
+        <Typography>
+          {modelInterpretation?.risk_assessment?.confidence_score}
+        </Typography>
+
+        <Typography>
+          {modelInterpretation?.risk_assessment?.justification}
+        </Typography>
+      </CardContent>
+    </Card>
+  </>
+)}
+
 
 {activeAnalysis === "train" && deviationInterpretation && (
   <Card sx={{ mt: 2 }}>
