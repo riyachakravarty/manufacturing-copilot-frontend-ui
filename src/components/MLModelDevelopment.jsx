@@ -739,6 +739,7 @@ const MLModelDevelopment = () => {
   <Typography variant="h6" color="primary">
     AI led Interpretation
   </Typography>
+  </Box>
 
       {activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mt: 2 }}>
@@ -762,44 +763,84 @@ const MLModelDevelopment = () => {
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Dependence / Optimal Operating Ranges
       </Typography>
-    </CardContent>
 
     <AIInterpretationContent
   rows={optimalRanges.interpretation_table}
   sources={optimalRanges.sources}
 />
+</CardContent>
       </Card>
 )}
 
-{activeAnalysis === "train" && modelInterpretation && (
+{activeAnalysis === "train" && modelInterpretation?.model_assessment && modelInterpretation?.risk_assessment && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         ML model interpretation
       </Typography>
-    </CardContent>
+    
+    <Typography variant="subtitle2">Fit Quality</Typography>
+    <Typography>{modelInterpretation.model_assessment.fit_quality}</Typography>
 
-    <AIInterpretationContentFI
-  explanation={modelInterpretation}
-/>
+    <Typography variant="subtitle2">Generalization</Typography>
+    <Typography>{modelInterpretation.model_assessment.generalization}</Typography>
+
+    <Typography variant="subtitle2">Bias</Typography>
+    <Typography>{modelInterpretation.model_assessment.bias_explanation}</Typography>
+
+    <Typography variant="subtitle2">Temporal Behavior</Typography>
+    <Typography>{modelInterpretation.model_assessment.temporal_behavior}</Typography>
+
+    <Typography variant="subtitle2">Operational Readiness</Typography>
+    <Typography>{modelInterpretation.model_assessment.operational_readiness}</Typography>
+  
+    <Typography variant="subtitle2">Deployment Recommendation</Typography>
+    <Typography>
+      {modelInterpretation.risk_assessment.deployment_recommendation}
+    </Typography>
+
+    <Typography variant="subtitle2">Confidence Score</Typography>
+    <Typography>
+      {modelInterpretation.risk_assessment.confidence_score}
+    </Typography>
+    <Typography>
+      {modelInterpretation.risk_assessment.justification}
+    </Typography>
+  </CardContent>
       </Card>
 )}
 
-{activeAnalysis === "train" && deviationInterpretation && (
+{activeAnalysis === "train" && deviationInterpretation?.deviation_analysis && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-        Train Test Timeseries Deviation interpretation
+        Train Test Timeseries interpretation
       </Typography>
-    </CardContent>
+    
+    <Typography variant="subtitle2">Period Type (Under/Over prediction) </Typography>
+    <Typography>{deviationInterpretation.deviation_analysis.period_type}</Typography>
 
-    <AIInterpretationContentFI
-  explanation={deviationInterpretation}
-/>
+    <Typography variant="subtitle2">Start time</Typography>
+    <Typography>{deviationInterpretation.deviation_analysis.start}</Typography>
+
+    <Typography variant="subtitle2">End Time</Typography>
+    <Typography>{deviationInterpretation.deviation_analysis.end}</Typography>
+
+    <Typography variant="subtitle2">Likely Cause</Typography>
+    <Typography>{deviationInterpretation.deviation_analysis.likely_cause}</Typography>
+
+    <Typography variant="subtitle2">Cause Classification</Typography>
+    <Typography>{deviationInterpretation.deviation_analysis.cause_classification}</Typography>
+
+    <Typography variant="subtitle2">Recommended Action</Typography>
+    <Typography>{deviationInterpretation.deviation_analysis.recommended_action}</Typography>
+  
+    <Typography variant="subtitle2">Confidence Level</Typography>
+    <Typography>{deviationInterpretation.deviation_analysis.confidence_level}</Typography>
+  </CardContent>
       </Card>
 )}
 
-  </Box>
   </Paper>
     </Grid>   
     </Grid>
