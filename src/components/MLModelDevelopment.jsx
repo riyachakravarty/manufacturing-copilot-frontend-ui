@@ -198,6 +198,9 @@ const MLModelDevelopment = () => {
     setTrainTimeseriesPlot(result.plot_train_timeseries);
     setTestTimeseriesPlot(result.plot_test_timeseries);
     setModelInterpretation(result.model_interpretation)
+    console.log("Model Interpretation:", modelInterpretation);
+    console.log("Deviation Interpretation:", deviationInterpretation);
+
     setDeviationInterpretation(result.deviation_interpretation)
     setActiveAnalysis("train");
     setFeatureImportance(null);
