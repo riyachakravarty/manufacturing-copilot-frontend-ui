@@ -318,6 +318,7 @@ const MLModelDevelopment = () => {
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
+            minHeight: 0,
           }}
         >
         <CardContent
