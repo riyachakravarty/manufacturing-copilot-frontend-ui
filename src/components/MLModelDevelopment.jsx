@@ -732,6 +732,13 @@ const MLModelDevelopment = () => {
 </Grid>
 
 {/* AI led Interpretation panel */}
+
+{modelInterpretation && (
+  <div style={{ background: "red", padding: 20 }}>
+    MODEL EXISTS
+  </div>
+)}
+
 <Grid
   item
   xs={12}
@@ -795,18 +802,6 @@ const MLModelDevelopment = () => {
       </Card>
 )}
 
-{modelInterpretation && (
-
-<Card sx={{ mt: 2 }}>
-<CardContent>
-  <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-    ML Model Interpretation
-  </Typography>
-
-  <AIInterpretationContentModel data={modelInterpretation} />
-</CardContent>
-</Card>
-)}
 
 
 
