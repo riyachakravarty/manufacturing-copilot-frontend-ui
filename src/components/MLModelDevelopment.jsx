@@ -316,10 +316,11 @@ const MLModelDevelopment = () => {
     sx={{
       flex: "0 0 28%",                  // fixed-ish column width (adjust 24-32% as you like)
       maxWidth: "32%",
-      minWidth: 260,
+      minWidth: 0,
       height: "100%",
       overflowY: "auto",                // left panel scrolls internally
       boxSizing: "border-box",
+      minHeight: 0,
     }}
   >
             {/* Target Dropdown */}
@@ -495,10 +496,11 @@ const MLModelDevelopment = () => {
 <Box
     sx={{
       flex: "1 1 48%",                   // middle grows but doesn't push layout vertically
-      minWidth: 480,
+      minWidth: 0,
       height: "100%",
       overflowY: "auto",                 // critical: internal vertical scroll for plots
       boxSizing: "border-box",
+      minHeight: 0
     }}
   >
     <Box sx={{ display: "flex", justifyContent: "space-between",alignItems: "center", mb: 2, flexShrink: 0 }}>
@@ -725,10 +727,11 @@ const MLModelDevelopment = () => {
     sx={{
       flex: "0 0 24%",                   // interpretation column fixed-ish width
       maxWidth: "30%",
-      minWidth: 300,
+      minWidth: 0,
       height: "100%",
       overflowY: "auto",                 // AI interpretations scroll internally
       boxSizing: "border-box",
+      minHeight: 0
     }}
   >
 
