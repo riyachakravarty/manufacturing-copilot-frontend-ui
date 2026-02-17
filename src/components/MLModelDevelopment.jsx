@@ -294,40 +294,28 @@ const MLModelDevelopment = () => {
   };
 
     return (
-    <Grid container spacing={2} sx={{ flexGrow: 1, minHeight: 0, height: "100%" }}>
-      {/* Left Panel */}
-      <Grid item 
-        xs={12}
-        md="auto"
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          //px: 1,
-          fontSize: "0.85rem",
-          flexShrink: 0,
-          minWidth: 320,
-          transition: "width 0.3s ease",
-          width: 320, // fixed like DVE
-          minHeight: 0,
-  }}>
-          <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: 2,
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            minHeight: 0,
-          }}
-        >
-        <CardContent
-          sx={{
-            flexGrow: 1,
-            overflowY: "auto",
-            minHeight: 0,
-          }}
-        >
+      <Box
+      sx={{
+        height: "100%",                     // parent will be constrained by MainPage/CardContent
+        display: "flex",
+        flexDirection: "row",
+        gap: 2,
+        alignItems: "stretch",
+        flexWrap: "nowrap",                 // DO NOT allow wrapping to a new row
+        minHeight: 0,                       // CRITICAL: allows children to clip & scroll
+      }}
+      >
+      {/* LEFT PANEL */}
+  <Box
+    sx={{
+      flex: "0 0 28%",                  // fixed-ish column width (adjust 24-32% as you like)
+      maxWidth: "32%",
+      minWidth: 260,
+      height: "100%",
+      overflowY: "auto",                // left panel scrolls internally
+      boxSizing: "border-box",
+    }}
+  >
             {/* Target Dropdown */}
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
               <InputLabel>Target / Objective</InputLabel>
@@ -494,38 +482,18 @@ const MLModelDevelopment = () => {
                   </Button>
 
             
-          </CardContent>
-        </Card>
-      </Grid>
+                  </Box>
 
 
 {/* Right Panel */}
-<Grid
-  item
-  xs={12}
-  md
-  sx={{
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    minWidth: 0,
-    minHeight: 0,
-    flexShrink: 1,          // allow growth
-   flexGrow: 1,
-   overflow: "hidden",     // <-- NEW: disallows the middle column from growing outer layout
-  }}
->
-  <Paper
+<Box
     sx={{
-      p: 2,
+      flex: "1 1 48%",                   // middle grows but doesn't push layout vertically
+      minWidth: 480,
       height: "100%",
-      display: "flex",
-      flexDirection: "column",
-      bgcolor: theme.palette.background.paper,
-      overflowY: "auto",     // <-- NEW: internal vertical scroll for middle column
-      minHeight: 0,          // <-- needed for some browsers to honor flex clipping
+      overflowY: "auto",                 // critical: internal vertical scroll for plots
+      boxSizing: "border-box",
     }}
-    elevation={3}
   >
     <Box sx={{ display: "flex", justifyContent: "space-between",alignItems: "center", mb: 2, flexShrink: 0 }}>
       <Typography variant="h6" gutterBottom color="primary">
@@ -732,42 +700,19 @@ const MLModelDevelopment = () => {
 )}
 
     </Box>
-  </Paper>
-</Grid>
 
 {/* AI led Interpretation panel */}
 
-<Grid
-  item
-  xs={12}
-  md="auto"
-  sx={{
-    height: "100%",
-    flexShrink: 0,
-    display: "flex",
-    flexDirection: "column",
-    fontSize: "0.85rem",
-    width: 480,
-    minHeight: 0,
-  }}
->
-<Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
 <Box
-  sx={{
-    position: "sticky",
-    top: 0,
-    zIndex: 2,
-    bgcolor: "background.paper",
-    pb: 1,
-    mb: 2,
-    borderBottom: "1px solid",
-    borderColor: "divider",
-  }}
->
-  <Typography variant="h6" color="primary">
-    AI led Interpretation
-  </Typography>
-  </Box>
+    sx={{
+      flex: "0 0 24%",                   // interpretation column fixed-ish width
+      maxWidth: "30%",
+      minWidth: 300,
+      height: "100%",
+      overflowY: "auto",                 // AI interpretations scroll internally
+      boxSizing: "border-box",
+    }}
+  >
 
   {activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mt: 2 }}>
@@ -860,9 +805,9 @@ const MLModelDevelopment = () => {
             </CardContent>
           </Card>
         )}
-  </Paper>
-    </Grid>   
-    </Grid>
+  </Box>
+  </Box>
+  </Box>
   );
 };
 
