@@ -738,16 +738,22 @@ const MLModelDevelopment = () => {
   xs={12}
   md={4}
   sx={{
-    height: "100%",
+    //height: "100%",
     //flexShrink: 0,
     display: "flex",
     flexDirection: "column",
     fontSize: "0.85rem",
-    width: 480,
+    //width: 480,
     minHeight: 0,
   }}
 >
-<Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
+<Paper sx={{ p: 2, 
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+  //height: "100%", 
+  //overflowY: "auto" }}>
+}}>
 <Box
   sx={{
     position: "sticky",
@@ -765,9 +771,9 @@ const MLModelDevelopment = () => {
   </Typography>
   </Box>
 
-  <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+  <Box sx={{ flex: 1 , overflowY: "auto", pr: 1 }}>
 
-      {activeAnalysis === "feature_importance" && featureImportance && (
+  {activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -798,112 +804,66 @@ const MLModelDevelopment = () => {
       </Card>
 )}
 
-{activeAnalysis === "train" &&
-  modelInterpretation && (
-
-    <Card sx={{ mt: 2 }}>
-      <CardContent>
-        <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-          ML model interpretation
-        </Typography>
-
-        <Typography variant="subtitle2">Fit Quality</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.fit_quality}
-        </Typography>
-
-        <Typography variant="subtitle2">Generalization</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.generalization}
-        </Typography>
-
-        <Typography variant="subtitle2">Bias</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.bias_explanation}
-        </Typography>
-
-        <Typography variant="subtitle2">Temporal Behavior</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.temporal_behavior}
-        </Typography>
-
-        <Typography variant="subtitle2">Operational Readiness</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.operational_readiness}
-        </Typography>
-
-        <Typography variant="subtitle2">Deployment Recommendation</Typography>
-        <Typography>
-          {modelInterpretation?.risk_assessment?.deployment_recommendation}
-        </Typography>
-
-        <Typography variant="subtitle2">Confidence Score</Typography>
-        <Typography>
-          {modelInterpretation?.risk_assessment?.confidence_score}
-        </Typography>
-
-        <Typography>
-          {modelInterpretation?.risk_assessment?.justification}
-        </Typography>
-      </CardContent>
-    </Card>
-)}
-
-{activeAnalysis === "train" &&
-  deviationInterpretation?.deviation_analysis?.length > 0 && (
-    <Card sx={{ mt: 2 }}>
-      <CardContent>
-        <Typography
-          variant="subtitle1"
-          sx={{ fontWeight: "bold", mb: 2 }}
-        >
-          Train Test Timeseries Interpretation
-        </Typography>
-
-        {deviationInterpretation.deviation_analysis.map((item, index) => (
-          <Box
-            key={index}
-            sx={{
-              mb: 3,
-              p: 2,
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            <Typography variant="subtitle2" color="primary">
-              Period Type
+{/* ML Model */}
+{activeAnalysis === "train" && modelInterpretation && (
+        <Card sx={{ mb: 2 }}>
+          <CardContent>
+            <Typography variant="subtitle1" fontWeight="bold">
+              ML Model Interpretation
             </Typography>
-            <Typography>{item.period_type}</Typography>
+            <AIInterpretationContentModel data={modelInterpretation} />
+          </CardContent>
+        </Card>
+      )}
 
-            <Typography variant="subtitle2">Start Time</Typography>
-            <Typography>{item.start}</Typography>
+      {/* Deviation Windows */}
+      {activeAnalysis === "train" &&
+        deviationInterpretation?.deviation_analysis?.length > 0 && (
+          <Card sx={{ mb: 2 }}>
+            <CardContent>
+              <Typography variant="subtitle1" fontWeight="bold">
+                Train Test Timeseries Interpretation
+              </Typography>
 
-            <Typography variant="subtitle2">End Time</Typography>
-            <Typography>{item.end}</Typography>
+              {deviationInterpretation.deviation_analysis.map((item, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    mt: 2,
+                    p: 2,
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: "divider",
+                  }}
+                >
+                  <Typography variant="subtitle2" color="primary">
+                    {item.period_type.toUpperCase()}
+                  </Typography>
 
-            <Typography variant="subtitle2">Likely Cause</Typography>
-            <Typography>{item.likely_cause}</Typography>
+                  <Typography variant="body2">
+                    <strong>Start:</strong> {item.start}
+                  </Typography>
 
-            <Typography variant="subtitle2">
-              Cause Classification
-            </Typography>
-            <Typography>{item.cause_classification}</Typography>
+                  <Typography variant="body2">
+                    <strong>End:</strong> {item.end}
+                  </Typography>
 
-            <Typography variant="subtitle2">
-              Recommended Action
-            </Typography>
-            <Typography>{item.recommended_action}</Typography>
+                  <Typography variant="body2">
+                    <strong>Cause:</strong> {item.likely_cause}
+                  </Typography>
 
-            <Typography variant="subtitle2">
-              Confidence Level
-            </Typography>
-            <Typography>{item.confidence_level}</Typography>
-          </Box>
-        ))}
-      </CardContent>
-    </Card>
-)}
+                  <Typography variant="body2">
+                    <strong>Action:</strong> {item.recommended_action}
+                  </Typography>
+
+                  <Typography variant="body2">
+                    <strong>Confidence:</strong> {item.confidence_level}
+                  </Typography>
+                </Box>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 </Box>
   </Paper>
     </Grid>   
