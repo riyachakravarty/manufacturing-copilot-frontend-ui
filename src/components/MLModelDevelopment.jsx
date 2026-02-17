@@ -200,11 +200,12 @@ const MLModelDevelopment = () => {
     setTrainTimeseriesPlot(result.plot_train_timeseries);
     setTestTimeseriesPlot(result.plot_test_timeseries);
     setModelInterpretation(result.model_interpretation)
-    console.log("Model Interpretation:", modelInterpretation);
-    setActiveAnalysis("train");
+    console.log("Model Interpretation:", result.model_interpretation);
 
     setDeviationInterpretation(result.deviation_interpretation)
-    console.log("Deviation Interpretation:", deviationInterpretation);
+    console.log("Deviation Interpretation:", result.deviation_interpretation);
+
+    setActiveAnalysis("train");
 
     setFeatureImportance(null);
     setOptimalRanges(null);
