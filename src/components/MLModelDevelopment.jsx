@@ -512,6 +512,7 @@ const MLModelDevelopment = () => {
     minHeight: 0,
     flexShrink: 1,          // allow growth
    flexGrow: 1,
+   overflow: "hidden",     // <-- NEW: disallows the middle column from growing outer layout
   }}
 >
   <Paper
@@ -521,6 +522,8 @@ const MLModelDevelopment = () => {
       display: "flex",
       flexDirection: "column",
       bgcolor: theme.palette.background.paper,
+      overflowY: "auto",     // <-- NEW: internal vertical scroll for middle column
+      minHeight: 0,          // <-- needed for some browsers to honor flex clipping
     }}
     elevation={3}
   >
@@ -595,7 +598,7 @@ const MLModelDevelopment = () => {
                     margin: { t: 40, b: 40, l: 40, r: 40 },
                   }}
                   useResizeHandler
-                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                  style={{ width: "100%", height: 360, minHeight: 320  }}
                 />
               </CardContent>
             </Card>
@@ -618,7 +621,7 @@ const MLModelDevelopment = () => {
                     margin: { t: 40, b: 40, l: 40, r: 40 },
                   }}
                   useResizeHandler
-                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                  style={{ width: "100%", height: 360, minHeight: 320  }}
                 />
               </CardContent>
             </Card>
@@ -641,7 +644,7 @@ const MLModelDevelopment = () => {
                     margin: { t: 40, b: 40, l: 40, r: 40 },
                   }}
                   useResizeHandler
-                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                  style={{ width: "100%", height: 360, minHeight: 320  }}
                 />
               </CardContent>
             </Card>
@@ -664,7 +667,7 @@ const MLModelDevelopment = () => {
                     margin: { t: 40, b: 40, l: 40, r: 40 },
                   }}
                   useResizeHandler
-                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                  style={{ width: "100%", height: 360, minHeight: 320  }}
                 />
               </CardContent>
             </Card>
@@ -696,7 +699,7 @@ const MLModelDevelopment = () => {
           margin: { t: 40, b: 40, l: 60, r: 40 },
         }}
         useResizeHandler
-        style={{ width: "100%",  minHeight: 450 }}
+        style={{ width: "100%",  height: 360, minHeight: 320  }}
       />
 
     </CardContent>
@@ -722,7 +725,7 @@ const MLModelDevelopment = () => {
           margin: { t: 40, b: 40, l: 60, r: 40 },
         }}
         useResizeHandler
-        style={{ width: "100%", height: "100%", minHeight: 400 }}
+        style={{ width: "100%", height: 360, minHeight: 320  }}
       />
     </CardContent>
   </Card>
