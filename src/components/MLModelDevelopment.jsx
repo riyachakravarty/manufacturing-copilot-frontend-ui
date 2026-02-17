@@ -116,6 +116,14 @@ const MLModelDevelopment = () => {
     setError("");
   };
 
+  useEffect(() => {
+    console.log("STATE UPDATE → activeAnalysis:", activeAnalysis);
+  }, [activeAnalysis]);
+  
+  useEffect(() => {
+    console.log("STATE UPDATE → modelInterpretation:", modelInterpretation);
+  }, [modelInterpretation]);
+
 
 // Function to train the ML model
 
@@ -201,8 +209,6 @@ const MLModelDevelopment = () => {
     setTestTimeseriesPlot(result.plot_test_timeseries);
     setModelInterpretation(result.model_interpretation)
     console.log("Model Interpretation:", result.model_interpretation);
-    console.log("Model assessment:", modelInterpretation?.model_assessment) 
-    console.log("Risk assessment:",modelInterpretation?.risk_assessment)
 
     //setDeviationInterpretation(result.deviation_interpretation)
     //console.log("Deviation Interpretation:", result.deviation_interpretation);
@@ -718,8 +724,6 @@ const MLModelDevelopment = () => {
 </Grid>
 
 {/* AI led Interpretation panel */}
-console.log("RENDER CHECK → activeAnalysis:", activeAnalysis);
-console.log("RENDER CHECK → modelInterpretation:", modelInterpretation);
 <Grid
   item
   xs={12}
