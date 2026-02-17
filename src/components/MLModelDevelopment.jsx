@@ -45,6 +45,12 @@ import AIInterpretationContentFI from "./AIInterpretationContentFI";
 import AIInterpretationContentModel from "./AIInterpretationContentModel";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
+export const PlotContainer = ({ children, height = 380, maxHeight = 520 }) => (
+  <Box sx={{ width: "100%", height, maxHeight, mb: 2, minHeight: 0 }}>
+    {children}
+  </Box>
+);
+
 const MLModelDevelopment = () => {
   const [edaColumns, setEdaColumns] = useState([]);
 //  const [loading, setLoading] = useState(false);
@@ -556,6 +562,7 @@ const MLModelDevelopment = () => {
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
                   Predicted vs Actual (Train Data)
                 </Typography>
+                <PlotContainer height={380}>
                 <Plot
                   data={trainPlot.data}
                   layout={{
@@ -566,8 +573,9 @@ const MLModelDevelopment = () => {
                     margin: { t: 40, b: 40, l: 40, r: 40 },
                   }}
                   useResizeHandler
-                  style={{ width: "100%", height: 360, minHeight: 320  }}
+                  style={{ width: "100%", height: "100%"}}
                 />
+                </PlotContainer>
               </CardContent>
             </Card>
           )}
@@ -579,6 +587,7 @@ const MLModelDevelopment = () => {
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
                   Predicted vs Actual (Test Data)
                 </Typography>
+                <PlotContainer height={380}>
                 <Plot
                   data={testPlot.data}
                   layout={{
@@ -589,8 +598,9 @@ const MLModelDevelopment = () => {
                     margin: { t: 40, b: 40, l: 40, r: 40 },
                   }}
                   useResizeHandler
-                  style={{ width: "100%", height: 360, minHeight: 320  }}
+                  style={{ width: "100%", height: "100%"   }}
                 />
+                </PlotContainer>
               </CardContent>
             </Card>
           )}
@@ -602,6 +612,7 @@ const MLModelDevelopment = () => {
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
                   Predicted vs Actual Timeseies (Train Data)
                 </Typography>
+                <PlotContainer height={380}>
                 <Plot
                   data={trainTimeseriesPlot.data}
                   layout={{
@@ -612,8 +623,9 @@ const MLModelDevelopment = () => {
                     margin: { t: 40, b: 40, l: 40, r: 40 },
                   }}
                   useResizeHandler
-                  style={{ width: "100%", height: 360, minHeight: 320  }}
+                  style={{ wwidth: "100%", height: "100%"  }}
                 />
+                </PlotContainer>
               </CardContent>
             </Card>
           )}
@@ -625,6 +637,7 @@ const MLModelDevelopment = () => {
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
                   Predicted vs Actual Timeseries (Test Data)
                 </Typography>
+                <PlotContainer height={380}>
                 <Plot
                   data={testTimeseriesPlot.data}
                   layout={{
@@ -635,8 +648,9 @@ const MLModelDevelopment = () => {
                     margin: { t: 40, b: 40, l: 40, r: 40 },
                   }}
                   useResizeHandler
-                  style={{ width: "100%", height: 360, minHeight: 320  }}
-                />
+                  style={{ width: "100%", height: "100%" }}
+        />
+      </PlotContainer>
               </CardContent>
             </Card>
           )}
@@ -657,6 +671,7 @@ const MLModelDevelopment = () => {
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Feature Importance
       </Typography>
+      <PlotContainer height={380}>
       <Plot
         data={featureImportance.plot.data}
         layout={{
@@ -667,8 +682,9 @@ const MLModelDevelopment = () => {
           margin: { t: 40, b: 40, l: 60, r: 40 },
         }}
         useResizeHandler
-        style={{ width: "100%",  height: 360, minHeight: 320  }}
+        style={{ width: "100%", height: "100%"  }}
       />
+      </PlotContainer>
 
     </CardContent>
   </Card>
@@ -683,6 +699,7 @@ const MLModelDevelopment = () => {
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Dependence / Optimal Operating Ranges
       </Typography>
+      <PlotContainer height={380}>
       <Plot
         data={optimalRanges.plot.data}
         layout={{
@@ -693,8 +710,9 @@ const MLModelDevelopment = () => {
           margin: { t: 40, b: 40, l: 60, r: 40 },
         }}
         useResizeHandler
-        style={{ width: "100%", height: 360, minHeight: 320  }}
+        style={{ width: "100%", height: "100%"  }}
       />
+      </PlotContainer>
     </CardContent>
   </Card>
 )}
