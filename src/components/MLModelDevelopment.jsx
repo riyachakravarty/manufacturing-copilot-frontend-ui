@@ -202,8 +202,8 @@ const MLModelDevelopment = () => {
     setModelInterpretation(result.model_interpretation)
     console.log("Model Interpretation:", result.model_interpretation);
 
-    setDeviationInterpretation(result.deviation_interpretation)
-    console.log("Deviation Interpretation:", result.deviation_interpretation);
+    //setDeviationInterpretation(result.deviation_interpretation)
+    //console.log("Deviation Interpretation:", result.deviation_interpretation);
 
     setActiveAnalysis("train");
 
