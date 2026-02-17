@@ -186,6 +186,8 @@ const MLModelDevelopment = () => {
     }
 
     const result = await res.json();
+    console.log("FULL BACKEND RESPONSE:", result);
+    
     if (!result.success) {
       throw new Error(result.error || "Unknown error while training model");
     }
@@ -199,9 +201,10 @@ const MLModelDevelopment = () => {
     setTestTimeseriesPlot(result.plot_test_timeseries);
     setModelInterpretation(result.model_interpretation)
     console.log("Model Interpretation:", modelInterpretation);
-    console.log("Deviation Interpretation:", deviationInterpretation);
 
     setDeviationInterpretation(result.deviation_interpretation)
+    console.log("Deviation Interpretation:", deviationInterpretation);
+
     setActiveAnalysis("train");
     setFeatureImportance(null);
     setOptimalRanges(null);
