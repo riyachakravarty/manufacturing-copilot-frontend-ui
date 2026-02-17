@@ -104,17 +104,10 @@ const MainPage = () => {
       minHeight: 0,
     }}
   >
-        <CardContent sx={{ flexGrow: 1, minHeight: 0, p: 0 }}>
-      <Box
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          minHeight: 0,
-        }}
-      >
+        <CardContent sx={{ flexGrow: 1, minHeight: 0, p: 0, display: "flex", flexDirection: "column", }}>
+     
         {renderTabContent()}
-      </Box>
+     
     </CardContent>
       </Card>
     </Box>
