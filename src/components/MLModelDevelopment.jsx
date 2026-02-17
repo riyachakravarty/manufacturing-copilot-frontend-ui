@@ -298,7 +298,7 @@ const MLModelDevelopment = () => {
       {/* Left Panel */}
       <Grid item 
         xs={12}
-        md="auto"
+        md={3}
         sx={{
           height: "100%",
           display: "flex",
@@ -502,7 +502,7 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md
+  md={6}
   sx={{
     height: "100%",
     display: "flex",
@@ -736,22 +736,23 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md={4}
+  md={3}
   sx={{
-    height: "100%",
-    flexShrink: 0,
+    //height: "100%",
+    //flexShrink: 0,
+    border: "3px solid red",   // 👈 ADD HERE
     display: "flex",
     flexDirection: "column",
     fontSize: "0.85rem",
     width: 480,
-    minHeight: 0,
+    //minHeight: 0,
   }}
 >
 <Paper sx={{ p: 2, 
   display: "flex",
   flexDirection: "column",
-  overflow: "hidden",
-  height: "100%", 
+  //overflow: "hidden",
+  maxHeight: "100%", 
   //overflowY: "auto" }}>
 }}
 >
@@ -772,7 +773,7 @@ const MLModelDevelopment = () => {
   </Typography>
   </Box>
 
-  <Box sx={{ flexGrow: 1,  overflowY: "auto", pr: 1 }}>
+  <Box sx={{ flex: 1, overflowY: "auto", pr: 1, minHeight: 0 }}>
 
   {activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mb: 2 }}>
