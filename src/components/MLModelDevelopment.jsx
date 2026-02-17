@@ -42,6 +42,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 import AIInterpretationContent from "./AIInterpretationContent";
 import AIInterpretationContentFI from "./AIInterpretationContentFI";
+import AIInterpretationContentModel from "./AIInterpretationContentModel";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const MLModelDevelopment = () => {
@@ -794,56 +795,17 @@ const MLModelDevelopment = () => {
       </Card>
 )}
 
-{ modelInterpretation && (
+{activeAnalysis === "train" && modelInterpretation && (
 
-    <Card sx={{ mt: 2 }}>
-      <CardContent>
-        <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-          ML model interpretation
-        </Typography>
+<Card sx={{ mt: 2 }}>
+<CardContent>
+  <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+    ML Model Interpretation
+  </Typography>
 
-<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Typography variant="subtitle2">Fit Quality</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.fit_quality}
-        </Typography>
-
-        <Typography variant="subtitle2">Generalization</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.generalization}
-        </Typography>
-
-        <Typography variant="subtitle2">Bias</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.bias_explanation}
-        </Typography>
-
-        <Typography variant="subtitle2">Temporal Behavior</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.temporal_behavior}
-        </Typography>
-
-        <Typography variant="subtitle2">Operational Readiness</Typography>
-        <Typography>
-          {modelInterpretation?.model_assessment?.operational_readiness}
-        </Typography>
-
-        <Typography variant="subtitle2">Deployment Recommendation</Typography>
-        <Typography>
-          {modelInterpretation?.risk_assessment?.deployment_recommendation}
-        </Typography>
-
-        <Typography variant="subtitle2">Confidence Score</Typography>
-        <Typography>
-          {modelInterpretation?.risk_assessment?.confidence_score}
-        </Typography>
-
-        <Typography>
-          {modelInterpretation?.risk_assessment?.justification}
-        </Typography>
-        </Box>
-      </CardContent>
-    </Card>
+  <AIInterpretationContentModel data={modelInterpretation} />
+</CardContent>
+</Card>
 )}
 
 
