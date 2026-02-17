@@ -733,19 +733,13 @@ const MLModelDevelopment = () => {
 
 {/* AI led Interpretation panel */}
 
-{modelInterpretation && (
-  <div style={{ background: "red", padding: 20 }}>
-    MODEL EXISTS
-  </div>
-)}
-
 <Grid
   item
   xs={12}
   md={4}
   sx={{
     height: "100%",
-    flexShrink: 0,
+    //flexShrink: 0,
     display: "flex",
     flexDirection: "column",
     fontSize: "0.85rem",
@@ -770,6 +764,8 @@ const MLModelDevelopment = () => {
     AI led Interpretation
   </Typography>
   </Box>
+
+  <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
 
       {activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mt: 2 }}>
@@ -908,7 +904,7 @@ const MLModelDevelopment = () => {
       </CardContent>
     </Card>
 )}
-
+</Box>
   </Paper>
     </Grid>   
     </Grid>
