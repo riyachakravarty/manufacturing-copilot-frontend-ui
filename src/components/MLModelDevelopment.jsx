@@ -739,11 +739,11 @@ const MLModelDevelopment = () => {
   md={4}
   sx={{
     height: "100%",
-    //flexShrink: 0,
+    flexShrink: 0,
     display: "flex",
     flexDirection: "column",
     fontSize: "0.85rem",
-    //width: 480,
+    width: 480,
     minHeight: 0,
   }}
 >
