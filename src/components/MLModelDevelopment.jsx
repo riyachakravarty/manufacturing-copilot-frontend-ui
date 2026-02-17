@@ -67,7 +67,7 @@ const MLModelDevelopment = () => {
   const [trainTimeseriesPlot, setTrainTimeseriesPlot] = useState(null);
   const [testTimeseriesPlot, setTestTimeseriesPlot] = useState(null);
   const [modelInterpretation, setModelInterpretation] =useState(null);
-  const [deviationInterpretation, setDeviationInterpretation] =useState(null);
+  //const [deviationInterpretation, setDeviationInterpretation] =useState(null);
   // SHAP plots and states
   const [featureImportance, setFeatureImportance] = useState(null);
   const [optimalRanges, setOptimalRanges] = useState(null);
