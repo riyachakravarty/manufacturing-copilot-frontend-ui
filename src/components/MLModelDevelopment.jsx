@@ -42,7 +42,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 import AIInterpretationContent from "./AIInterpretationContent";
 import AIInterpretationContentFI from "./AIInterpretationContentFI";
-import AIInterpretationContentModel from "./AIInterpretationContentModel";
+//import AIInterpretationContentModel from "./AIInterpretationContentModel";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const MLModelDevelopment = () => {
