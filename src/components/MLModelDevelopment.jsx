@@ -832,61 +832,7 @@ const MLModelDevelopment = () => {
 )}
 
 
-{activeAnalysis === "train" &&
-  deviationInterpretation?.deviation_analysis?.length > 0 && (
-    <Card sx={{ mt: 2 }}>
-      <CardContent>
-        <Typography
-          variant="subtitle1"
-          sx={{ fontWeight: "bold", mb: 2 }}
-        >
-          Train Test Timeseries Interpretation
-        </Typography>
 
-        {deviationInterpretation.deviation_analysis.map((item, index) => (
-          <Box
-            key={index}
-            sx={{
-              mb: 3,
-              p: 2,
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            <Typography variant="subtitle2" color="primary">
-              Period Type
-            </Typography>
-            <Typography>{item.period_type}</Typography>
-
-            <Typography variant="subtitle2">Start Time</Typography>
-            <Typography>{item.start}</Typography>
-
-            <Typography variant="subtitle2">End Time</Typography>
-            <Typography>{item.end}</Typography>
-
-            <Typography variant="subtitle2">Likely Cause</Typography>
-            <Typography>{item.likely_cause}</Typography>
-
-            <Typography variant="subtitle2">
-              Cause Classification
-            </Typography>
-            <Typography>{item.cause_classification}</Typography>
-
-            <Typography variant="subtitle2">
-              Recommended Action
-            </Typography>
-            <Typography>{item.recommended_action}</Typography>
-
-            <Typography variant="subtitle2">
-              Confidence Level
-            </Typography>
-            <Typography>{item.confidence_level}</Typography>
-          </Box>
-        ))}
-      </CardContent>
-    </Card>
-)}
 
   </Paper>
     </Grid>   
