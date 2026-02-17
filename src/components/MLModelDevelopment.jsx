@@ -294,7 +294,7 @@ const MLModelDevelopment = () => {
   };
 
     return (
-    <Grid container spacing={2} sx={{ flexGrow: 1, minHeight: 0 }}>
+    <Grid container spacing={2} sx={{ flexGrow: 1, minHeight: 0, height: "100%" }}>
       {/* Left Panel */}
       <Grid item 
         xs={12}
@@ -738,34 +738,32 @@ const MLModelDevelopment = () => {
   xs={12}
   md={3}
   sx={{
-    //height: "100%",
+    height: "100%",
     //flexShrink: 0,
     border: "3px solid red",   // 👈 ADD HERE
     display: "flex",
     flexDirection: "column",
     fontSize: "0.85rem",
-    width: 480,
-    //minHeight: 0,
+    //width: 480,
+    minHeight: 0,
   }}
 >
 <Paper sx={{ p: 2, 
   display: "flex",
   flexDirection: "column",
   //overflow: "hidden",
-  maxHeight: "100%", 
+  height: "100%",
+  minHeight: 0, 
   //overflowY: "auto" }}>
 }}
 >
 <Box
   sx={{
-    position: "sticky",
-    top: 0,
-    zIndex: 2,
-    bgcolor: "background.paper",
-    pb: 1,
-    mb: 2,
-    borderBottom: "1px solid",
-    borderColor: "divider",
+    flexShrink: 0,
+        pb: 1,
+        mb: 2,
+        borderBottom: "1px solid",
+        borderColor: "divider",
   }}
 >
   <Typography variant="h6" color="primary">
@@ -773,7 +771,9 @@ const MLModelDevelopment = () => {
   </Typography>
   </Box>
 
-  <Box sx={{ flex: 1, overflowY: "auto", pr: 1, minHeight: 0 }}>
+  <Box sx={{ fflexGrow: 1,
+        minHeight: 0,
+        overflowY: "auto"}}>
 
   {activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mb: 2 }}>
