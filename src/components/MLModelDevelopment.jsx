@@ -738,7 +738,7 @@ const MLModelDevelopment = () => {
   xs={12}
   md={4}
   sx={{
-    //height: "100%",
+    height: "100%",
     //flexShrink: 0,
     display: "flex",
     flexDirection: "column",
@@ -751,9 +751,10 @@ const MLModelDevelopment = () => {
   display: "flex",
   flexDirection: "column",
   overflow: "hidden",
-  //height: "100%", 
+  height: "100%", 
   //overflowY: "auto" }}>
-}}>
+}}
+>
 <Box
   sx={{
     position: "sticky",
@@ -771,10 +772,10 @@ const MLModelDevelopment = () => {
   </Typography>
   </Box>
 
-  <Box sx={{ flex: 1 , overflowY: "auto", pr: 1 }}>
+  <Box sx={{ flexGrow: 1,  overflowY: "auto", pr: 1 }}>
 
   {activeAnalysis === "feature_importance" && featureImportance && (
-  <Card sx={{ mt: 2 }}>
+  <Card sx={{ mb: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Feature Importance
@@ -790,7 +791,7 @@ const MLModelDevelopment = () => {
 )}
 
 {activeAnalysis === "optimal_ranges" && optimalRanges && (
-  <Card sx={{ mt: 2 }}>
+  <Card sx={{ mb: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Dependence / Optimal Operating Ranges
