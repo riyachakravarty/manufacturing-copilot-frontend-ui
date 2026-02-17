@@ -126,6 +126,11 @@ const MLModelDevelopment = () => {
     console.log("CHECK risk_assessment:", modelInterpretation?.risk_assessment);
   }, [modelInterpretation]);
 
+  useEffect(() => {
+    console.log("AI PANEL → activeAnalysis:", activeAnalysis);
+    console.log("AI PANEL → modelInterpretation:", modelInterpretation);
+  }, [activeAnalysis, modelInterpretation]);
+
 
 // Function to train the ML model
 
