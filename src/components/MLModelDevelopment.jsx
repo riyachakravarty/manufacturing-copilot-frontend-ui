@@ -121,7 +121,9 @@ const MLModelDevelopment = () => {
   }, [activeAnalysis]);
   
   useEffect(() => {
-    console.log("STATE UPDATE → modelInterpretation:", modelInterpretation);
+    console.log("CHECK modelInterpretation:", modelInterpretation);
+    console.log("CHECK model_assessment:", modelInterpretation?.model_assessment);
+    console.log("CHECK risk_assessment:", modelInterpretation?.risk_assessment);
   }, [modelInterpretation]);
 
 
