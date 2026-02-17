@@ -794,8 +794,7 @@ const MLModelDevelopment = () => {
       </Card>
 )}
 
-{activeAnalysis === "train" &&
-  modelInterpretation && (
+{ modelInterpretation && (
 
     <Card sx={{ mt: 2 }}>
       <CardContent>
