@@ -803,6 +803,7 @@ const MLModelDevelopment = () => {
           ML model interpretation
         </Typography>
 
+<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Typography variant="subtitle2">Fit Quality</Typography>
         <Typography>
           {modelInterpretation?.model_assessment?.fit_quality}
@@ -841,6 +842,7 @@ const MLModelDevelopment = () => {
         <Typography>
           {modelInterpretation?.risk_assessment?.justification}
         </Typography>
+        </Box>
       </CardContent>
     </Card>
 )}
