@@ -201,6 +201,8 @@ const MLModelDevelopment = () => {
     setTestTimeseriesPlot(result.plot_test_timeseries);
     setModelInterpretation(result.model_interpretation)
     console.log("Model Interpretation:", result.model_interpretation);
+    console.log("Model assessment:", modelInterpretation?.model_assessment) 
+    console.log("Risk assessment:",modelInterpretation?.risk_assessment)
 
     //setDeviationInterpretation(result.deviation_interpretation)
     //console.log("Deviation Interpretation:", result.deviation_interpretation);
