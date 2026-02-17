@@ -718,6 +718,8 @@ const MLModelDevelopment = () => {
 </Grid>
 
 {/* AI led Interpretation panel */}
+console.log("RENDER CHECK → activeAnalysis:", activeAnalysis);
+console.log("RENDER CHECK → modelInterpretation:", modelInterpretation);
 <Grid
   item
   xs={12}
@@ -782,8 +784,7 @@ const MLModelDevelopment = () => {
 )}
 
 {activeAnalysis === "train" &&
-  modelInterpretation?.model_assessment &&
-  modelInterpretation?.risk_assessment && (
+  modelInterpretation && (
 
     <Card sx={{ mt: 2 }}>
       <CardContent>
