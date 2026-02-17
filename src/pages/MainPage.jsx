@@ -45,7 +45,7 @@ const MainPage = () => {
   };
 
   return (
-    <Box sx={{ padding: 4,height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <Box sx={{ padding: 4,height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <Typography variant="h4" sx={{ mb: 2, color: 'primary.main' }}>
         Welcome to Nexus AI
@@ -104,7 +104,7 @@ const MainPage = () => {
       minHeight: 0,
     }}
   >
-        <CardContent sx={{ flexGrow: 1, minHeight: 0, p: 0, display: "flex", flexDirection: "column", }}>
+        <CardContent sx={{ flexGrow: 1, minHeight: 0, p: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
      
         {renderTabContent()}
      
