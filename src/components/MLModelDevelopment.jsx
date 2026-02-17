@@ -308,15 +308,16 @@ const MLModelDevelopment = () => {
         gap: 2,
         alignItems: "stretch",
         flexWrap: "nowrap",                 // DO NOT allow wrapping to a new row
-        minHeight: 0,                       // CRITICAL: allows children to clip & scroll
+        minHeight: 0,
+        overflow: "hidden",                       // CRITICAL: allows children to clip & scroll
       }}
       >
       {/* LEFT PANEL */}
   <Box
     sx={{
       flex: "0 0 28%",                  // fixed-ish column width (adjust 24-32% as you like)
-      maxWidth: "32%",
-      minWidth: 0,
+      maxWidth: "320",
+      minWidth: 260,
       height: "100%",
       overflowY: "auto",                // left panel scrolls internally
       boxSizing: "border-box",
@@ -495,7 +496,7 @@ const MLModelDevelopment = () => {
 {/* Right Panel */}
 <Box
     sx={{
-      flex: "1 1 48%",                   // middle grows but doesn't push layout vertically
+      flex: "1 1 auto",                   // middle grows but doesn't push layout vertically
       minWidth: 0,
       height: "100%",
       overflowY: "auto",                 // critical: internal vertical scroll for plots
@@ -725,9 +726,9 @@ const MLModelDevelopment = () => {
 
 <Box
     sx={{
-      flex: "0 0 24%",                   // interpretation column fixed-ish width
-      maxWidth: "30%",
-      minWidth: 0,
+      flex: "0 0 30%",                   // interpretation column fixed-ish width
+      maxWidth: 420,
+      minWidth: 300,
       height: "100%",
       overflowY: "auto",                 // AI interpretations scroll internally
       boxSizing: "border-box",
