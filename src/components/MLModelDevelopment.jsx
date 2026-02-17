@@ -298,7 +298,7 @@ const MLModelDevelopment = () => {
       {/* Left Panel */}
       <Grid item 
         xs={12}
-        md={3}
+        md="auto"
         sx={{
           height: "100%",
           display: "flex",
@@ -502,7 +502,7 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md={6}
+  md
   sx={{
     height: "100%",
     display: "flex",
@@ -736,34 +736,28 @@ const MLModelDevelopment = () => {
 <Grid
   item
   xs={12}
-  md={3}
+  md="auto"
   sx={{
     height: "100%",
-    //flexShrink: 0,
-    border: "3px solid red",   // 👈 ADD HERE
+    flexShrink: 0,
     display: "flex",
     flexDirection: "column",
     fontSize: "0.85rem",
-    //width: 480,
+    width: 480,
     minHeight: 0,
   }}
 >
-<Paper sx={{ p: 2, 
-  display: "flex",
-  flexDirection: "column",
-  //overflow: "hidden",
-  height: "100%",
-  minHeight: 0, 
-  //overflowY: "auto" }}>
-}}
->
+<Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
 <Box
   sx={{
-    flexShrink: 0,
-        pb: 1,
-        mb: 2,
-        borderBottom: "1px solid",
-        borderColor: "divider",
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    bgcolor: "background.paper",
+    pb: 1,
+    mb: 2,
+    borderBottom: "1px solid",
+    borderColor: "divider",
   }}
 >
   <Typography variant="h6" color="primary">
@@ -771,12 +765,8 @@ const MLModelDevelopment = () => {
   </Typography>
   </Box>
 
-  <Box sx={{ fflexGrow: 1,
-        minHeight: 0,
-        overflowY: "auto"}}>
-
   {activeAnalysis === "feature_importance" && featureImportance && (
-  <Card sx={{ mb: 2 }}>
+  <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Feature Importance
@@ -792,7 +782,7 @@ const MLModelDevelopment = () => {
 )}
 
 {activeAnalysis === "optimal_ranges" && optimalRanges && (
-  <Card sx={{ mb: 2 }}>
+  <Card sx={{ mt: 2 }}>
     <CardContent>
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
         SHAP Dependence / Optimal Operating Ranges
@@ -808,7 +798,7 @@ const MLModelDevelopment = () => {
 
 {/* ML Model */}
 {activeAnalysis === "train" && modelInterpretation && (
-        <Card sx={{ mb: 2 }}>
+        <Card sx={{ mt: 2 }}>
           <CardContent>
             <Typography variant="subtitle1" fontWeight="bold">
               ML Model Interpretation
@@ -821,7 +811,7 @@ const MLModelDevelopment = () => {
       {/* Deviation Windows */}
       {activeAnalysis === "train" &&
         deviationInterpretation?.deviation_analysis?.length > 0 && (
-          <Card sx={{ mb: 2 }}>
+          <Card sx={{ mt: 2 }}>
             <CardContent>
               <Typography variant="subtitle1" fontWeight="bold">
                 Train Test Timeseries Interpretation
@@ -866,7 +856,6 @@ const MLModelDevelopment = () => {
             </CardContent>
           </Card>
         )}
-</Box>
   </Paper>
     </Grid>   
     </Grid>
