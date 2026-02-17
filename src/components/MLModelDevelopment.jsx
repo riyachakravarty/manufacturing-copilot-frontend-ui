@@ -201,11 +201,11 @@ const MLModelDevelopment = () => {
     setTestTimeseriesPlot(result.plot_test_timeseries);
     setModelInterpretation(result.model_interpretation)
     console.log("Model Interpretation:", modelInterpretation);
+    setActiveAnalysis("train");
 
     setDeviationInterpretation(result.deviation_interpretation)
     console.log("Deviation Interpretation:", deviationInterpretation);
 
-    setActiveAnalysis("train");
     setFeatureImportance(null);
     setOptimalRanges(null);
   } catch (err) {
