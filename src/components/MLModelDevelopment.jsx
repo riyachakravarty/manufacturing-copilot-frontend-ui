@@ -796,16 +796,11 @@ const MLModelDevelopment = () => {
 )}
 
 {modelInterpretation && (
-
-<Card sx={{ mt: 2 }}>
-<CardContent>
-  <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-    ML Model Interpretation
-  </Typography>
-
-  <AIInterpretationContentModel data={modelInterpretation} />
-</CardContent>
-</Card>
+  <Card sx={{ mt: 2, bgcolor: "red" }}>
+    <CardContent>
+      <Typography>MODEL INTERPRETATION TEST</Typography>
+    </CardContent>
+  </Card>
 )}
 
 
