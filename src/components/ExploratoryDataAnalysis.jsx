@@ -294,7 +294,12 @@ const generatemultivariateanalysis = async () => {
 
 
   return (
-    <Grid container spacing={2}>
+    <Grid
+  container
+  spacing={2}
+  wrap="nowrap"
+  sx={{ height: "100%", minHeight: 0 }}
+>
       {/* Left Panel */}
       <Grid item 
         xs={12}
