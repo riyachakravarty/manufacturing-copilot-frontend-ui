@@ -52,7 +52,7 @@ export const PlotContainer = ({ children, height = 380 }) => (
       maxWidth: "100%",
       height,
       maxHeight: 520,
-      flexGrow,
+      flexGrow: 1,
       display: "block",   // 🔴 important
       //mb: 2,
     }}
