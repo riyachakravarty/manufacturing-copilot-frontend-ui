@@ -331,8 +331,8 @@ const generatemultivariateanalysis = async () => {
         sx={{
           height: "100%",
           //flexGrow: 1,
-          overflowY: "auto",
-          //minHeight: 0,
+          //overflowY: "auto",
+          minHeight: 0,
         }}
       >
             {/* Target Dropdown */}
