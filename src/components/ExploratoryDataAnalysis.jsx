@@ -294,42 +294,47 @@ const generatemultivariateanalysis = async () => {
 
 
   return (
-    <Grid
-  container
-  spacing={2}
-  //wrap="nowrap"
-  sx={{ height: "100%", 
-  //minHeight: 0 
-  }}
->
-      {/* Left Panel */}
-      <Grid item 
-        xs={12}
-        md={4}
+    <Grid container spacing={2} wrap="nowrap" sx={{ 
+      //minHeight: 0, 
+      height: "100%" }}>
+    {/* Left Panel */}
+    <Grid item 
+      //xs={2}
+      //md={2}
+      sx={{
+        flex: "0 0 20%",   // Left fixed 20%
+        maxWidth: "20%",
+      minWidth: 260,
+        //height: "100%",
+        //display: "flex",
+        //flexDirection: "column",
+        //px: 1,
+        fontSize: "0.85rem",
+        //flexShrink: 0,
+        //minWidth: 320,
+        //transition: "width 0.3s ease",
+        //width: 320, // fixed like DVE
+        //minHeight: 0,
+        overflowY: "auto"
+}}>
+        <Card
         sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-          px: 1,
-          fontSize: "0.85rem",
-          flexShrink: 0,
-          minWidth: 320,
-          transition: "width 0.3s ease",
-          width: 320, // fixed like DVE
-          minHeight: 0,
-  }}>
-              <Card
-              sx={{
           borderRadius: 3,
           boxShadow: 2,
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          minHeight: 0
+          //flexGrow: 1,
+          //display: "flex",
+          //flexDirection: "column",
+          height: "100%"
         }}
       >
-          <CardContent>
+      <CardContent
+        sx={{
+          height: "100%",
+          //flexGrow: 1,
+          overflowY: "auto",
+          //minHeight: 0,
+        }}
+      >
             {/* Target Dropdown */}
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
               <InputLabel>Target / Objective</InputLabel>
