@@ -308,22 +308,23 @@ const MLModelDevelopment = () => {
   };
 
     return (
-      <Grid container spacing={2} sx={{ flexGrow: 1, minHeight: 0, height: "100%" }}>
+      <Grid container spacing={2} wrap="nowrap" sx={{ minHeight: 0, height: "100%" }}>
       {/* Left Panel */}
       <Grid item 
-        xs={12}
-        md="auto"
+        xs={2}
+        //md={2}
         sx={{
           height: "100%",
-          display: "flex",
-          flexDirection: "column",
+          //display: "flex",
+          //flexDirection: "column",
           //px: 1,
           fontSize: "0.85rem",
-          flexShrink: 0,
-          minWidth: 320,
-          transition: "width 0.3s ease",
-          width: 320, // fixed like DVE
+          //flexShrink: 0,
+          //minWidth: 320,
+          //transition: "width 0.3s ease",
+          //width: 320, // fixed like DVE
           minHeight: 0,
+          overflowY: "auto"
   }}>
           <Card
           sx={{
@@ -515,26 +516,27 @@ const MLModelDevelopment = () => {
 {/* Right Panel */}
 <Grid
   item
-  xs={12}
-  md
+  xs={6}
+  //md={6}
   sx={{
+    border: "2px solid red",
     height: "100%",
-    display: "flex",
-    flexDirection: "column",
+    //display: "flex",
+    //flexDirection: "column",
     minWidth: 0,
     minHeight: 0,
     //flexShrink: 1,          // allow growth
    //flexGrow: 1,
    overflowY: "auto",
-    overflowX: "hidden",
+    //overflowX: "hidden",
   }}
 >
   <Paper
     sx={{
       p: 2,
       height: "100%",
-      display: "flex",
-      flexDirection: "column",
+      //display: "flex",
+      //flexDirection: "column",
       bgcolor: theme.palette.background.paper,
     }}
     elevation={3}
@@ -776,19 +778,22 @@ const MLModelDevelopment = () => {
 
 <Grid
   item
-  xs={12}
-  md="auto"
+  xs={4}
+  //md={4}
   sx={{
     height: "100%",
-    flexShrink: 0,
-    display: "flex",
-    flexDirection: "column",
+    //flexShrink: 0,
+    //display: "flex",
+    //flexDirection: "column",
     fontSize: "0.85rem",
-    width: 480,
+    //width: 480,
     minHeight: 0,
+    overflowY: "auto"
   }}
 >
-<Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
+<Paper sx={{ p: 2, height: "100%", 
+  //overflowY: "auto" 
+  }}>
 <Box
   sx={{
     position: "sticky",
