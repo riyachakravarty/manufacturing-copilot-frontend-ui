@@ -297,8 +297,10 @@ const generatemultivariateanalysis = async () => {
     <Grid
   container
   spacing={2}
-  wrap="nowrap"
-  sx={{ height: "100%", minHeight: 0 }}
+  //wrap="nowrap"
+  sx={{ height: "100%", 
+  //minHeight: 0 
+  }}
 >
       {/* Left Panel */}
       <Grid item 
@@ -315,6 +317,7 @@ const generatemultivariateanalysis = async () => {
           minWidth: 320,
           transition: "width 0.3s ease",
           width: 320, // fixed like DVE
+          minHeight: 0,
   }}>
               <Card
               sx={{
