@@ -330,16 +330,18 @@ const MLModelDevelopment = () => {
           sx={{
             borderRadius: 3,
             boxShadow: 2,
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
+            //flexGrow: 1,
+            //display: "flex",
+            //flexDirection: "column",
+            height: "100%"
           }}
         >
         <CardContent
           sx={{
-            flexGrow: 1,
+            height: "100%",
+            //flexGrow: 1,
             overflowY: "auto",
-            minHeight: 0,
+            //minHeight: 0,
           }}
         >
             {/* Target Dropdown */}
