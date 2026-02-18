@@ -45,8 +45,16 @@ import AIInterpretationContentFI from "./AIInterpretationContentFI";
 import AIInterpretationContentModel from "./AIInterpretationContentModel";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
-export const PlotContainer = ({ children, height = 380, maxHeight = 520 }) => (
-  <Box sx={{ width: "100%", height, maxHeight, mb: 2, minHeight: 0 }}>
+export const PlotContainer = ({ children, height = 380 }) => (
+  <Box
+    sx={{
+      width: "100%",
+      maxWidth: "100%",
+      height,
+      overflow: "hidden",   // 🔴 important
+      mb: 2,
+    }}
+  >
     {children}
   </Box>
 );
@@ -300,30 +308,39 @@ const MLModelDevelopment = () => {
   };
 
     return (
-      <Box
-      sx={{
-        height: "100%",                     // parent will be constrained by MainPage/CardContent
-        display: "flex",
-        flexDirection: "row",
-        gap: 2,
-        alignItems: "stretch",
-        flexWrap: "nowrap",                 // DO NOT allow wrapping to a new row
-        minHeight: 0,
-        overflow: "hidden",                       // CRITICAL: allows children to clip & scroll
-      }}
-      >
-      {/* LEFT PANEL */}
-  <Box
-    sx={{
-      flex: "0 0 25%",                  // fixed-ish column width (adjust 24-32% as you like)
-      maxWidth: "25%",
-      //minWidth: 260,
-      height: "100%",
-      overflowY: "auto",                // left panel scrolls internally
-      boxSizing: "border-box",
-      minHeight: 0,
-    }}
-  >
+      <Grid container spacing={2} sx={{ flexGrow: 1, minHeight: 0, height: "100%" }}>
+      {/* Left Panel */}
+      <Grid item 
+        xs={12}
+        md="auto"
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          //px: 1,
+          fontSize: "0.85rem",
+          flexShrink: 0,
+          minWidth: 320,
+          transition: "width 0.3s ease",
+          width: 320, // fixed like DVE
+          minHeight: 0,
+  }}>
+          <Card
+          sx={{
+            borderRadius: 3,
+            boxShadow: 2,
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+        <CardContent
+          sx={{
+            flexGrow: 1,
+            overflowY: "auto",
+            minHeight: 0,
+          }}
+        >
             {/* Target Dropdown */}
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
               <InputLabel>Target / Objective</InputLabel>
@@ -490,19 +507,35 @@ const MLModelDevelopment = () => {
                   </Button>
 
             
-                  </Box>
+                  </CardContent>
+        </Card>
+      </Grid>
 
 
 {/* Right Panel */}
-<Box
+<Grid
+  item
+  xs={12}
+  md
+  sx={{
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    minHeight: 0,
+    flexShrink: 1,          // allow growth
+   flexGrow: 1,
+  }}
+>
+  <Paper
     sx={{
-      flex: "1 1 50%",                   // middle grows but doesn't push layout vertically
-      minWidth: 0,
+      p: 2,
       height: "100%",
-      overflowY: "auto",                 // critical: internal vertical scroll for plots
-      boxSizing: "border-box",
-      minHeight: 0
+      display: "flex",
+      flexDirection: "column",
+      bgcolor: theme.palette.background.paper,
     }}
+    elevation={3}
   >
     <Box sx={{ display: "flex", justifyContent: "space-between",alignItems: "center", mb: 2, flexShrink: 0 }}>
       <Typography variant="h6" gutterBottom color="primary">
@@ -620,10 +653,16 @@ const MLModelDevelopment = () => {
                   data={trainTimeseriesPlot.data}
                   layout={{
                     ...trainTimeseriesPlot.layout,
-                    autosize: true,
+                    autosize: false,
+                    width: undefined,         // remove fixed width
+                    height: undefined,
+                    legend: {
+                      orientation: "h",
+                      y: 1.1
+                    },
                     paper_bgcolor: theme.palette.background.paper,
                     plot_bgcolor: theme.palette.background.default,
-                    margin: { t: 40, b: 40, l: 40, r: 40 },
+                    margin: { t: 40, b: 60, l: 50, r: 20 },
                   }}
                   useResizeHandler
                   style={{ wwidth: "100%", height: "100%"  }}
@@ -645,10 +684,16 @@ const MLModelDevelopment = () => {
                   data={testTimeseriesPlot.data}
                   layout={{
                     ...testTimeseriesPlot.layout,
-                    autosize: true,
+                    autosize: false,
+                    width: undefined,         // remove fixed width
+                    height: undefined,
+                    legend: {
+                      orientation: "h",
+                      y: 1.1
+                    },
                     paper_bgcolor: theme.palette.background.paper,
                     plot_bgcolor: theme.palette.background.default,
-                    margin: { t: 40, b: 40, l: 40, r: 40 },
+                    margin: { t: 40, b: 60, l: 50, r: 20 },
                   }}
                   useResizeHandler
                   style={{ width: "100%", height: "100%" }}
@@ -721,19 +766,42 @@ const MLModelDevelopment = () => {
 )}
 
     </Box>
+    </Paper>
+</Grid>
 
 {/* AI led Interpretation panel */}
 
+<Grid
+  item
+  xs={12}
+  md="auto"
+  sx={{
+    height: "100%",
+    flexShrink: 0,
+    display: "flex",
+    flexDirection: "column",
+    fontSize: "0.85rem",
+    width: 480,
+    minHeight: 0,
+  }}
+>
+<Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
 <Box
-    sx={{
-      flex: "0 0 25%",                   // interpretation column fixed-ish width
-      maxWidth: "25%",
-      height: "100%",
-      overflowY: "auto",                 // AI interpretations scroll internally
-      boxSizing: "border-box",
-      minHeight: 0
-    }}
-  >
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    bgcolor: "background.paper",
+    pb: 1,
+    mb: 2,
+    borderBottom: "1px solid",
+    borderColor: "divider",
+  }}
+>
+<Typography variant="h6" color="primary">
+    AI led Interpretation
+  </Typography>
+  </Box>
 
   {activeAnalysis === "feature_importance" && featureImportance && (
   <Card sx={{ mt: 2 }}>
@@ -826,9 +894,9 @@ const MLModelDevelopment = () => {
             </CardContent>
           </Card>
         )}
-  </Box>
-  </Box>
-  </Box>
+  </Paper>
+    </Grid>   
+    </Grid>
   );
 };
 
