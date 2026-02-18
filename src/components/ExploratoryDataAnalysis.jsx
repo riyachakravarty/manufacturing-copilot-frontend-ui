@@ -316,7 +316,16 @@ const generatemultivariateanalysis = async () => {
           transition: "width 0.3s ease",
           width: 320, // fixed like DVE
   }}>
-        <Card sx={{ borderRadius: 3, boxShadow: 2, flexGrow: 1 }}>
+              <Card
+              sx={{
+          borderRadius: 3,
+          boxShadow: 2,
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: 0
+        }}
+      >
           <CardContent>
             {/* Target Dropdown */}
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
