@@ -790,6 +790,7 @@ const MLModelDevelopment = () => {
     fontSize: "0.85rem",
     //width: 480,
     minHeight: 0,
+    minWidth: 0,
     overflowY: "auto"
   }}
 >
