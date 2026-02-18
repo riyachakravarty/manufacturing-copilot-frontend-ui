@@ -679,7 +679,7 @@ const MLModelDevelopment = () => {
                   }}
                   useResizeHandler
                   config={{ responsive: false }}   // 🔴 IMPORTANT
-                  style={{ wwidth: "100%", height: "100%"  }}
+                  style={{ width: "100%", height: "100%"  }}
                 />
                 </PlotContainer>
               </CardContent>
