@@ -535,6 +535,7 @@ const MLModelDevelopment = () => {
     //minHeight: 0,
     //flexShrink: 1,          // allow growth
    //flexGrow: 1,
+   minHeight: 0,
    overflowY: "auto",
     //overflowX: "hidden",
   }}
@@ -717,7 +718,11 @@ const MLModelDevelopment = () => {
           )}
 
           {/* --- Default Message if No Outputs Yet --- */}
-          {!trainMetrics && !testMetrics && !trainPlot && !testPlot && (
+              {activeAnalysis === "train" &&
+              !trainMetrics &&
+              !testMetrics &&
+              !trainPlot &&
+              !testPlot && (
             <Typography variant="body2" color="text.secondary">
               No analysis results yet.
             </Typography>
