@@ -308,13 +308,18 @@ const MLModelDevelopment = () => {
   };
 
     return (
-      <Grid container spacing={2} wrap="nowrap" sx={{ minHeight: 0, height: "100%" }}>
+      <Grid container spacing={2} wrap="nowrap" sx={{ 
+        //minHeight: 0, 
+        height: "100%" }}>
       {/* Left Panel */}
       <Grid item 
-        xs={2}
+        //xs={2}
         //md={2}
         sx={{
-          height: "100%",
+          flex: "0 0 20%",   // Left fixed 20%
+          maxWidth: "20%",
+        minWidth: 260,
+          //height: "100%",
           //display: "flex",
           //flexDirection: "column",
           //px: 1,
@@ -323,7 +328,7 @@ const MLModelDevelopment = () => {
           //minWidth: 320,
           //transition: "width 0.3s ease",
           //width: 320, // fixed like DVE
-          minHeight: 0,
+          //minHeight: 0,
           overflowY: "auto"
   }}>
           <Card
@@ -518,15 +523,16 @@ const MLModelDevelopment = () => {
 {/* Right Panel */}
 <Grid
   item
-  xs={6}
+  //xs={6}
   //md={6}
   sx={{
+    flex: "1 1 50%",   // Middle flexible
     border: "2px solid red",
-    height: "100%",
+    //height: "100%",
     //display: "flex",
     //flexDirection: "column",
     minWidth: 0,
-    minHeight: 0,
+    //minHeight: 0,
     //flexShrink: 1,          // allow growth
    //flexGrow: 1,
    overflowY: "auto",
@@ -780,17 +786,20 @@ const MLModelDevelopment = () => {
 
 <Grid
   item
-  xs={4}
+  //xs={4}
   //md={4}
   sx={{
-    height: "100%",
+    flex: "0 0 30%",   // Right fixed 30%
+    maxWidth: "30%",
+      minWidth: 320,
+    //height: "100%",
     //flexShrink: 0,
     //display: "flex",
     //flexDirection: "column",
     fontSize: "0.85rem",
     //width: 480,
-    minHeight: 0,
-    minWidth: 0,
+    //minHeight: 0,
+    //minWidth: 0,
     overflowY: "auto"
   }}
 >
