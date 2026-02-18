@@ -51,8 +51,8 @@ export const PlotContainer = ({ children, height = 380 }) => (
       width: "100%",
       maxWidth: "100%",
       height,
-      overflow: "hidden",   // 🔴 important
-      mb: 2,
+      display: "block",   // 🔴 important
+      //mb: 2,
     }}
   >
     {children}
@@ -523,8 +523,10 @@ const MLModelDevelopment = () => {
     flexDirection: "column",
     minWidth: 0,
     minHeight: 0,
-    flexShrink: 1,          // allow growth
-   flexGrow: 1,
+    //flexShrink: 1,          // allow growth
+   //flexGrow: 1,
+   overflowY: "auto",
+    overflowX: "hidden",
   }}
 >
   <Paper
@@ -662,9 +664,10 @@ const MLModelDevelopment = () => {
                     },
                     paper_bgcolor: theme.palette.background.paper,
                     plot_bgcolor: theme.palette.background.default,
-                    margin: { t: 40, b: 60, l: 50, r: 20 },
+                    margin: { t: 40, b: 80, l: 50, r: 20 },
                   }}
                   useResizeHandler
+                  config={{ responsive: false }}   // 🔴 IMPORTANT
                   style={{ wwidth: "100%", height: "100%"  }}
                 />
                 </PlotContainer>
