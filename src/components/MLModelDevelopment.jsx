@@ -330,7 +330,7 @@ const MLModelDevelopment = () => {
         setDecisionLoading(true);
         setDecisionError(null);
   
-        const response = await fetch(`${BACKEND_URL}/ml/decision_summary`, {
+        const response = await fetch(`${BACKEND_URL}/ml/ml_decision_summary`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
