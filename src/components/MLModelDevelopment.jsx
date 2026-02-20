@@ -316,45 +316,49 @@ const MLModelDevelopment = () => {
    // ==============================
   // Decision Summary Call
   // ==============================
-  const handleDecisionSummary = async () => {
-    if (!targetColumn || !selectedFeatures || selectedFeatures.length === 0) return;
-
-    try {
-      setDecisionLoading(true);
-      setDecisionError(null);
-
-      const response = await fetch(`${BACKEND_URL}/ml/ml_decision_summary`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          target: targetColumn,
-          features: selectedFeatures,
-          performanceDirection,
-          splitPercent
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.error || "Failed to fetch summary");
-
-      setDecisionSummary(data);
-
-    } catch (err) {
-      console.error(err);
-      setDecisionError(err.message);
-    } finally {
-      setDecisionLoading(false);
-    }
-  };
+  
 
   // ==============================
   // Auto Trigger
   // ==============================
+
   useEffect(() => {
-    if (targetColumn && selectedFeatures?.length > 0) {
-      handleDecisionSummary();
-    }
+    const handleDecisionSummary = async () => {
+      if (!targetColumn || !selectedFeatures || selectedFeatures.length === 0) return;
+  
+      try {
+        setDecisionLoading(true);
+        setDecisionError(null);
+  
+        const response = await fetch(`${BACKEND_URL}/ml/decision_summary`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            target: targetColumn,
+            features: selectedFeatures,
+            performanceDirection,
+            splitPercent
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch summary");
+        }
+  
+        setDecisionSummary(data);
+  
+      } catch (err) {
+        console.error(err);
+        setDecisionError(err.message);
+      } finally {
+        setDecisionLoading(false);
+      }
+    };
+  
+    handleDecisionSummary();
+  
   }, [targetColumn, selectedFeatures]);
 
   // ==============================
