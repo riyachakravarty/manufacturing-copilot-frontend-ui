@@ -583,6 +583,78 @@ const MLModelDevelopment = () => {
 </Box>
     <Divider sx={{ mb: 2 }} />
 
+    {/* ================= DECISION LAYER ================= */}
+
+    <Box
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 10,
+    bgcolor: "background.paper",
+    pb: 2,
+  }}
+>
+
+  {/* Recommendation Card */}
+  {activeAnalysis === "optimal_ranges" && (
+    <Card
+      sx={{
+        mb: 2,
+        borderLeft: "6px solid",
+        borderColor: "success.main",
+      }}
+    >
+      <CardContent>
+        <Typography variant="subtitle2" color="success.main">
+          Recommended Operating Adjustment
+        </Typography>
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          Maintain vap_bottom_temp between 82–85°C and
+          keep crack_gas_line_pressure below 1.8 bar.
+        </Typography>
+      </CardContent>
+    </Card>
+  )}
+
+  {/* Performance Snapshot */}
+  {activeAnalysis === "train" && trainMetrics && (
+    <Card sx={{ mb: 2 }}>
+      <CardContent>
+        <Typography variant="subtitle2" color="primary">
+          Model Performance Snapshot
+        </Typography>
+
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid item xs={4}>
+            <Typography variant="caption">Train R²</Typography>
+            <Typography fontWeight="bold">
+              {trainMetrics.r2?.toFixed(2)}
+            </Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography variant="caption">Test R²</Typography>
+            <Typography fontWeight="bold">
+              {testMetrics?.r2?.toFixed(2)}
+            </Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography variant="caption">Generalization</Typography>
+            <Typography
+              fontWeight="bold"
+              color={
+                testMetrics?.r2 > 0.8 ? "success.main" : "warning.main"
+              }
+            >
+              {testMetrics?.r2 > 0.8 ? "Stable" : "Needs Review"}
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  )}
+
+</Box>
+
     {/* Content Scroll Area */}
     <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
       {loading && (
