@@ -105,8 +105,17 @@ const MainPage = () => {
     }}
   >
         <CardContent sx={{ flexGrow: 1, minHeight: 0, p: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <Box
+    sx={{
+      height: "calc(100vh - 180px)",   // adjust 180 if header size differs
+      minHeight: 0,
+      display: "flex",
+      flexDirection: "column",
+    }}
+  >
      
         {renderTabContent()}
+        </Box>
      
     </CardContent>
       </Card>
