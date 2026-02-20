@@ -660,7 +660,7 @@ const MLModelDevelopment = () => {
   }}
 >
 {/* Prompting user to select target and features */}
-{(!target || selectedFeatures.length === 0) && (
+{(!targetColumn || selectedFeatures.length === 0) && (
   <Box
     sx={{
       mb: 2,
