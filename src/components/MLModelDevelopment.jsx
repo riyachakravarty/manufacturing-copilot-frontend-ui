@@ -359,7 +359,7 @@ const MLModelDevelopment = () => {
   
     handleDecisionSummary();
   
-  }, [targetColumn, selectedFeatures]);
+  }, [targetColumn, selectedFeatures, splitPercent,performanceDirection]);
 
   // ==============================
   // Confidence Coloring Logic
