@@ -374,9 +374,9 @@ const MLModelDevelopment = () => {
 
   let recommendationColor = "error.main";
 
-  if (confidence >= 0.75) {
+  if (confidence >= 75) {
     recommendationColor = "success.main";
-  } else if (confidence >= 0.5) {
+  } else if (confidence >= 50) {
     recommendationColor = "warning.main";
   }
 
