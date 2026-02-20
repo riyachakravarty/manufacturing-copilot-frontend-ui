@@ -528,7 +528,7 @@ const MLModelDevelopment = () => {
   //md={6}
   sx={{
     flex: "1 1 50%",   // Middle flexible
-    //border: "2px solid red",
+    border: "2px solid red",
     //height: "100%",
     //display: "flex",
     //flexDirection: "column",
