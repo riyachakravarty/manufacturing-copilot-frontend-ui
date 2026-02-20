@@ -719,9 +719,6 @@ const MLModelDevelopment = () => {
             <strong>{rec.feature}</strong> → Maintain between{" "}
             <strong>{rec.optimal_low} – {rec.optimal_high}</strong>
           </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Importance: {rec.importance}
-          </Typography>
         </Box>
       ))}
   </CardContent>
@@ -740,63 +737,84 @@ const MLModelDevelopment = () => {
           )}
 
           {decisionSummary && (
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Typography variant="caption">Train R²</Typography>
-                <Typography fontWeight="bold">
-                  {snapshot?.train_r2}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={6}>
-                <Typography variant="caption">Test R²</Typography>
-                <Typography fontWeight="bold">
-                  {snapshot?.test_r2}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Typography variant="body2">
-                  {snapshot?.fit_quality}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Typography variant="body2">
-                  {snapshot?.operational_readiness}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Typography variant="caption">
-                  Deployment Recommendation
-                </Typography>
-
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography
-                    sx={{
-                      fontWeight: "bold",
-                      color: recommendationColor
-                    }}
-                  >
-                    {snapshot?.deployment_recommendation}
-                  </Typography>
+            <Box sx={{ display: "flex", gap: 6, mb: 2 }}>
+            <Box>
+              <Typography variant="body2" color="text.secondary">
+                Train R²
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {decisionSummary?.performance_snapshot?.train_r2}
+              </Typography>
+            </Box>
+      
+            <Box>
+              <Typography variant="body2" color="text.secondary">
+                Test R²
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {decisionSummary?.performance_snapshot?.test_r2}
+              </Typography>
+            </Box>
+          </Box>
+)}
+      
+          {/* Explanation Text (Smaller) */}
+          <Typography
+            variant="body2"
+            sx={{ fontSize: "0.9rem", mb: 2 }}
+            color="text.secondary"
+          >
+            {decisionSummary?.performance_snapshot?.fit_quality}
+          </Typography>
+      
+          <Typography
+            variant="body2"
+            sx={{ fontSize: "0.9rem", mb: 2 }}
+            color="text.secondary"
+          >
+            {decisionSummary?.performance_snapshot?.generalization}
+          </Typography>
+      
+          <Typography
+            variant="body2"
+            sx={{ fontSize: "0.9rem", mb: 2 }}
+            color="text.secondary"
+          >
+            {decisionSummary?.performance_snapshot?.operational_readiness}
+          </Typography>
+      
+          {/* Deployment Recommendation */}
+          <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
+            Deployment Recommendation
+          </Typography>
+      
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                textTransform: "capitalize",
+                color: recommendationColor,
+              }}
+            >
+              {decisionSummary?.performance_snapshot?.deployment_recommendation}
+            </Typography>
 
                   <Chip
                     label={`Confidence: ${confidence}`}
-                    size="small"
                     sx={{
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                      px: 2,
+                      py: 1,
                       bgcolor: recommendationColor,
                       color: "white"
                     }}
                   />
-                </Box>
-              </Grid>
-            </Grid>
-          )}
+                  </Box>
         </CardContent>
       </Card>
-</Box>
+      </Box>
 
     {/* Content Scroll Area */}
     <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
