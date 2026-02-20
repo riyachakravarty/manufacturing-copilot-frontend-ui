@@ -317,49 +317,54 @@ const MLModelDevelopment = () => {
   // Decision Summary Call
   // ==============================
   
+  const handleGenerateDecision = async () => {
+    if (!targetColumn) {
+      setDecisionError("Please select a target variable.");
+      return;
+    }
+  
+    if (!selectedFeatures || selectedFeatures.length < 2) {
+      setDecisionError("Please select at least 2 features.");
+      return;
+    }
+  
+    await handleDecisionSummary();
+  };
 
-  // ==============================
-  // Auto Trigger
-  // ==============================
+  
+  const handleDecisionSummary = async () => {
+    if (!targetColumn || !selectedFeatures || selectedFeatures.length === 0) return;
 
-  useEffect(() => {
-    const handleDecisionSummary = async () => {
-      if (!targetColumn || !selectedFeatures || selectedFeatures.length === 0) return;
-  
-      try {
-        setDecisionLoading(true);
-        setDecisionError(null);
-  
-        const response = await fetch(`${BACKEND_URL}/ml/ml_decision_summary`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            target: targetColumn,
-            features: selectedFeatures,
-            performanceDirection,
-            splitPercent
-          }),
-        });
-  
-        const data = await response.json();
-  
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to fetch summary");
-        }
-  
-        setDecisionSummary(data);
-  
-      } catch (err) {
-        console.error(err);
-        setDecisionError(err.message);
-      } finally {
-        setDecisionLoading(false);
+    try {
+      setDecisionLoading(true);
+      setDecisionError(null);
+
+      const response = await fetch(`${BACKEND_URL}/ml/ml_decision_summary`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target: targetColumn,
+          features: selectedFeatures,
+          performanceDirection,
+          splitPercent
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch summary");
       }
-    };
-  
-    handleDecisionSummary();
-  
-  }, [targetColumn, selectedFeatures, splitPercent,performanceDirection]);
+
+      setDecisionSummary(data);
+
+    } catch (err) {
+      console.error(err);
+      setDecisionError(err.message);
+    } finally {
+      setDecisionLoading(false);
+    }
+  };
 
   // ==============================
   // Confidence Coloring Logic
@@ -664,22 +669,29 @@ const MLModelDevelopment = () => {
   }}
 >
 {/* Prompting user to select target and features */}
-{(!targetColumn || selectedFeatures.length === 0) && (
-  <Box
-    sx={{
-      mb: 2,
-      p: 2,
-      borderRadius: 2,
-      bgcolor: "background.default",
-      border: "1px dashed",
-      borderColor: "divider"
-    }}
+<Box
+  sx={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    mb: 2,
+    p: 2,
+    borderRadius: 2,
+    bgcolor: theme.palette.background.default,
+  }}
+>
+  <Typography variant="body2" color="text.secondary">
+    Select a target variable and relevant features from the left panel to generate model outcomes.
+  </Typography>
+
+  <Button
+    variant="contained"
+    color="primary"
+    onClick={handleGenerateDecision}
   >
-    <Typography variant="body2" color="text.secondary">
-      Select a target variable and relevant features from the left panel to generate model outcomes.
-    </Typography>
-  </Box>
-)}
+    Generate Recommendations
+  </Button>
+</Box>
 
   {/* Recommendation Card */}
   <Card sx={{ mb: 2, borderLeft: "6px solid", borderColor: "success.main" }}>
