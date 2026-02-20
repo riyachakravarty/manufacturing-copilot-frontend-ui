@@ -10,6 +10,7 @@ import {
   Box,
   Paper, 
   CircularProgress,
+  Chip,
   Alert,
   Typography,
   Grid,
@@ -89,6 +90,10 @@ const MLModelDevelopment = () => {
   const [optimalRanges, setOptimalRanges] = useState(null);
   const [shapLoading, setShapLoading] = useState(false);
   const [activeAnalysis, setActiveAnalysis] = useState(null);// "train" | "feature_importance" | "optimal_ranges"
+
+  const [decisionSummary, setDecisionSummary] = useState(null);
+  const [decisionLoading, setDecisionLoading] = useState(false);
+  const [decisionError, setDecisionError] = useState(null);
 
   // Helper function to render metric cards
   const renderMetrics = (metrics, title) => (
@@ -307,6 +312,66 @@ const MLModelDevelopment = () => {
       setShapLoading(false);
     }
   };
+
+   // ==============================
+  // Decision Summary Call
+  // ==============================
+  const handleDecisionSummary = async () => {
+    if (!targetColumn || !selectedFeatures || selectedFeatures.length === 0) return;
+
+    try {
+      setDecisionLoading(true);
+      setDecisionError(null);
+
+      const response = await fetch(`${BACKEND_URL}/ml/ml_decision_summary`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target: targetColumn,
+          features: selectedFeatures,
+          performanceDirection,
+          splitPercent
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || "Failed to fetch summary");
+
+      setDecisionSummary(data);
+
+    } catch (err) {
+      console.error(err);
+      setDecisionError(err.message);
+    } finally {
+      setDecisionLoading(false);
+    }
+  };
+
+  // ==============================
+  // Auto Trigger
+  // ==============================
+  useEffect(() => {
+    if (targetColumn && selectedFeatures?.length > 0) {
+      handleDecisionSummary();
+    }
+  }, [targetColumn, selectedFeatures]);
+
+  // ==============================
+  // Confidence Coloring Logic
+  // ==============================
+  const snapshot = decisionSummary?.performance_snapshot;
+  const confidence = snapshot?.confidence_score || 0;
+
+  let recommendationColor = "error.main";
+
+  if (confidence >= 0.75) {
+    recommendationColor = "success.main";
+  } else if (confidence >= 0.5) {
+    recommendationColor = "warning.main";
+  }
+
+
 
     return (
       <Grid container spacing={2} wrap="nowrap" sx={{ 
@@ -594,65 +659,127 @@ const MLModelDevelopment = () => {
     pb: 2,
   }}
 >
+{/* Prompting user to select target and features */}
+{(!target || selectedFeatures.length === 0) && (
+  <Box
+    sx={{
+      mb: 2,
+      p: 2,
+      borderRadius: 2,
+      bgcolor: "background.default",
+      border: "1px dashed",
+      borderColor: "divider"
+    }}
+  >
+    <Typography variant="body2" color="text.secondary">
+      Select a target variable and relevant features from the left panel to generate model outcomes.
+    </Typography>
+  </Box>
+)}
 
   {/* Recommendation Card */}
-  {activeAnalysis === "optimal_ranges" && (
-    <Card
-      sx={{
-        mb: 2,
-        borderLeft: "6px solid",
-        borderColor: "success.main",
-      }}
-    >
-      <CardContent>
-        <Typography variant="subtitle2" color="success.main">
-          Recommended Operating Adjustment
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 1 }}>
-          Maintain vap_bottom_temp between 82–85°C and
-          keep crack_gas_line_pressure below 1.8 bar.
-        </Typography>
-      </CardContent>
-    </Card>
-  )}
+  <Card sx={{ mb: 2, borderLeft: "6px solid", borderColor: "success.main" }}>
+  <CardContent>
+    <Typography variant="h6" color="success.main" gutterBottom>
+      Recommendations
+    </Typography>
+
+    {decisionLoading && <CircularProgress size={24} />}
+
+    {decisionError && (
+      <Typography color="error">{decisionError}</Typography>
+    )}
+
+    {!decisionSummary && !decisionLoading && (
+      <Typography variant="body2" color="text.secondary">
+        No recommendations generated yet.
+      </Typography>
+    )}
+
+    {decisionSummary &&
+      decisionSummary.recommendations?.map((rec, index) => (
+        <Box key={index} sx={{ mb: 1 }}>
+          <Typography variant="body2">
+            <strong>{rec.feature}</strong> → Maintain between{" "}
+            <strong>{rec.optimal_low} – {rec.optimal_high}</strong>
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Importance: {rec.importance}
+          </Typography>
+        </Box>
+      ))}
+  </CardContent>
+</Card>
 
   {/* Performance Snapshot */}
-  {activeAnalysis === "train" && trainMetrics && (
-    <Card sx={{ mb: 2 }}>
-      <CardContent>
-        <Typography variant="subtitle2" color="primary">
-          Model Performance Snapshot
-        </Typography>
+  <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Typography variant="h6" color="primary" gutterBottom>
+            Performance Snapshot
+          </Typography>
 
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={4}>
-            <Typography variant="caption">Train R²</Typography>
-            <Typography fontWeight="bold">
-              {trainMetrics.r2?.toFixed(2)}
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="caption">Test R²</Typography>
-            <Typography fontWeight="bold">
-              {testMetrics?.r2?.toFixed(2)}
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="caption">Generalization</Typography>
-            <Typography
-              fontWeight="bold"
-              color={
-                testMetrics?.r2 > 0.8 ? "success.main" : "warning.main"
-              }
-            >
-              {testMetrics?.r2 > 0.8 ? "Stable" : "Needs Review"}
-            </Typography>
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
-  )}
 
+          {decisionLoading && (
+            <CircularProgress size={24} />
+          )}
+
+          {decisionSummary && (
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="caption">Train R²</Typography>
+                <Typography fontWeight="bold">
+                  {snapshot?.train_r2}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="caption">Test R²</Typography>
+                <Typography fontWeight="bold">
+                  {snapshot?.test_r2}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography variant="body2">
+                  {snapshot?.fit_quality}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography variant="body2">
+                  {snapshot?.operational_readiness}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography variant="caption">
+                  Deployment Recommendation
+                </Typography>
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                      color: recommendationColor
+                    }}
+                  >
+                    {snapshot?.deployment_recommendation}
+                  </Typography>
+
+                  <Chip
+                    label={`Confidence: ${confidence}`}
+                    size="small"
+                    sx={{
+                      bgcolor: recommendationColor,
+                      color: "white"
+                    }}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+          )}
+        </CardContent>
+      </Card>
 </Box>
 
     {/* Content Scroll Area */}
