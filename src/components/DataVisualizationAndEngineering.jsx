@@ -332,9 +332,7 @@ export default function DataVisualizationAndEngineering() {
       const result = await response.json();
       if (result.type === "plot" && result.data) {
         //setPlotData(result.data);
-        setLastPlot({
-          data: result.data,
-        });
+        setLastPlot(result.data);
         
       } else {
         setError("Unexpected response from server.");
@@ -370,9 +368,7 @@ export default function DataVisualizationAndEngineering() {
 
       if (result.type === "plot" && result.data) {
         //setPlotData(result.data);
-        setLastPlot({
-          data: result.data,
-        });
+        setLastPlot(result.data);
         
         setExpanded(false); // Collapse left accordion to free space
       } else {
@@ -404,9 +400,7 @@ export default function DataVisualizationAndEngineering() {
 
       if (result.type === "plot" && result.data) {
         //setPlotData(result.data);   // Same as missing value analysis
-        setLastPlot({
-          data: result.data,
-        });
+        setLastPlot(result.data);
         
         setExpanded(false);         // Collapse left panel like before
       } else {
@@ -544,9 +538,7 @@ export default function DataVisualizationAndEngineering() {
 
       if (result.type === "plot" && result.data) {
         //setPlotData(result.data);
-        setLastPlot({
-          data: result.data,
-        });
+        setLastPlot(result.data);
         
         setExpanded(false); // Collapse left accordion to free space
       } else {
@@ -579,9 +571,7 @@ export default function DataVisualizationAndEngineering() {
 
       if (result.type === "plot" && result.data) {
         //setPlotData(result.data);
-        setLastPlot({
-          data: result.data,
-        });
+        setLastPlot(result.data);
         
         setExpanded(false); // Collapse left accordion to free space
       } else {
