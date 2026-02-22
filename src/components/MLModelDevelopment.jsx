@@ -807,7 +807,8 @@ const MLModelDevelopment = () => {
                 color: "success.main"
               }}
             >
-              {decisionSummary?.performance_snapshot?.deployment_recommendation}
+              {/*{decisionSummary?.performance_snapshot?.deployment_recommendation}*/}
+              Ready to deploy
             </Typography>
             {decisionSummary && (
                   <Chip
