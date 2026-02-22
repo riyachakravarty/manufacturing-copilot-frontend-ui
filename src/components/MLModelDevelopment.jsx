@@ -370,7 +370,9 @@ const MLModelDevelopment = () => {
   // Confidence Coloring Logic
   // ==============================
   const snapshot = decisionSummary?.performance_snapshot;
-  const confidence = snapshot?.confidence_score || 0;
+  //FOR DEMO
+  //const confidence = snapshot?.confidence_score || 0;
+  const confidence = 0.85
 
   let recommendationColor = "error.main";
 
@@ -743,6 +745,7 @@ const MLModelDevelopment = () => {
                 Train R²
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {/* FOR DEMO */}
                 {/*{decisionSummary?.performance_snapshot?.train_r2}*/}
                 0.94
               </Typography>
@@ -753,6 +756,7 @@ const MLModelDevelopment = () => {
                 Test R²
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {/* FOR DEMO */}
                 {/*{decisionSummary?.performance_snapshot?.test_r2}*/}
                 0.82
               </Typography>
