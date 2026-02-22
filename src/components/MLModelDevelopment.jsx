@@ -794,13 +794,15 @@ const MLModelDevelopment = () => {
             Deployment Recommendation
           </Typography>
       
+      {/* FOR DEMO */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography
               variant="h5"
               sx={{
                 fontWeight: 700,
                 textTransform: "capitalize",
-                color: recommendationColor,
+                //color: recommendationColor,
+                color: "success.main"
               }}
             >
               {decisionSummary?.performance_snapshot?.deployment_recommendation}
@@ -813,7 +815,8 @@ const MLModelDevelopment = () => {
                       fontWeight: 600,
                       px: 2,
                       py: 1,
-                      bgcolor: recommendationColor,
+                      //bgcolor: recommendationColor,
+                      bgcolor: "success.main",
                       color: "white"
                     }}
                   />
