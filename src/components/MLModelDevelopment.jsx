@@ -374,13 +374,15 @@ const MLModelDevelopment = () => {
   //const confidence = snapshot?.confidence_score || 0;
   const confidence = 0.85
 
-  let recommendationColor = "error.main";
+  //FOR DEMO
 
-  if (confidence >= 75) {
-    recommendationColor = "success.main";
-  } else if (confidence >= 50) {
-    recommendationColor = "warning.main";
-  }
+  //let recommendationColor = "error.main";
+
+  //if (confidence >= 75) {
+    //recommendationColor = "success.main";
+  //} else if (confidence >= 50) {
+    //recommendationColor = "warning.main";
+  //}
 
 
 
