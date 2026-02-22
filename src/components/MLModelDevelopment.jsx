@@ -369,8 +369,8 @@ const MLModelDevelopment = () => {
   // ==============================
   // Confidence Coloring Logic
   // ==============================
-  const snapshot = decisionSummary?.performance_snapshot;
   //FOR DEMO
+  //const snapshot = decisionSummary?.performance_snapshot;
   //const confidence = snapshot?.confidence_score || 0;
   const confidence = 0.85
 
