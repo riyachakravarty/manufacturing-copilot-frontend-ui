@@ -797,6 +797,7 @@ const MLModelDevelopment = () => {
           </Typography>
       
       {/* FOR DEMO */}
+      {decisionSummary && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography
               variant="h5"
@@ -810,7 +811,6 @@ const MLModelDevelopment = () => {
               {/*{decisionSummary?.performance_snapshot?.deployment_recommendation}*/}
               Ready to deploy
             </Typography>
-            {decisionSummary && (
                   <Chip
                     label={`Confidence: ${confidence}`}
                     sx={{
@@ -823,8 +823,8 @@ const MLModelDevelopment = () => {
                       color: "white"
                     }}
                   />
-                )}
                   </Box>
+                  )}
         </CardContent>
       </Card>
       </Box>
