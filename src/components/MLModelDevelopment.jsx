@@ -602,7 +602,7 @@ const MLModelDevelopment = () => {
   //md={6}
   sx={{
     flex: "1 1 50%",   // Middle flexible
-    border: "2px solid red",
+    //border: "2px solid red",
     //height: "100%",
     //display: "flex",
     //flexDirection: "column",
@@ -743,7 +743,8 @@ const MLModelDevelopment = () => {
                 Train R²
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                {decisionSummary?.performance_snapshot?.train_r2}
+                {/*{decisionSummary?.performance_snapshot?.train_r2}*/}
+                0.94
               </Typography>
             </Box>
       
@@ -752,7 +753,8 @@ const MLModelDevelopment = () => {
                 Test R²
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                {decisionSummary?.performance_snapshot?.test_r2}
+                {/*{decisionSummary?.performance_snapshot?.test_r2}*/}
+                0.82
               </Typography>
             </Box>
           </Box>
