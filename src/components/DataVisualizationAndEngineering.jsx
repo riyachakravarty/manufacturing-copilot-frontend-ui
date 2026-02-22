@@ -1,6 +1,8 @@
 // src/components/DataVisualizationAndEngineering.jsx
 //import React, { useState, useContext, useEffect } from "react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { PlotContext } from "../context/PlotContext";
+
 import Plot from "react-plotly.js";
 //import { AppContext } from "../context/AppContext";
 import {
@@ -42,7 +44,9 @@ export default function DataVisualizationAndEngineering() {
   const [columns, setColumns] = useState([]);
   const [selectedColumns, setSelectedColumns] = useState([]);
 
-  const [plotData, setPlotData] = useState(null);
+  //const [plotData, setPlotData] = useState(null);
+  const { lastPlot, setLastPlot } = useContext(PlotContext);
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -211,7 +215,8 @@ export default function DataVisualizationAndEngineering() {
   const handleExpand = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
     setError("");
-    setPlotData(null);
+    //setPlotData(null);
+    setLastPlot(null);
   };
 
   // Auto-load columns when "Missing Values in Column" mode is selected
@@ -314,7 +319,8 @@ export default function DataVisualizationAndEngineering() {
     }
     setError("");
     setLoading(true);
-    setPlotData(null);
+    //setPlotData(null);
+    setLastPlot(null);
     try {
       const prompt = `Perform variability analysis where selected variable is ${selectedColumns[0]}`;
       const response = await fetch(`${BACKEND_URL}/chat`, {
@@ -325,7 +331,11 @@ export default function DataVisualizationAndEngineering() {
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
       const result = await response.json();
       if (result.type === "plot" && result.data) {
-        setPlotData(result.data);
+        //setPlotData(result.data);
+        setLastPlot({
+          data: result.data,
+        });
+        
       } else {
         setError("Unexpected response from server.");
       }
@@ -345,7 +355,8 @@ export default function DataVisualizationAndEngineering() {
     }
     setLoading(true);
     setError("");
-    setPlotData(null);
+    //setPlotData(null);
+    setLastPlot(null);
 
     try {
       const prompt = `Missing value analysis where selected variable is ${missingValueColumn}`;
@@ -358,7 +369,11 @@ export default function DataVisualizationAndEngineering() {
       const result = await response.json();
 
       if (result.type === "plot" && result.data) {
-        setPlotData(result.data);
+        //setPlotData(result.data);
+        setLastPlot({
+          data: result.data,
+        });
+        
         setExpanded(false); // Collapse left accordion to free space
       } else {
         setError("Unexpected response from server.");
@@ -388,7 +403,11 @@ export default function DataVisualizationAndEngineering() {
       const result = await response.json();
 
       if (result.type === "plot" && result.data) {
-        setPlotData(result.data);   // Same as missing value analysis
+        //setPlotData(result.data);   // Same as missing value analysis
+        setLastPlot({
+          data: result.data,
+        });
+        
         setExpanded(false);         // Collapse left panel like before
       } else {
         console.error("Unexpected response format:", result);
@@ -524,7 +543,11 @@ export default function DataVisualizationAndEngineering() {
       const result = await response.json();
 
       if (result.type === "plot" && result.data) {
-        setPlotData(result.data);
+        //setPlotData(result.data);
+        setLastPlot({
+          data: result.data,
+        });
+        
         setExpanded(false); // Collapse left accordion to free space
       } else {
         setError("Unexpected response from server.");
@@ -555,7 +578,11 @@ export default function DataVisualizationAndEngineering() {
       const result = await response.json();
 
       if (result.type === "plot" && result.data) {
-        setPlotData(result.data);
+        //setPlotData(result.data);
+        setLastPlot({
+          data: result.data,
+        });
+        
         setExpanded(false); // Collapse left accordion to free space
       } else {
         setError("Unexpected response from server.");
@@ -1337,11 +1364,12 @@ export default function DataVisualizationAndEngineering() {
         {loading && <CircularProgress />}
         {error && <Alert severity="error">{error}</Alert>}
 
-        {plotData ? (
+        {/*{plotData ? (*/}
+        {lastPlot ? (
           <Plot
-            data={plotData.data}
+            data={lastPlot.data}
             layout={{
-              ...plotData.layout,
+              ...lastPlot.layout,
               autosize: true,
               paper_bgcolor: theme.palette.background.paper,
               plot_bgcolor: theme.palette.background.default,
