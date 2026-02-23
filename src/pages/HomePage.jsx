@@ -22,6 +22,8 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
+const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
+
 const HomePage = () => {
   const { setUploadedFile, setSelectedMode, setContextFiles } = useContext(AppContext);
   const [file, setFile] = useState(null);
@@ -32,6 +34,28 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [localContextFiles, setLocalContextFiles] = useState([]);
   const [contextUploading, setContextUploading] = useState(false);
+  const [targetColumn, setTargetColumn] = useState("");
+  const [columns, setColumns] = useState([]);
+
+  useEffect(() => {
+    // Fetch columns on mount
+    const fetchColumns = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/get_columns`);
+        if (!response.ok) throw new Error("Failed to fetch columns");
+        const data = await response.json();
+        if (data.columns) {
+          setColumns(data.columns);
+        } else {
+          setError(data.error || "No columns found.");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching columns.");
+      }
+    };
+    fetchColumns();
+  }, []);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -219,6 +243,22 @@ const HomePage = () => {
               </Typography>
             </Grid>
           )}
+
+          {/* Target Dropdown */}
+          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+              <InputLabel>Target / Objective</InputLabel>
+              <Select
+                value={targetColumn}
+                label="Target / Objective"
+                onChange={(e) => setTargetColumn(e.target.value)}
+              >
+                {columns.map((col) => (
+                  <MenuItem key={col} value={col}>
+                    {col}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
               <Grid item xs={12}>
                 <Typography variant="h6">Select Mode</Typography>
