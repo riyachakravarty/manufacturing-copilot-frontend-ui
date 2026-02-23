@@ -62,13 +62,14 @@ export const PlotContainer = ({ children, height = 380 }) => (
 );
 
 const MLModelDevelopment = () => {
+  const {targetColumn} = useContext(AppContext);
   const [edaColumns, setEdaColumns] = useState([]);
 //  const [loading, setLoading] = useState(false);
   const [expandedCard, setExpandedCard] = useState(false);
 //  const [expanded, setExpanded] = useState("");
   const theme = useTheme();
   const [error, setError] = useState("");
-  const [targetColumn, setTargetColumn] = useState("");
+  //const [targetColumn, setTargetColumn] = useState("");
   const [performanceDirection, setPerformanceDirection] = useState("higher");
   const [selectedFeatures, setSelectedFeatures] = useState([]);
   const [TrainTestOption, setTrainTestOption] = useState("");
@@ -428,21 +429,6 @@ const MLModelDevelopment = () => {
             //minHeight: 0,
           }}
         >
-            {/* Target Dropdown */}
-            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-              <InputLabel>Target / Objective</InputLabel>
-              <Select
-                value={targetColumn}
-                label="Target / Objective"
-                onChange={(e) => setTargetColumn(e.target.value)}
-              >
-                {edaColumns.map((col) => (
-                  <MenuItem key={col} value={col}>
-                    {col}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
 
             {/* Performance Direction Toggle */}
             <ToggleButtonGroup
