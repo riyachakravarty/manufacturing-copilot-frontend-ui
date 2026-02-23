@@ -39,25 +39,6 @@ const HomePage = () => {
   const [columns, setColumns] = useState([]);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    // Fetch columns on mount
-    const fetchColumns = async () => {
-      try {
-        const response = await fetch(`${BACKEND_URL}/get_columns`);
-        if (!response.ok) throw new Error("Failed to fetch columns");
-        const data = await response.json();
-        if (data.columns) {
-          setColumns(data.columns);
-        } else {
-          setError(data.error || "No columns found.");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Error fetching columns.");
-      }
-    };
-    fetchColumns();
-  }, []);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -86,6 +67,15 @@ const HomePage = () => {
         setUploadedFile(file);
         setSelectedMode(mode);
         setShowSnackbar(true);
+
+            // Fetch columns AFTER upload
+        const colResponse = await fetch(`${BACKEND_URL}/get_columns`);
+        if (!colResponse.ok) throw new Error("Failed to fetch columns");
+        const colData = await colResponse.json();
+        if (colData.columns) {
+          setColumns(colData.columns);
+        }
+
         alert('File upload successful!')
       } else {
         alert('File upload failed');
