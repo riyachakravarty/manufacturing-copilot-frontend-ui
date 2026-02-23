@@ -26,7 +26,7 @@ import { AppContext } from "../context/AppContext";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const HomePage = () => {
-  const { setUploadedFile, setSelectedMode, setContextFiles } = useContext(AppContext);
+  const { setUploadedFile, setSelectedMode, setContextFiles, targetColumn, setTargetColumn } = useContext(AppContext);
   const [file, setFile] = useState(null);
   const [mode, setMode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [localContextFiles, setLocalContextFiles] = useState([]);
   const [contextUploading, setContextUploading] = useState(false);
-  const [targetColumn, setTargetColumn] = useState("");
+  //const [targetColumn, setTargetColumn] = useState("");
   const [columns, setColumns] = useState([]);
 
 
