@@ -1,5 +1,5 @@
 // src/pages/HomePage.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -37,7 +37,6 @@ const HomePage = () => {
   const [contextUploading, setContextUploading] = useState(false);
   const [targetColumn, setTargetColumn] = useState("");
   const [columns, setColumns] = useState([]);
-  const [error, setError] = useState("");
 
 
   const handleFileChange = (e) => {
