@@ -28,7 +28,7 @@ const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const HomePage = () => {
   const theme = useTheme();
-  const { setUploadedFile, setSelectedMode, setContextFiles, targetColumn, setTargetColumn } = useContext(AppContext);
+  const { uploadedFile, setUploadedFile, setSelectedMode, setContextFiles, targetColumn, setTargetColumn } = useContext(AppContext);
   const [file, setFile] = useState(null);
   const [mode, setMode] = useState('');
   const [loading, setLoading] = useState(false);
