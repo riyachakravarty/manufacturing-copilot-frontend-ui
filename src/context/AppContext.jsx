@@ -6,7 +6,7 @@ export const AppProvider = ({ children }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [selectedMode, setSelectedMode] = useState("");
   const [contextFiles, setContextFiles] = useState([]); // NEW
-  const [selectedTarget, setSelectedTarget] = useState("");
+  const [targetColumn, setTargetColumn] = useState("");
 
 
   // Load uploaded file info from localStorage on first render
@@ -14,7 +14,7 @@ export const AppProvider = ({ children }) => {
     const storedFile = localStorage.getItem("uploadedFile");
     const storedMode = localStorage.getItem("selectedMode"); 
     const storedContextFiles = localStorage.getItem("contextFiles"); 
-    const storedTarget = localStorage.getItem("selectedTarget");
+    const storedTarget = localStorage.getItem("targetColumn");
 
     if (storedFile) {
       setUploadedFile(JSON.parse(storedFile));
@@ -23,7 +23,7 @@ export const AppProvider = ({ children }) => {
     if (storedContextFiles) {
       setContextFiles(JSON.parse(storedContextFiles));
     }
-    if (storedTarget) setSelectedTarget(storedTarget);
+    if (storedTarget) setTargetColumn(storedTarget);
 
   }, []);
 
@@ -54,17 +54,17 @@ export const AppProvider = ({ children }) => {
   }, [contextFiles]);
 
   useEffect(() => {
-    if (selectedTarget) {
-      localStorage.setItem("selectedTarget", selectedTarget);
+    if (targetColumn) {
+      localStorage.setItem("targetColumn", targetColumn);
     } else {
-      localStorage.removeItem("selectedTarget");
+      localStorage.removeItem("targetColumn");
     }
   }, [selectedTarget]);
   
 
 
   return (
-    <AppContext.Provider value={{ uploadedFile, setUploadedFile, selectedMode, setSelectedMode, contextFiles, setContextFiles, selectedTarget,setSelectedTarget}}>
+    <AppContext.Provider value={{ uploadedFile, setUploadedFile, selectedMode, setSelectedMode, contextFiles, setContextFiles, targetColumn,setTargetColumn}}>
       {children}
     </AppContext.Provider>
   );
