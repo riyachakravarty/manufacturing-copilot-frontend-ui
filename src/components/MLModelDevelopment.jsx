@@ -44,6 +44,8 @@ import { useTheme } from "@mui/material/styles";
 import AIInterpretationContent from "./AIInterpretationContent";
 import AIInterpretationContentFI from "./AIInterpretationContentFI";
 import AIInterpretationContentModel from "./AIInterpretationContentModel";
+import { AppContext } from "../context/AppContext";
+
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 export const PlotContainer = ({ children, height = 380 }) => (
