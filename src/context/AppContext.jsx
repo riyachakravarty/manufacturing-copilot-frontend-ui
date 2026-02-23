@@ -59,7 +59,7 @@ export const AppProvider = ({ children }) => {
     } else {
       localStorage.removeItem("targetColumn");
     }
-  }, [selectedTarget]);
+  }, [targetColumn]);
   
 
 
