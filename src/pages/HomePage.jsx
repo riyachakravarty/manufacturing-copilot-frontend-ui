@@ -1,6 +1,5 @@
 // src/pages/HomePage.jsx
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -14,6 +13,8 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -36,6 +37,7 @@ const HomePage = () => {
   const [contextUploading, setContextUploading] = useState(false);
   const [targetColumn, setTargetColumn] = useState("");
   const [columns, setColumns] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Fetch columns on mount
