@@ -6,12 +6,16 @@ export const AppProvider = ({ children }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [selectedMode, setSelectedMode] = useState("");
   const [contextFiles, setContextFiles] = useState([]); // NEW
+  const [selectedTarget, setSelectedTarget] = useState("");
+
 
   // Load uploaded file info from localStorage on first render
   useEffect(() => {
     const storedFile = localStorage.getItem("uploadedFile");
     const storedMode = localStorage.getItem("selectedMode"); 
     const storedContextFiles = localStorage.getItem("contextFiles"); 
+    const storedTarget = localStorage.getItem("selectedTarget");
+
     if (storedFile) {
       setUploadedFile(JSON.parse(storedFile));
     }
@@ -19,6 +23,8 @@ export const AppProvider = ({ children }) => {
     if (storedContextFiles) {
       setContextFiles(JSON.parse(storedContextFiles));
     }
+    if (storedTarget) setSelectedTarget(storedTarget);
+
   }, []);
 
   // Whenever uploadedFile changes, store it in localStorage
@@ -47,9 +53,18 @@ export const AppProvider = ({ children }) => {
     }
   }, [contextFiles]);
 
+  useEffect(() => {
+    if (selectedTarget) {
+      localStorage.setItem("selectedTarget", selectedTarget);
+    } else {
+      localStorage.removeItem("selectedTarget");
+    }
+  }, [selectedTarget]);
+  
+
 
   return (
-    <AppContext.Provider value={{ uploadedFile, setUploadedFile, selectedMode, setSelectedMode, contextFiles, setContextFiles}}>
+    <AppContext.Provider value={{ uploadedFile, setUploadedFile, selectedMode, setSelectedMode, contextFiles, setContextFiles, selectedTarget,setSelectedTarget}}>
       {children}
     </AppContext.Provider>
   );
