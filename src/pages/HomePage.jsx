@@ -1,7 +1,7 @@
 // src/pages/HomePage.jsx
 import React, { useState } from "react";
 import {
-  Box,
+  //Box,
   Button,
   Container,
   Typography,
@@ -19,7 +19,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from "@mui/material/styles";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+//import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
@@ -27,7 +27,7 @@ import { AppContext } from "../context/AppContext";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const HomePage = () => {
-  const theme = useTheme();
+  //const theme = useTheme();
   const { uploadedFile, setUploadedFile, setSelectedMode, setContextFiles, targetColumn, setTargetColumn } = useContext(AppContext);
   const [file, setFile] = useState(null);
   const [mode, setMode] = useState('');
