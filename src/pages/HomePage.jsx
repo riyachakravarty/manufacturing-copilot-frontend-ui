@@ -156,11 +156,6 @@ const HomePage = () => {
             Upload your dataset and choose how you'd like to interact with the platform.
           </Typography>
 
-                {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
-      )}
 
           <Box sx={{ my: 3 }}>
             <Grid container spacing={3}>
