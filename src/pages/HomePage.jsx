@@ -17,6 +17,7 @@ import {
   InputLabel,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from "@mui/material/styles";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
@@ -26,6 +27,7 @@ import { AppContext } from "../context/AppContext";
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const HomePage = () => {
+  const theme = useTheme();
   const { setUploadedFile, setSelectedMode, setContextFiles, targetColumn, setTargetColumn } = useContext(AppContext);
   const [file, setFile] = useState(null);
   const [mode, setMode] = useState('');
@@ -146,156 +148,206 @@ const HomePage = () => {
   
 
   return (
-    <Container maxWidth="md" sx={{ py: 5 }}>
-      <Card elevation={6}>
-        <CardContent>
-          <Typography variant="h4" gutterBottom>
-            Welcome to Nexus AI
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-            Upload your dataset and choose how you'd like to interact with the platform.
-          </Typography>
+    <Container maxWidth="md" sx={{ py: 6 }}>
+  <Card
+    elevation={4}
+    sx={{
+      borderRadius: 4,
+      px: 4,
+      py: 5,
+    }}
+  >
+    <CardContent sx={{ p: 0 }}>
 
-
-          <Box sx={{ my: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={8}>
-                <Button
-                  variant="outlined"
-                  component="label"
-                  startIcon={<UploadFileIcon />}
-                  fullWidth
-                >
-                  Select File
-                  <input type="file" hidden onChange={handleFileChange} />
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleUpload}
-                  disabled={!file || loading}
-                  startIcon={<UploadFileIcon />}
-                  fullWidth
-                >
-                  {loading ? <CircularProgress size={20} color="inherit" /> : 'Upload'}
-                </Button>
-              </Grid>
-
-              {fileName && (
-                <Grid item xs={12}>
-                  <Typography variant="body2" color="success.main">
-                    File "{fileName}" being processed.
-                  </Typography>
-                </Grid>
-              )}
-
-          <Grid item xs={12}>
-            <Typography variant="h6">Add Process Context (Optional)</Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={8}>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<UploadFileIcon />}
-              fullWidth
-            >
-              + Add Context Files
-              <input
-                type="file"
-                hidden
-                multiple
-                onChange={handleContextFilesChange}
-              />
-            </Button>
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleContextUpload}
-              disabled={localContextFiles.length === 0 || contextUploading}
-              fullWidth
-            >
-              {contextUploading ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                "Upload Context"
-              )}
-            </Button>
-          </Grid>
-
-          {localContextFiles.length > 0 && (
-            <Grid item xs={12}>
-              <Typography variant="body2">
-                {localContextFiles.length} context file(s) added
-              </Typography>
-            </Grid>
-          )}
-
-          {/* Target Dropdown */}
-          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-              <InputLabel>Target / Objective</InputLabel>
-              <Select
-                value={targetColumn}
-                label="Target / Objective"
-                onChange={(e) => setTargetColumn(e.target.value)}
-              >
-                {columns.map((col) => (
-                  <MenuItem key={col} value={col}>
-                    {col}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-              <Grid item xs={12}>
-                <Typography variant="h6">Select Mode</Typography>
-                <Select
-                  fullWidth
-                  value={mode}
-                  onChange={handleModeChange}
-                  displayEmpty
-                  startAdornment={<SettingsSuggestIcon sx={{ mr: 1 }} />}
-                >
-                  <MenuItem value="" disabled>
-                    Choose mode
-                  </MenuItem>
-                  <MenuItem value="button">Click of a Button</MenuItem>
-                  <MenuItem value="genai">Gen-AI Led Prompt</MenuItem>
-                </Select>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="large"
-                  startIcon={<RocketLaunchIcon />}
-                  onClick={handleStartExploring}
-                  fullWidth
-                >
-                  Start Exploring
-                </Button>
-              </Grid>
-            </Grid>
-          </Box>
-        </CardContent>
-      </Card>
-
-      <Snackbar
-        open={showSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setShowSnackbar(false)}
+      {/* Header */}
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: 600, mb: 1 }}
       >
-        <Alert severity="success" onClose={() => setShowSnackbar(false)}>
-          File uploaded successfully!
-        </Alert>
-      </Snackbar>
-    </Container>
+        Welcome to Nexus AI
+      </Typography>
+
+      <Typography
+        variant="body1"
+        color="text.secondary"
+        sx={{ mb: 4 }}
+      >
+        Upload your dataset, select your objective, and start optimizing.
+      </Typography>
+
+      <Grid container spacing={4}>
+
+        {/* ---------------- FILE UPLOAD ---------------- */}
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            Upload Dataset
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={8}>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<UploadFileIcon />}
+                fullWidth
+              >
+                Select File
+                <input type="file" hidden onChange={handleFileChange} />
+              </Button>
+            </Grid>
+
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                onClick={handleUpload}
+                disabled={!file || loading}
+                fullWidth
+              >
+                {loading
+                  ? <CircularProgress size={20} color="inherit" />
+                  : "Upload"}
+              </Button>
+            </Grid>
+
+            {fileName && (
+              <Grid item xs={12}>
+                <Typography variant="body2" color="success.main">
+                  File "{fileName}" being processed.
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+
+        {/* ---------------- CONTEXT FILES ---------------- */}
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            Add Process Context (Optional)
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={8}>
+              <Button
+                variant="outlined"
+                component="label"
+                fullWidth
+              >
+                + Add Context Files
+                <input
+                  type="file"
+                  hidden
+                  multiple
+                  onChange={handleContextFilesChange}
+                />
+              </Button>
+            </Grid>
+
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                disabled={localContextFiles.length === 0 || contextUploading}
+                onClick={handleContextUpload}
+                fullWidth
+              >
+                {contextUploading
+                  ? <CircularProgress size={20} color="inherit" />
+                  : "Upload Context"}
+              </Button>
+            </Grid>
+
+            {localContextFiles.length > 0 && (
+              <Grid item xs={12}>
+                <Typography variant="body2">
+                  {localContextFiles.length} context file(s) added
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+
+        {/* ---------------- TARGET + MODE ---------------- */}
+        <Grid item xs={12}>
+
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            Select Objective
+          </Typography>
+
+          <FormControl
+            size="small"
+            sx={{ width: { xs: "100%", sm: 350 }, mb: 3 }}
+          >
+            <InputLabel>Target Variable</InputLabel>
+            <Select
+              value={targetColumn}
+              label="Target Variable"
+              onChange={(e) => setTargetColumn(e.target.value)}
+            >
+              {columns.map((col) => (
+                <MenuItem key={col} value={col}>
+                  {col}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            Select Mode
+          </Typography>
+
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} sm={6}>
+              <Select
+                fullWidth
+                size="small"
+                value={mode}
+                onChange={handleModeChange}
+                displayEmpty
+              >
+                <MenuItem value="" disabled>
+                  Choose mode
+                </MenuItem>
+                <MenuItem value="button">Click of a Button</MenuItem>
+                <MenuItem value="genai">Gen-AI Led Prompt</MenuItem>
+              </Select>
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                startIcon={<RocketLaunchIcon />}
+                onClick={handleStartExploring}
+                disabled={!uploadedFile || !mode || !targetColumn}
+                fullWidth
+                sx={{ fontWeight: 600 }}
+              >
+                Start Exploring
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+
+      </Grid>
+    </CardContent>
+  </Card>
+
+  {/* Snackbar */}
+  <Snackbar
+    open={showSnackbar}
+    autoHideDuration={3000}
+    onClose={() => setShowSnackbar(false)}
+  >
+    <Alert
+      severity="success"
+      onClose={() => setShowSnackbar(false)}
+      variant="filled"
+    >
+      File uploaded successfully!
+    </Alert>
+  </Snackbar>
+</Container>
+
   );
 };
 
