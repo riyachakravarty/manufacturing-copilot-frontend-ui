@@ -738,33 +738,47 @@ export default function DataVisualizationAndEngineering() {
   };
 
   return (
-    <Grid container spacing={2} sx={{ height: "calc(100vh - 100px)", flexWrap: "nowrap" }}>
-      {/* LEFT PANEL */}
-      <Grid
-        item
-        xs={12}
-        md={4}
+    <Grid container spacing={2} wrap="nowrap" sx={{ 
+      //minHeight: 0, 
+      height: "100%" }}>
+    {/* Left Panel */}
+    <Grid item 
+      //xs={2}
+      //md={2}
+      sx={{
+        flex: "0 0 20%",   // Left fixed 20%
+        maxWidth: "20%",
+      minWidth: 260,
+        //height: "100%",
+        //display: "flex",
+        //flexDirection: "column",
+        //px: 1,
+        fontSize: "0.85rem",
+        //flexShrink: 0,
+        //minWidth: 320,
+        //transition: "width 0.3s ease",
+        //width: 320, // fixed like DVE
+        //minHeight: 0,
+        overflowY: "auto"
+}}>
+        <Card
         sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          overflowY: "auto",
-          px: 1,
-          fontSize: "0.85rem",
-          flexShrink: 0,
-          minWidth: 320, // maintain minimum width even if collapsed
-          transition: "width 0.3s ease",
-          width: expanded ? 320 : 320, // fixed width, no shrink on collapse to avoid UI issues
+          borderRadius: 3,
+          boxShadow: 2,
+          //flexGrow: 1,
+          //display: "flex",
+          //flexDirection: "column",
+          height: "100%"
         }}
       >
-        <Paper
-          sx={{
-            p: 1,
-            bgcolor: theme.palette.background.paper,
-            flexGrow: 1,
-          }}
-          elevation={3}
-        >
+      <CardContent
+        sx={{
+          height: "100%",
+          //flexGrow: 1,
+          overflowY: "auto",
+          //minHeight: 0,
+        }}
+      >
           {/* Variability Analysis */}
           <Accordion expanded={expanded === "variability"} onChange={handleExpand("variability")}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -1289,40 +1303,47 @@ export default function DataVisualizationAndEngineering() {
               </Grid>
             </AccordionDetails>
           </Accordion>
-        </Paper>
+          </CardContent>
+        </Card>
       </Grid>
 
       {/* RIGHT PANEL */}
       
-<Grid
+      <Grid
   item
-  xs={12}
-  md={8}
+  //xs={6}
+  //md={6}
   sx={{
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
+    flex: "1 1 50%",   // Middle flexible
+    //border: "2px solid red",
+    //height: "100%",
+    //display: "flex",
+    //flexDirection: "column",
     minWidth: 0,
-    minHeight: 0,
+    //minHeight: 0,
+    //flexShrink: 1,          // allow growth
+   //flexGrow: 1,
+   minHeight: 0,
+   overflowY: "auto",
+    //overflowX: "hidden",
   }}
 >
   <Paper
     sx={{
       p: 2,
       height: "100%",
-      display: "flex",
-      flexDirection: "column",
+      //display: "flex",
+      //flexDirection: "column",
       bgcolor: theme.palette.background.paper,
     }}
     elevation={3}
   >
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between",alignItems: "center", mb: 2, flexShrink: 0 }}>
       <Typography variant="h6" gutterBottom color="primary">
         Analysis Output
       </Typography>
-      {/* Latest Augmented Data Download */}
-      {latestAugmentedDf && (
-        
+
+      {/* Latest Augmented Data Download */}    
         <Button
           variant="contained"
           color="secondary"
@@ -1335,7 +1356,7 @@ export default function DataVisualizationAndEngineering() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "treated_data.csv"; // same name as backend header
+    link.download = "feature_data.csv"; // same name as backend header
     link.click();
   } catch (err) {
     console.error(err);
@@ -1346,9 +1367,64 @@ export default function DataVisualizationAndEngineering() {
         >
           Download Latest Data
         </Button>
-    )}
+</Box>
+    <Divider sx={{ mb: 2 }} />
+
+    {/* ================= DECISION LAYER ================= */}
+
+    <Box
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 10,
+    bgcolor: "background.paper",
+    pb: 2,
+  }}
+>
+{/* Prompting user to select target and features */}
+<Box
+  sx={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    mb: 2,
+    p: 2,
+    borderRadius: 2,
+    bgcolor: theme.palette.background.default,
+  }}
+>
+  <Typography variant="body2" color="text.secondary">
+    Select a target variable and relevant features from the left panel to generate model outcomes.
+  </Typography>
+
+  <Button
+    variant="contained"
+    color="primary"
+  >
+    Generate Recommendations
+  </Button>
+</Box>
+
+  {/* Recommendation Card */}
+  <Card sx={{ mb: 2, borderLeft: "6px solid", borderColor: "success.main" }}>
+  <CardContent>
+    <Typography variant="h6" color="success.main" gutterBottom>
+      Recommendations
+    </Typography>
+
+  </CardContent>
+</Card>
+
+  {/* Performance Snapshot */}
+  <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Typography variant="h6" color="primary" gutterBottom>
+            Performance Snapshot
+          </Typography>
+
+        </CardContent>
+      </Card>
       </Box>
-      <Divider sx={{ mb: 2 }} />
 
       <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
         {loading && <CircularProgress />}
@@ -1438,6 +1514,87 @@ export default function DataVisualizationAndEngineering() {
     </Box>
   </Paper>
 </Grid>
+
+{/* AI led Interpretation panel */}
+
+<Grid
+  item
+  //xs={4}
+  //md={4}
+  sx={{
+    flex: "0 0 30%",   // Right fixed 30%
+    maxWidth: "30%",
+      minWidth: 320,
+    //height: "100%",
+    //flexShrink: 0,
+    //display: "flex",
+    //flexDirection: "column",
+    fontSize: "0.85rem",
+    //width: 480,
+    //minHeight: 0,
+    //minWidth: 0,
+    overflowY: "auto"
+  }}
+>
+<Paper sx={{ p: 2, height: "100%", 
+  //overflowY: "auto" 
+  }}>
+<Box
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    bgcolor: "background.paper",
+    pb: 1,
+    mb: 2,
+    borderBottom: "1px solid",
+    borderColor: "divider",
+  }}
+>
+<Typography variant="h6" color="primary">
+    AI led Interpretation
+  </Typography>
+  </Box>
+
+  <Card sx={{ mt: 2 }}>
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        SHAP Feature Importance
+      </Typography>
+
+    </CardContent>
+  </Card>
+
+  <Card sx={{ mt: 2 }}>
+    <CardContent>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+        SHAP Dependence / Optimal Operating Ranges
+      </Typography>
+</CardContent>
+      </Card>
+
+{/* ML Model */}
+        <Card sx={{ mt: 2 }}>
+          <CardContent>
+            <Typography variant="subtitle1" fontWeight="bold">
+              ML Model Interpretation
+            </Typography>
+          </CardContent>
+        </Card>
+
+      {/* Deviation Windows */}
+          <Card sx={{ mt: 2 }}>
+            <CardContent>
+              <Typography variant="subtitle1" fontWeight="bold">
+                Train Test Timeseries Interpretation
+              </Typography>
+
+            </CardContent>
+          </Card>
+  </Paper>
+    </Grid> 
+
+
 </Grid>
   );
 }
