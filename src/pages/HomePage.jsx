@@ -164,7 +164,7 @@ const HomePage = () => {
         variant="h4"
         sx={{ fontWeight: 600, mb: 1 }}
       >
-        Welcome to Nexus AI
+        Welcome to CitizenOps.AI
       </Typography>
 
       <Typography

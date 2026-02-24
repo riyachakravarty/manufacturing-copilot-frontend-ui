@@ -9,7 +9,6 @@ import ExploratoryDataAnalysis from "../components/ExploratoryDataAnalysis";
 import FeatureEngineering from "../components/FeatureEngineering";
 import MLModelDevelopment from "../components/MLModelDevelopment";
 import { useTheme } from "@mui/material/styles";
-import { AppContext } from "../context/AppContext";
 
 
 
@@ -54,7 +53,7 @@ const MainPage = () => {
     <Box sx={{ padding: 4,height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <Typography variant="h4" sx={{ mb: 2, color: 'primary.main' }}>
-        Welcome to Nexus AI
+        Welcome to CitizenOps.AI
       </Typography>
 
       {targetColumn && (
