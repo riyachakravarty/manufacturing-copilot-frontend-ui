@@ -13,7 +13,7 @@ const TabbedInterface = ({ value, handleChange }) => {
       centered
       sx={{ marginBottom: 3 }}
     >
-      <Tab label="Data Visualization & Engineering" />
+      <Tab label="Data Readiness Assessment" />
       <Tab label="Exploratory Data Analysis" />
       <Tab label="Feature Engineering" />
       <Tab label="ML Model Development" />
