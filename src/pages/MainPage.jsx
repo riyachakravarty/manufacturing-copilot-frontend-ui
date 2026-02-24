@@ -13,7 +13,7 @@ import { useTheme } from "@mui/material/styles";
 
 
 const tabLabels = [
-  { label: "Data Visualization & Engineering", icon: <DataObject /> },
+  { label: "Data Readiness Assessment", icon: <DataObject /> },
   { label: "Exploratory Data Analysis", icon: <Insights /> },
   { label: "Feature Engineering", icon: <Build /> },
   { label: "ML Model Development", icon: <PrecisionManufacturing /> },
