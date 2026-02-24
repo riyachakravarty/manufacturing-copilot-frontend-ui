@@ -622,7 +622,8 @@ const MLModelDevelopment = () => {
         Analysis Output
       </Typography>
 
-      {/* Latest Augmented Data Download */}    
+      {/* Latest Augmented Data Download */}  
+      {latestAugmentedDf && (  
         <Button
           variant="contained"
           color="secondary"
@@ -646,6 +647,7 @@ const MLModelDevelopment = () => {
         >
           Download Latest Data
         </Button>
+         )}
 </Box>
     <Divider sx={{ mb: 2 }} />
 

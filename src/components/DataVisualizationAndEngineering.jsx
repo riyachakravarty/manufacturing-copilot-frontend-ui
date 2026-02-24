@@ -1345,7 +1345,8 @@ export default function DataVisualizationAndEngineering() {
         Analysis Output
       </Typography>
 
-      {/* Latest Augmented Data Download */}    
+      {/* Latest Augmented Data Download */}
+      {latestAugmentedDf && (    
         <Button
           variant="contained"
           color="secondary"
@@ -1369,6 +1370,7 @@ export default function DataVisualizationAndEngineering() {
         >
           Download Latest Data
         </Button>
+        )}
 </Box>
     <Divider sx={{ mb: 2 }} />
 
