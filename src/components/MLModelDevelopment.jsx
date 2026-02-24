@@ -687,7 +687,7 @@ const MLModelDevelopment = () => {
 </Box>
 
   {/* Recommendation Card */}
-  <Card sx={{ mb: 2, borderLeft: "6px solid", borderColor: "success.main" }}>
+  <Card sx={{ mb: 2 }}>
   <CardContent>
     <Typography variant="h6" color="success.main" gutterBottom>
       Recommendations
@@ -721,7 +721,7 @@ const MLModelDevelopment = () => {
   <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography variant="h6" color="primary" gutterBottom>
-            Performance Snapshot
+            Model Performance Snapshot
           </Typography>
 
 

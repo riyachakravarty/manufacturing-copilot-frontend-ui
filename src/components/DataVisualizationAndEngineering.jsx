@@ -4,7 +4,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { PlotContext } from "../context/PlotContext";
 
 import Plot from "react-plotly.js";
-//import { AppContext } from "../context/AppContext";
+import { AppContext } from "../context/AppContext";
 import {
   Dialog,
   DialogTitle,
@@ -41,6 +41,7 @@ const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 export default function DataVisualizationAndEngineering() {
   //const { uploadedFile } = useContext(AppContext);
   const theme = useTheme();
+  const {targetColumn} = useContext(AppContext);
 
   const [expanded, setExpanded] = useState("variability");
   const [columns, setColumns] = useState([]);
@@ -91,6 +92,12 @@ export default function DataVisualizationAndEngineering() {
   const [selectAllDateTimeIntervals, setSelectAllDateTimeIntervals] = useState(false);
   const [selectAllMissingValueIntervals, setSelectAllMissingValueIntervals] = useState(false);
   const [selectAllOutlierIntervals, setSelectAllOutlierIntervals] = useState(false);
+
+  //Decision summary
+  const [readinessData, setReadinessData] = useState(null);
+  const [readinessLoading, setReadinessLoading] = useState(false);
+  const [readinessError, setReadinessError] = useState(null);
+  
 
   // Handlers for "Select All" checkboxes
 
@@ -306,6 +313,47 @@ export default function DataVisualizationAndEngineering() {
       //}
     //});
   //};
+
+//Decision summary
+  useEffect(() => {
+    if (!targetColumn) return;
+  
+    const fetchReadiness = async () => {
+      try {
+        setReadinessLoading(true);
+        setReadinessError(null);
+  
+        const response = await fetch(
+          `${BACKEND_URL}/data/readiness_summary`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              target: targetColumn
+            })
+          }
+        );
+  
+        const data = await response.json();
+  
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch readiness summary");
+        }
+  
+        setReadinessData(data);
+  
+      } catch (err) {
+        console.error(err);
+        setReadinessError(err.message);
+      } finally {
+        setReadinessLoading(false);
+      }
+    };
+  
+    fetchReadiness();
+  
+  }, [targetColumn]);
+  
 
   // Variability Analysis handlers
   const handleCheckboxChange = (column) => {
@@ -1385,46 +1433,99 @@ export default function DataVisualizationAndEngineering() {
     pb: 2,
   }}
 >
-{/* Prompting user to select target and features */}
-<Box
-  sx={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    mb: 2,
-    p: 2,
-    borderRadius: 2,
-    bgcolor: theme.palette.background.default,
-  }}
->
-  <Typography variant="body2" color="text.secondary">
-    Select a target variable and relevant features from the left panel to generate model outcomes.
-  </Typography>
-
-  <Button
-    variant="contained"
-    color="primary"
-  >
-    Generate Recommendations
-  </Button>
-</Box>
 
   {/* Recommendation Card */}
-  <Card sx={{ mb: 2, borderLeft: "6px solid", borderColor: "success.main" }}>
+  <Card
+  sx={{
+    mb: 2,
+    borderLeft: `6px solid ${
+      readinessData?.recommendations?.final_status === "red"
+        ? "#d32f2f"
+        : readinessData?.recommendations?.final_status === "yellow"
+        ? "#ed6c02"
+        : "#2e7d32"
+    }`
+  }}
+>
   <CardContent>
     <Typography variant="h6" color="success.main" gutterBottom>
       Recommendations
     </Typography>
 
+
+    {readinessLoading && <CircularProgress size={24} />}
+
+    {readinessError && (
+      <Typography color="error">{readinessError}</Typography>
+    )}
+
+    {readinessData && (
+      <>
+        <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          Final Status:{" "}
+          <strong style={{ textTransform: "capitalize" }}>
+            {readinessData.recommendations.final_status}
+          </strong>
+        </Typography>
+
+        {/* Target Actions */}
+        <Typography variant="subtitle2" sx={{ mt: 2 }}>
+          Target Actions
+        </Typography>
+
+        {readinessData.recommendations.target.actions.map((item, index) => (
+          <Typography key={index} variant="body2" sx={{ mb: 1 }}>
+            • {item.action}
+          </Typography>
+        ))}
+
+        {/* Feature Actions */}
+        <Typography variant="subtitle2" sx={{ mt: 2 }}>
+          Feature Actions
+        </Typography>
+
+        {readinessData.recommendations.features.actions.map((item, index) => (
+          <Typography key={index} variant="body2" sx={{ mb: 1 }}>
+            • <strong>{item.feature}:</strong>{" "}
+            {item.actions.join(" ")}
+          </Typography>
+        ))}
+      </>
+    )}
+
   </CardContent>
 </Card>
 
-  {/* Performance Snapshot */}
+  {/* Supporting Evidence */}
   <Card sx={{ mb: 2 }}>
         <CardContent>
           <Typography variant="h6" color="primary" gutterBottom>
-            Performance Snapshot
+            Supporting Evidence
           </Typography>
+
+          {readinessData && (
+      <>
+        {/* Target Observation */}
+        <Typography variant="subtitle2" sx={{ mt: 1 }}>
+          Target Observations
+        </Typography>
+
+        <Typography variant="body2" sx={{ mb: 2 }}>
+          {readinessData.observations.target}
+        </Typography>
+
+        {/* Feature Observations */}
+        <Typography variant="subtitle2">
+          Feature Observations
+        </Typography>
+
+        {readinessData.observations.features.map((item, index) => (
+          <Typography key={index} variant="body2" sx={{ mb: 1 }}>
+            • <strong>{item.feature}:</strong> {item.observation}
+          </Typography>
+        ))}
+      </>
+    )}
 
         </CardContent>
       </Card>
