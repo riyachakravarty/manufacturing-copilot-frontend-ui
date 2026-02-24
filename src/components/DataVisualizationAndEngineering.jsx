@@ -11,6 +11,8 @@ import {
   DialogContent,
   DialogActions,
   Box,
+  Card,
+  CardContent,
   Grid,
   Paper,
   Typography,
