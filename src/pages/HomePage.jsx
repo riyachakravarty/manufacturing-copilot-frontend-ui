@@ -160,12 +160,14 @@ const HomePage = () => {
     <CardContent sx={{ p: 0 }}>
 
       {/* Header */}
-      <Typography
-        variant="h4"
-        sx={{ fontWeight: 600, mb: 1 }}
-      >
-        Welcome to CitizenOps.AI
-      </Typography>
+          <Typography
+      variant="h4"
+      color="primary"
+      sx={{ fontWeight: 600, mb: 1 }}
+    >
+      Welcome to CitizenOps.AI
+    </Typography>
+
 
       <Typography
         variant="body1"
