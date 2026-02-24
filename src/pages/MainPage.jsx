@@ -8,6 +8,9 @@ import DataVisualizationAndEngineering from '../components/DataVisualizationAndE
 import ExploratoryDataAnalysis from "../components/ExploratoryDataAnalysis";
 import FeatureEngineering from "../components/FeatureEngineering";
 import MLModelDevelopment from "../components/MLModelDevelopment";
+import { useTheme } from "@mui/material/styles";
+import { AppContext } from "../context/AppContext";
+
 
 
 const tabLabels = [
@@ -20,6 +23,9 @@ const tabLabels = [
 const MainPage = () => {
   const { selectedFile, selectedMode } = useContext(AppContext);
   const [currentTab, setCurrentTab] = React.useState(0);
+  const theme = useTheme();
+  const { targetColumn } = useContext(AppContext);
+
 
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue);
@@ -50,6 +56,38 @@ const MainPage = () => {
       <Typography variant="h4" sx={{ mb: 2, color: 'primary.main' }}>
         Welcome to Nexus AI
       </Typography>
+
+      {targetColumn && (
+  <Box
+    sx={{
+      mb: 2,
+      px: 2,
+      py: 1.5,
+      borderRadius: 3,
+      display: "flex",
+      alignItems: "center",
+      gap: 1.5,
+      bgcolor: theme.palette.primary.light + "15",
+      border: `1px solid ${theme.palette.divider}`,
+      borderLeft: `4px solid ${theme.palette.primary.main}`
+    }}
+  >
+    <Typography
+      variant="body2"
+      sx={{ color: "text.secondary", fontWeight: 500 }}
+    >
+      🎯 Target / Objective:
+    </Typography>
+
+    <Typography
+      variant="subtitle1"
+      sx={{ fontWeight: 600, color: theme.palette.primary.main }}
+    >
+      {targetColumn}
+    </Typography>
+  </Box>
+)}
+
 
       {/* File + Mode */}
       <Box sx={{ mb: 3 }}>
