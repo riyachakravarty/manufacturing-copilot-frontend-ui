@@ -39,6 +39,7 @@ const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const ExploratoryDataAnalysis = () => {
   const {targetColumn} = useContext(AppContext);
+  const [edaSummary, setEdaSummary] = useState(null);
   const [edaColumns, setEdaColumns] = useState([]);
   const [edaOutput, setEdaOutput] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -292,6 +293,43 @@ const generatemultivariateanalysis = async () => {
     console.error("Error generating multivariate analysis:", err);
   }
 };
+
+// Decision summary
+useEffect(() => {
+  if (!targetColumn) return;
+
+  const fetchEDASummary = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`${BACKEND_URL}/eda/decision_summary`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          target: targetColumn
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to load EDA summary");
+
+      setEdaSummary(data);
+
+    } catch (err) {
+      console.error(err);
+      setEdaError(err.message);
+    } finally {
+      setEdaLoading(false);
+    }
+  };
+
+  fetchEDASummary();
+
+}, [targetColumn]);
+
 
 
   return (
@@ -783,6 +821,106 @@ const generatemultivariateanalysis = async () => {
         </Button>
       </Box>
       <Divider sx={{ mb: 2 }} />
+
+       {/* ================= DECISION LAYER ================= */}
+
+      <Card sx={{ mb: 2 }}>
+  <CardContent>
+    <Typography variant="h6" color="primary" gutterBottom>
+      Key Drivers of High vs Low Performance
+    </Typography>
+
+    {loading && <CircularProgress size={24} />}
+
+    {error && (
+      <Typography color="error">{edaError}</Typography>
+    )}
+
+    {edaSummary?.recommendations?.length === 0 && !loading && (
+      <Typography variant="body2" color="text.secondary">
+        No significant variable differences detected between top and bottom performance ranges.
+      </Typography>
+    )}
+
+    {edaSummary?.recommendations?.length > 0 && (
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell><strong>Feature</strong></TableCell>
+            <TableCell>Top 10% Avg</TableCell>
+            <TableCell>Bottom 10% Avg</TableCell>
+            <TableCell>% Difference</TableCell>
+            <TableCell>Direction</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {edaSummary.recommendations.map((row, index) => (
+            <TableRow
+              key={index}
+              sx={{
+                bgcolor:
+                  Math.abs(row.percent_difference) > 25
+                    ? "#ffebee"
+                    : "inherit"
+              }}
+            >
+              <TableCell>{row.feature}</TableCell>
+              <TableCell>{row.top_median}</TableCell>
+              <TableCell>{row.bottom_median}</TableCell>
+              <TableCell>{row.percent_difference}%</TableCell>
+              <TableCell>{row.direction}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    )}
+  </CardContent>
+</Card>
+
+
+<Card sx={{ mb: 2 }}>
+  <CardContent>
+    <Typography variant="h6" color="primary" gutterBottom>
+      Continuous Operating Ranges (Target Stability Zones)
+    </Typography>
+
+    {edaSummary?.supporting_evidence?.length > 0 && (
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell>Start</TableCell>
+            <TableCell>End</TableCell>
+            <TableCell>Duration (min)</TableCell>
+            <TableCell>Median Target</TableCell>
+            <TableCell>Classification</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {edaSummary.supporting_evidence.map((row, index) => (
+            <TableRow
+              key={index}
+              sx={{
+                bgcolor:
+                  row.classification === "top_10%"
+                    ? "#e8f5e9"
+                    : row.classification === "bottom_10%"
+                    ? "#ffebee"
+                    : "inherit"
+              }}
+            >
+              <TableCell>{row.start}</TableCell>
+              <TableCell>{row.end}</TableCell>
+              <TableCell>{row.duration_min}</TableCell>
+              <TableCell>{row.median_target}</TableCell>
+              <TableCell>{row.classification}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    )}
+  </CardContent>
+</Card>
+
 
       <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
         {/*loading && <CircularProgress /> */}
