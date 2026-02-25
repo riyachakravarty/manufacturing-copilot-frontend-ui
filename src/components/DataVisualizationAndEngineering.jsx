@@ -364,11 +364,11 @@ export default function DataVisualizationAndEngineering() {
   
 
   // Variability Analysis handlers
-  const handleCheckboxChange = (column) => {
-    setSelectedColumns((prev) =>
-      prev.includes(column) ? prev.filter((c) => c !== column) : [...prev, column]
-    );
-  };
+  //const handleCheckboxChange = (column) => {
+    //setSelectedColumns((prev) =>
+      //prev.includes(column) ? prev.filter((c) => c !== column) : [...prev, column]
+    //);
+  //};
 
   const runVariabilityAnalysis = async () => {
     if (selectedColumns.length === 0) {
