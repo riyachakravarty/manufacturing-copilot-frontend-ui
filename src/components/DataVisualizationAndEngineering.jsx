@@ -387,7 +387,7 @@ export default function DataVisualizationAndEngineering() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          variable: variabilityColumn
+          variable: selectedColumns
         })
       });
   
