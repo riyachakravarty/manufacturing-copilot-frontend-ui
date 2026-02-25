@@ -34,6 +34,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  TableContainer,
   CircularProgress,
   Alert
 } from "@mui/material";
@@ -1083,8 +1084,11 @@ useEffect(() => {
       <Typography variant="h6" color="primary" gutterBottom>
         Performance Gradient Insights
       </Typography>
-
-      <Table size="small">
+      <TableContainer
+            component={Paper}
+            sx={{ maxHeight: 240, overflowY: "auto", borderRadius: 2 }}
+          >
+       <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell><strong>Feature</strong></TableCell>
@@ -1099,10 +1103,13 @@ useEffect(() => {
           {qcutSummary.map((row, index) => (
             <TableRow
               key={index}
+              hover
               sx={{
-                bgcolor:
-                  Math.abs(row.percent_difference_top_vs_bottom) > 25
-                    ? "#ffebee"
+                backgroundColor:
+                  row.duration_minutes > 120
+                    ? "rgba(211, 47, 47, 0.08)"
+                    : row.duration_minutes > 30
+                    ? "rgba(237, 108, 2, 0.08)"
                     : "inherit"
               }}
             >
@@ -1118,6 +1125,7 @@ useEffect(() => {
           ))}
         </TableBody>
       </Table>
+      </TableContainer>
     </CardContent>
   </Card>
 )}
