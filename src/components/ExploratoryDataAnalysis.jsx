@@ -325,9 +325,9 @@ useEffect(() => {
 
     } catch (err) {
       console.error(err);
-      setEdaError(err.message);
+      setError(err.message);
     } finally {
-      setEdaLoading(false);
+      setLoading(false);
     }
   };
 
@@ -835,10 +835,9 @@ useEffect(() => {
       Key Drivers of High vs Low Performance
     </Typography>
 
-    {loading && <CircularProgress size={24} />}
-
+    
     {error && (
-      <Typography color="error">{edaError}</Typography>
+      <Typography color="error">{error}</Typography>
     )}
 
     {edaSummary?.recommendations?.length === 0 && !loading && (
