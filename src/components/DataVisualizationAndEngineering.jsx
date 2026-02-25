@@ -426,7 +426,6 @@ export default function DataVisualizationAndEngineering() {
       const data = await response.json();
   
       if (!response.ok) throw new Error(data.error || "Failed to run missing analysis");
-      const result = await response.json();
 
       setLastPlot(data.plot);
       setMissingDiagnostics({
