@@ -34,6 +34,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  CircularProgress
 } from "@mui/material";
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -847,6 +848,8 @@ useEffect(() => {
     <Typography variant="h6" color="primary" gutterBottom>
       Key Drivers of High vs Low Performance
     </Typography>
+
+    {loading && <CircularProgress size={24} />}
 
     
     {error && (
