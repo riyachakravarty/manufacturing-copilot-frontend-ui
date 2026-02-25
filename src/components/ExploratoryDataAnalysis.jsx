@@ -1,6 +1,6 @@
 // src/components/ExploratoryDataAnalysis.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Plot from "react-plotly.js";
 //import axios from "axios";
 import {
@@ -33,12 +33,13 @@ import {
 import { DataGridPro } from '@mui/x-data-grid-pro';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
+import { AppContext } from "../context/AppContext";
 
 const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 
 const ExploratoryDataAnalysis = () => {
+  const {targetColumn} = useContext(AppContext);
   const [edaColumns, setEdaColumns] = useState([]);
-  const [targetColumn, setTargetColumn] = useState("");
   const [edaOutput, setEdaOutput] = useState(null);
   const [loading, setLoading] = useState(false);
   const [performanceDirection, setPerformanceDirection] = useState("higher");
@@ -335,21 +336,6 @@ const generatemultivariateanalysis = async () => {
           //minHeight: 0,
         }}
       >
-            {/* Target Dropdown */}
-            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-              <InputLabel>Target / Objective</InputLabel>
-              <Select
-                value={targetColumn}
-                label="Target / Objective"
-                onChange={(e) => setTargetColumn(e.target.value)}
-              >
-                {edaColumns.map((col) => (
-                  <MenuItem key={col} value={col}>
-                    {col}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
 
             {/* Performance Direction Toggle */}
             <ToggleButtonGroup
@@ -754,27 +740,34 @@ const generatemultivariateanalysis = async () => {
 {/* Right Panel */}
 <Grid
   item
-  xs={12}
-  md={8}
+  //xs={6}
+  //md={6}
   sx={{
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
+    flex: "1 1 50%",   // Middle flexible
+    //border: "2px solid red",
+    //height: "100%",
+    //display: "flex",
+    //flexDirection: "column",
     minWidth: 0,
-    minHeight: 0,
+    //minHeight: 0,
+    //flexShrink: 1,          // allow growth
+   //flexGrow: 1,
+   minHeight: 0,
+   overflowY: "auto",
+    //overflowX: "hidden",
   }}
 >
   <Paper
     sx={{
       p: 2,
       height: "100%",
-      display: "flex",
-      flexDirection: "column",
+      //display: "flex",
+      //flexDirection: "column",
       bgcolor: theme.palette.background.paper,
     }}
     elevation={3}
   >
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between",alignItems: "center", mb: 2, flexShrink: 0 }}>
       <Typography variant="h6" gutterBottom color="primary">
         Analysis Output
       </Typography>
@@ -881,6 +874,83 @@ const generatemultivariateanalysis = async () => {
     </Box>
   </Paper>
 </Grid>
+
+{/* AI led Interpretation panel */}
+
+<Grid
+  item
+  //xs={4}
+  //md={4}
+  sx={{
+    flex: "0 0 30%",   // Right fixed 30%
+    maxWidth: "30%",
+      minWidth: 320,
+    //height: "100%",
+    //flexShrink: 0,
+    //display: "flex",
+    //flexDirection: "column",
+    fontSize: "0.85rem",
+    //width: 480,
+    //minHeight: 0,
+    //minWidth: 0,
+    overflowY: "auto"
+  }}
+>
+<Paper sx={{ p: 2, height: "100%", 
+  //overflowY: "auto" 
+  }}>
+<Box
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    bgcolor: "background.paper",
+    pb: 1,
+    mb: 2,
+    borderBottom: "1px solid",
+    borderColor: "divider",
+  }}
+>
+<Typography variant="h6" color="primary">
+    AI led Interpretation
+  </Typography>
+  </Box>
+
+    <Card sx={{ mb: 2 }}>
+      <CardContent>
+        <Typography variant="subtitle1" fontWeight="bold" color="error">
+          Missing Timestamp Gaps
+        </Typography>
+
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardContent>
+        <Typography variant="subtitle1" fontWeight="bold" color="warning.main">
+          Missing Values in Column
+        </Typography>
+
+        
+      </CardContent>
+    </Card>
+ 
+  <Card sx={{ mb: 2 }}>
+    <CardContent>
+
+      <Typography variant="subtitle1" fontWeight="bold" color="primary">
+        Variability Insights
+      </Typography>
+
+      
+    </CardContent>
+  </Card>
+
+
+
+  </Paper>
+    </Grid> 
+
     </Grid>
   );
 };
