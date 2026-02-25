@@ -45,6 +45,7 @@ const BACKEND_URL = "https://manufacturing-copilot-backend.onrender.com";
 const ExploratoryDataAnalysis = () => {
   const {targetColumn} = useContext(AppContext);
   const [edaSummary, setEdaSummary] = useState(null);
+  const [qcutSummary, setQcutSummary] = useState(null);
   const [edaColumns, setEdaColumns] = useState([]);
   const [edaOutput, setEdaOutput] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -109,6 +110,8 @@ const ExploratoryDataAnalysis = () => {
 const generateQcutBoxPlots = async () => {
   setLoading(true);
   setError("");
+  setEdaOutput(null);
+  setQcutSummary(null);
   try {
     if (!targetColumn || selectedQcutColumns.length === 0) {
       console.error("Target or columns not selected for Q-cut analysis");
@@ -131,12 +134,12 @@ const generateQcutBoxPlots = async () => {
     console.log("Q-cut plot response:", result);
 
     // 🔑 Example: if backend returns {"type": "plot", "data": ...}
-    if (result.type === "plot") {
-      setEdaOutput({
+    
+    setEdaOutput({
         data: result.data,
         //layout: data.layout,
       });
-    }
+      setQcutSummary(result.interpretation);
   } catch (err) {
     console.error("Error generating Q-cut box plots:", err);
   }
@@ -829,6 +832,16 @@ useEffect(() => {
 
        {/* ================= DECISION LAYER ================= */}
 
+       <Box
+  sx={{
+    position: "sticky",
+    top: 0,
+    zIndex: 10,
+    bgcolor: "background.paper",
+    pb: 2,
+  }}
+>
+
       <Card sx={{ mb: 2 }}>
   <CardContent>
     <Typography variant="h6" color="primary" gutterBottom>
@@ -924,6 +937,7 @@ useEffect(() => {
     )}
   </CardContent>
 </Card>
+</Box>
 
 
       <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
@@ -1058,36 +1072,51 @@ useEffect(() => {
   </Typography>
   </Box>
 
-    <Card sx={{ mb: 2 }}>
-      <CardContent>
-        <Typography variant="subtitle1" fontWeight="bold" color="error">
-          Missing Timestamp Gaps
-        </Typography>
-
-      </CardContent>
-    </Card>
-
-    <Card>
-      <CardContent>
-        <Typography variant="subtitle1" fontWeight="bold" color="warning.main">
-          Missing Values in Column
-        </Typography>
-
-        
-      </CardContent>
-    </Card>
- 
+    {/* QCut Interpretation */}
+{qcutSummary && (
   <Card sx={{ mb: 2 }}>
     <CardContent>
-
-      <Typography variant="subtitle1" fontWeight="bold" color="primary">
-        Variability Insights
+      <Typography variant="h6" color="primary" gutterBottom>
+        Performance Gradient Insights
       </Typography>
 
-      
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell><strong>Feature</strong></TableCell>
+            <TableCell>Trend</TableCell>
+            <TableCell>% Diff between top & bottom</TableCell>
+            <TableCell>Separation</TableCell>
+            <TableCell>Spread</TableCell>
+            <TableCell>Distribution</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {qcutSummary.map((row, index) => (
+            <TableRow
+              key={index}
+              sx={{
+                bgcolor:
+                  Math.abs(row.percent_difference_top_vs_bottom) > 25
+                    ? "#ffebee"
+                    : "inherit"
+              }}
+            >
+              <TableCell>{row.feature}</TableCell>
+              <TableCell>{row.trend}</TableCell>
+              <TableCell>
+                {row.percent_difference_top_vs_bottom}%
+              </TableCell>
+              <TableCell>{row.separation_strength}</TableCell>
+              <TableCell>{row.spread_behavior}</TableCell>
+              <TableCell>{row.distribution_shape}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </CardContent>
   </Card>
-
+)}
 
 
   </Paper>
