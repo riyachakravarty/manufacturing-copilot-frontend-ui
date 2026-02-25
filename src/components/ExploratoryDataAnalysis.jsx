@@ -944,8 +944,8 @@ useEffect(() => {
 
 
       <Box sx={{ flexGrow: 1, overflowY: "auto", minHeight: 400 }}>
-        {/*loading && <CircularProgress /> */}
-        {/* error && <Alert severity="error">{error}</Alert> */}
+        {loading && <CircularProgress />}
+        {error && <Alert severity="error">{error}</Alert>}
 
         {edaOutput ? (
           <>
