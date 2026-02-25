@@ -851,22 +851,21 @@ export default function DataVisualizationAndEngineering() {
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <FormGroup>
+              <RadioGroup
+                value={selectedColumns}
+                onChange={(e) => setSelectedColumns(e.target.value)}
+                sx={{ maxWidth: "100%" }}
+              >
                 {columns.map((col) => (
                   <FormControlLabel
                     key={col}
-                    control={
-                      <Checkbox
-                        checked={selectedColumns.includes(col)}
-                        onChange={() => handleCheckboxChange(col)}
-                        size="small"
-                      />
-                    }
+                    value={col}
+                    control={<Radio size="small" />}
                     label={col}
                     sx={{ fontSize: "0.85rem" }}
                   />
                 ))}
-              </FormGroup>
+              </RadioGroup>
               <Button variant="contained" size="small" sx={{ mt: 1 }} onClick={runVariabilityAnalysis}>
                 Run Variability Analysis
               </Button>
