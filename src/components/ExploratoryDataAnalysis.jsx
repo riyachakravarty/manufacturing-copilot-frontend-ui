@@ -865,7 +865,11 @@ useEffect(() => {
     )}
 
     {edaSummary?.recommendations?.length > 0 && (
-      <Table size="small">
+      <TableContainer
+      component={Paper}
+      sx={{ maxHeight: 240, overflowY: "auto", borderRadius: 2 }}
+    >
+      <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell><strong>Feature</strong></TableCell>
@@ -895,6 +899,7 @@ useEffect(() => {
           ))}
         </TableBody>
       </Table>
+      </TableContainer>
     )}
   </CardContent>
 </Card>
@@ -907,7 +912,11 @@ useEffect(() => {
     </Typography>
 
     {edaSummary?.supporting_evidence?.length > 0 && (
-      <Table size="small">
+      <TableContainer
+      component={Paper}
+      sx={{ maxHeight: 240, overflowY: "auto", borderRadius: 2 }}
+    >
+      <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell>Start</TableCell>
@@ -939,6 +948,7 @@ useEffect(() => {
           ))}
         </TableBody>
       </Table>
+      </TableContainer>
     )}
   </CardContent>
 </Card>
