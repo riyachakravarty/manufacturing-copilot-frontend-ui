@@ -65,6 +65,7 @@ export default function DataVisualizationAndEngineering() {
   const [outlierColumn, setOutlierColumn] = useState("");
   const [outlierMethod, setOutlierMethod] = useState("zscore");
   const [missingDiagnostics, setMissingDiagnostics] = useState(null);
+  const [variabilitySummary, setVariabilitySummary] = useState(null);
   //const [outlierPlot, setOutlierPlot] = useState(null);
 
   // For treatment cards
@@ -378,22 +379,26 @@ export default function DataVisualizationAndEngineering() {
     setLoading(true);
     //setPlotData(null);
     setLastPlot(null);
+    setVariabilitySummary(null);
     try {
-      const prompt = `Perform variability analysis where selected variable is ${selectedColumns[0]}`;
-      const response = await fetch(`${BACKEND_URL}/chat`, {
+      const response = await fetch(`${BACKEND_URL}/data/variability_analysis`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          variable: variabilityColumn
+        })
       });
-      if (!response.ok) throw new Error(`Server error: ${response.status}`);
-      const result = await response.json();
-      if (result.type === "plot" && result.data) {
-        //setPlotData(result.data);
-        setLastPlot(result.data);
+  
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to run variability analysis");
+  
+      
+      setLastPlot(data.plot);
+      setVariabilitySummary(data.variability_summary);
         
-      } else {
-        setError("Unexpected response from server.");
-      }
+      
     } catch (err) {
       console.error(err);
       setError("Error running variability analysis.");
@@ -1798,6 +1803,35 @@ export default function DataVisualizationAndEngineering() {
     </Card>
   </>
 )}
+
+{variabilitySummary && (
+  <Card sx={{ mb: 2 }}>
+    <CardContent>
+
+      <Typography variant="subtitle1" fontWeight="bold" color="primary">
+        Variability Insights
+      </Typography>
+
+      {/* Summary Text */}
+      <Typography variant="body2" sx={{ mt: 2 }}>
+        {variabilitySummary.summary_text}
+      </Typography>
+
+      <Divider sx={{ my: 2 }} />
+
+      {/* Key Metrics Grid */}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+
+        <Typography variant="body2">
+          <strong>High Variance Zones:</strong>{" "}
+          {variabilitySummary.high_variance_zones}
+        </Typography>
+
+      </Box>
+    </CardContent>
+  </Card>
+)}
+
 
   </Paper>
     </Grid> 
