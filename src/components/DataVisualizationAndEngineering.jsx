@@ -30,6 +30,12 @@ import {
   Radio,
   MenuItem,
   Select,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer
   //FormControl,
   //InputLabel
 } from "@mui/material";
@@ -58,6 +64,7 @@ export default function DataVisualizationAndEngineering() {
   const [treatmentMode, setTreatmentMode] = useState("datetime");
   const [outlierColumn, setOutlierColumn] = useState("");
   const [outlierMethod, setOutlierMethod] = useState("zscore");
+  const [missingDiagnostics, setMissingDiagnostics] = useState(null);
   //const [outlierPlot, setOutlierPlot] = useState(null);
 
   // For treatment cards
@@ -405,25 +412,28 @@ export default function DataVisualizationAndEngineering() {
     setError("");
     //setPlotData(null);
     setLastPlot(null);
+    setMissingDiagnostics(null);
 
     try {
-      const prompt = `Missing value analysis where selected variable is ${missingValueColumn}`;
-      const response = await fetch(`${BACKEND_URL}/chat`, {
+      const response = await fetch(`${BACKEND_URL}/data/missing_analysis`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          variable: missingValueColumn,
+        }),
       });
-      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+  
+      const data = await response.json();
+  
+      if (!response.ok) throw new Error(data.error || "Failed to run missing analysis");
       const result = await response.json();
 
-      if (result.type === "plot" && result.data) {
-        //setPlotData(result.data);
-        setLastPlot(result.data);
+      setLastPlot(data.plot);
+      setMissingDiagnostics({
+        missing_datetime: data.missing_datetime,
+        missing_values: data.missing_values,
+      });
         
-        setExpanded(false); // Collapse left accordion to free space
-      } else {
-        setError("Unexpected response from server.");
-      }
     } catch (err) {
       console.error(err);
       setError("Error running missing value analysis.");
@@ -1661,41 +1671,135 @@ export default function DataVisualizationAndEngineering() {
   </Typography>
   </Box>
 
-  <Card sx={{ mt: 2 }}>
-    <CardContent>
-      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-        SHAP Feature Importance
-      </Typography>
+  {missingDiagnostics && (
+  <>
+    {/* =============================== */}
+    {/* Missing Timestamp Card */}
+    {/* =============================== */}
+    <Card sx={{ mb: 2 }}>
+      <CardContent>
+        <Typography variant="subtitle1" fontWeight="bold" color="error">
+          Missing Timestamp Gaps
+        </Typography>
 
-    </CardContent>
-  </Card>
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          {missingDiagnostics.missing_datetime.summary_text}
+        </Typography>
 
-  <Card sx={{ mt: 2 }}>
-    <CardContent>
-      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
-        SHAP Dependence / Optimal Operating Ranges
-      </Typography>
-</CardContent>
-      </Card>
 
-{/* ML Model */}
-        <Card sx={{ mt: 2 }}>
-          <CardContent>
-            <Typography variant="subtitle1" fontWeight="bold">
-              ML Model Interpretation
-            </Typography>
-          </CardContent>
-        </Card>
+        <Divider sx={{ my: 2 }} />
 
-      {/* Deviation Windows */}
-          <Card sx={{ mt: 2 }}>
-            <CardContent>
-              <Typography variant="subtitle1" fontWeight="bold">
-                Train Test Timeseries Interpretation
-              </Typography>
+        {/* Table */}
+        {missingDiagnostics.missing_datetime.interval_table?.length > 0 && (
+          <TableContainer
+            component={Paper}
+            sx={{ maxHeight: 240, overflowY: "auto", borderRadius: 2 }}
+          >
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Start</TableCell>
+                  <TableCell>End</TableCell>
+                  <TableCell align="right">Duration (min)</TableCell>
+                  <TableCell>Month</TableCell>
+                </TableRow>
+              </TableHead>
 
-            </CardContent>
-          </Card>
+              <TableBody>
+                {missingDiagnostics.missing_datetime.interval_table.map(
+                  (row, index) => (
+                    <TableRow
+                      key={index}
+                      hover
+                      sx={{
+                        backgroundColor:
+                          row.duration_minutes > 120
+                            ? "rgba(211, 47, 47, 0.08)"  // red
+                            : row.duration_minutes > 30
+                            ? "rgba(237, 108, 2, 0.08)"  // orange
+                            : "inherit"
+                      }}
+                    >
+                      <TableCell>{row.start}</TableCell>
+                      <TableCell>{row.end}</TableCell>
+                      <TableCell align="right">
+                        {row.duration_minutes}
+                      </TableCell>
+                      <TableCell>{row.month}</TableCell>
+                    </TableRow>
+                  )
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </CardContent>
+    </Card>
+
+    {/* =============================== */}
+    {/* Missing Value Card */}
+    {/* =============================== */}
+    <Card>
+      <CardContent>
+        <Typography variant="subtitle1" fontWeight="bold" color="warning.main">
+          Missing Values in Column
+        </Typography>
+
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          {missingDiagnostics.missing_values.summary_text}
+        </Typography>
+
+
+        <Divider sx={{ my: 2 }} />
+
+        {missingDiagnostics.missing_values.interval_table?.length > 0 && (
+          <TableContainer
+            component={Paper}
+            sx={{ maxHeight: 240, overflowY: "auto", borderRadius: 2 }}
+          >
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Start</TableCell>
+                  <TableCell>End</TableCell>
+                  <TableCell align="right">Duration (min)</TableCell>
+                  <TableCell>Month</TableCell>
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {missingDiagnostics.missing_values.interval_table.map(
+                  (row, index) => (
+                    <TableRow
+                      key={index}
+                      hover
+                      sx={{
+                        backgroundColor:
+                          row.duration_minutes > 120
+                            ? "rgba(211, 47, 47, 0.08)"
+                            : row.duration_minutes > 30
+                            ? "rgba(237, 108, 2, 0.08)"
+                            : "inherit"
+                      }}
+                    >
+                      <TableCell>{row.start}</TableCell>
+                      <TableCell>{row.end}</TableCell>
+                      <TableCell align="right">
+                        {row.duration_minutes}
+                      </TableCell>
+                      <TableCell>{row.month}</TableCell>
+                    </TableRow>
+                  )
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </CardContent>
+    </Card>
+  </>
+)}
+
   </Paper>
     </Grid> 
 
